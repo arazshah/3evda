@@ -95,7 +95,8 @@ def test_first_login_requires_enrollment_and_returns_recovery_codes(api, owner):
     setup = api.get("/api/auth/totp/setup").json()
     assert setup["otpauth_uri"].startswith("otpauth://totp/")
     assert "3evda.com" in setup["otpauth_uri"]
-    assert setup["qr_svg"].lstrip().startswith("<svg") or "<svg" in setup["qr_svg"]
+    assert setup["qr_data_uri"].startswith("data:image/svg+xml")
+    assert "xmlns" in setup["qr_data_uri"]  # required for the SVG to render inside <img>
     assert len(setup["secret"]) >= 16
 
     # Refreshing the setup page keeps the same secret.

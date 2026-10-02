@@ -275,7 +275,6 @@ export interface components {
       readonly lqip: string;
       readonly watermarked: boolean;
       readonly error: string;
-      /** @default 0 */
       readonly usage_count: number;
       readonly variants: components["schemas"]["MediaVariant"][];
       /** Format: date-time */
@@ -338,8 +337,7 @@ export interface components {
       readonly lqip?: string;
       readonly watermarked?: boolean;
       readonly error?: string;
-      /** @default 0 */
-      readonly usage_count: number;
+      readonly usage_count?: number;
       readonly variants?: components["schemas"]["MediaVariant"][];
       /** Format: date-time */
       readonly created_at?: string;
@@ -381,7 +379,7 @@ export interface components {
     TotpSetup: {
       otpauth_uri: string;
       secret: string;
-      qr_svg: string;
+      qr_data_uri: string;
     };
     WatermarkSetting: {
       enabled?: boolean;

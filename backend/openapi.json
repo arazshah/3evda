@@ -1083,8 +1083,7 @@
                     },
                     "usage_count": {
                         "type": "integer",
-                        "readOnly": true,
-                        "default": 0
+                        "readOnly": true
                     },
                     "variants": {
                         "type": "array",
@@ -1316,8 +1315,7 @@
                     },
                     "usage_count": {
                         "type": "integer",
-                        "readOnly": true,
-                        "default": 0
+                        "readOnly": true
                     },
                     "variants": {
                         "type": "array",
@@ -1412,13 +1410,13 @@
                     "secret": {
                         "type": "string"
                     },
-                    "qr_svg": {
+                    "qr_data_uri": {
                         "type": "string"
                     }
                 },
                 "required": [
                     "otpauth_uri",
-                    "qr_svg",
+                    "qr_data_uri",
                     "secret"
                 ]
             },

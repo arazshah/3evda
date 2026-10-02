@@ -6,8 +6,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 // Persian is served without a prefix (/about), English under /en (/en/about).
 // Internally every page lives under app/[locale]; these rules map the public URLs onto it.
 // Paths with a file extension (favicon.svg, robots.txt, …) are public files and are not rewritten.
+// /panel is the admin app (Persian only) and is not locale-prefixed either.
 const UNPREFIXED =
-  "/:path((?!en(?:/|$)|fa(?:/|$)|api/|django-admin/|static/|media/|health$|_next/|.*\\.[^/]+$).*)";
+  "/:path((?!en(?:/|$)|fa(?:/|$)|panel(?:/|$)|api/|django-admin/|static/|media/|storage-signed/|health$|_next/|.*\\.[^/]+$).*)";
 
 // `next dev` only: forward API/media requests to the compose gateway (production routes them in Caddy).
 const DEV_GATEWAY = process.env.DEV_GATEWAY_URL ?? "http://localhost:8080";

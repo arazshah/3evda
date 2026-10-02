@@ -13,7 +13,7 @@ class MediaVariantSerializer(serializers.ModelSerializer):  # type: ignore[type-
 
 class MediaAssetSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     variants = MediaVariantSerializer(many=True, read_only=True)
-    usage_count = serializers.IntegerField(read_only=True, default=0)
+    usage_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = MediaAsset

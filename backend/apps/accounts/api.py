@@ -101,7 +101,7 @@ class RecoveryCodesSerializer(serializers.Serializer):  # type: ignore[type-arg]
 class TotpSetupSerializer(serializers.Serializer):  # type: ignore[type-arg]
     otpauth_uri = serializers.CharField()
     secret = serializers.CharField()
-    qr_svg = serializers.CharField()
+    qr_data_uri = serializers.CharField()
 
 
 def _state_body(request: HttpRequest) -> dict[str, Any]:
@@ -186,8 +186,8 @@ class TotpSetupView(APIView):
             device = TOTPDevice.objects.create(user=user, name="authenticator", confirmed=False)
         uri = device.config_url
         secret = uri.split("secret=")[1].split("&")[0]
-        qr_svg = segno.make(uri, error="m").svg_inline(scale=5, dark="#0F0D0B", light="#F2EADF")
-        return Response({"otpauth_uri": uri, "secret": secret, "qr_svg": qr_svg})
+        qr = segno.make(uri, error="m").svg_data_uri(scale=5, dark="#0F0D0B", light="#F2EADF")
+        return Response({"otpauth_uri": uri, "secret": secret, "qr_data_uri": qr})
 
 
 class TotpConfirmView(APIView):

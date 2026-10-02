@@ -29,6 +29,8 @@ export const csrfMiddleware: Middleware = {
 export const api = createClient<paths>({
   baseUrl: typeof window === "undefined" ? "http://localhost" : window.location.origin,
   credentials: "same-origin",
+  // Resolve fetch at call time (not at import), so tests and polyfills can swap it.
+  fetch: (request) => globalThis.fetch(request),
 });
 api.use(csrfMiddleware);
 
