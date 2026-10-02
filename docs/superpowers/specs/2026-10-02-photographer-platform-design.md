@@ -1,7 +1,7 @@
 # پلتفرم عکاسی سودا رحیم‌پور (3evda.com) — سند طراحی
 
 **تاریخ:** 2026-10-02
-**وضعیت:** نسخه ۱ بر اساس پاسخ‌های صاحب پروژه. منتظر تأیید نهایی پالت و فونت (`docs/design/brand-preview.html`)
+**وضعیت:** نسخه ۲ — بلاگ به نسخه ۱ اضافه شد و استقرار با Docker Compose روی Coolify قطعی شد. نقشه‌ی راه اجرایی: `docs/superpowers/plans/2026-10-02-roadmap.md`
 **جایگزین:** `2026-09-11-3evda-production-cms-design.md`. استک آن سند (Next.js تک‌لایه، Drizzle و Better Auth) کنار گذاشته شد. الزامات امنیت، دسترس‌پذیری، سئو، بکاپ و استقرار Coolify از آن سند به ارث می‌رسند، مگر جایی که این سند خلافش را بگوید.
 
 ## ۱. تصمیم‌های تأییدشده
@@ -10,7 +10,9 @@
 |---|---|
 | استک | Django + DRF، PostgreSQL، Next.js (React) |
 | ظاهر | تیره، با پالت و فونت جدید (بخش ۴) |
-| ماژول‌های نسخه ۱ | سایت و CMS، **گالری مشتری**، **رزرو**، **پیش‌فاکتور** |
+| ماژول‌های نسخه ۱ | سایت و CMS، **بلاگ**، **گالری مشتری**، **رزرو**، **پیش‌فاکتور** |
+| استقرار | یک فایل `docker-compose.yml` در ریشه‌ی مخزن که Coolify (Build Pack: Docker Compose) آن را روی سرور بیلد و اجرا می‌کند |
+| روند توسعه | فاز به فاز. هر فاز در یک Pull Request، با CI در GitHub Actions. فقط وقتی همه‌ی تست‌ها سبز باشند به `main` مرج می‌شود و Coolify از `main` دیپلوی می‌کند |
 | زبان | فارسی (پیش‌فرض، RTL) + انگلیسی (LTR) |
 | سرور | Coolify روی سرور **داخل ایران**، دامنه `3evda.com` |
 | پرداخت آنلاین | فعلاً ندارد |
@@ -54,7 +56,7 @@
 - **پکیج‌ها و قیمت:** پکیج‌های تعریف‌شده در پنل + **ماشین‌حساب استعلام** (نوع خدمت، تعداد محصول، زاویه‌ها، استایلینگ، ویدیو، تحویل فوری) ← برآورد تقریبی ← ثبت استعلام
 - **رزرو:** انتخاب پکیج یا خدمت ← انتخاب روز و بازه از زمان‌های آزاد ← اطلاعات تماس ← وضعیت «در انتظار تأیید»
 - **درباره من، پشت صحنه، سؤالات متداول، تماس** (نقشه ارومیه، اینستاگرام، تلفن)
-- **مجله/بلاگ:** از فاز بعد. ساختار و مسیرهایش از ابتدا رزرو می‌شوند.
+- **مجله/بلاگ:** فهرست مقالات، دسته و برچسب، صفحه‌ی مقاله، مقالات مرتبط، RSS (بخش ۵.۶)
 - **گالری مشتری:** مسیر `/g/<token>`، `noindex`، دوزبانه
 
 ## ۴. هویت بصری (پیشنهاد، قابل مشاهده در `docs/design/brand-preview.html`)
@@ -113,60 +115,103 @@
 - دانلود تکی یا **ZIP** (ساخت در پس‌زمینه با Celery) با لینک موقت امضاشده. لاگ دانلود ثبت می‌شود.
 - انقضای خودکار و آرشیو. نمایش فضای مصرفی هر گالری و کل استوریج در داشبورد.
 
-### ۵.۶ داشبورد ادمین
-خلاصه: استعلام‌ها و رزروهای جدید (badge)، رزروهای این هفته، پیش‌فاکتورهای در انتظار، گالری‌های رو به انقضا، فضای دیسک. ورود با رمز + TOTP، بدون ثبت‌نام.
+### ۵.۶ بلاگ
+- **Article** برای هر زبان یک رکورد جداگانه است و نسخه‌های fa و en با `translation_group` به هم وصل می‌شوند (محتوای دو زبان لزوماً یکی نیست و این برای سئو بهتر است).
+- فیلدها: عنوان، slug (فارسی یا لاتین)، خلاصه، کاور، بدنه، دسته، برچسب‌ها، زمان مطالعه (خودکار)، وضعیت (`پیش‌نویس ← زمان‌بندی‌شده ← منتشرشده`)، تاریخ انتشار، فیلدهای SEO (عنوان، توضیح، تصویر OG)، و پروژه‌های پورتفولیوی مرتبط.
+- **ویرایشگر:** TipTap در پنل. محتوا به‌صورت JSON ساختاریافته ذخیره و هنگام رندر با allowlist به HTML امن تبدیل می‌شود. عکس داخل متن از کتابخانه‌ی Media انتخاب می‌شود.
+- تغییر slug باعث ساخت خودکار ریدایرکت ۳۰۱ می‌شود. RSS برای هر زبان، Schema `Article` و `BreadcrumbList`، و حضور در sitemap.
+- پیش‌نمایش پیش‌نویس با لینک امضاشده‌ی موقت.
+
+### ۵.۷ داشبورد ادمین
+خلاصه: استعلام‌ها و رزروهای جدید (badge)، مقالات زمان‌بندی‌شده، رزروهای این هفته، پیش‌فاکتورهای در انتظار، گالری‌های رو به انقضا، فضای دیسک. ورود با رمز + TOTP، بدون ثبت‌نام.
 
 ## ۶. معماری
 
+همه‌ی سرویس‌ها در یک `docker-compose.yml` تعریف می‌شوند. Coolify فقط سرویس `gateway` را به دامنه‌ی `3evda.com` وصل می‌کند و TLS را Traefik خود Coolify مدیریت می‌کند. بقیه‌ی سرویس‌ها فقط در شبکه‌ی داخلی compose در دسترس‌اند.
+
 ```text
-                    Coolify (Traefik, TLS) — Iran server
-Browser ──► web: Next.js 16 (public SSR/ISR · /panel · /g/<token>)
-               │ rewrite /api/* → api (same origin: session cookie + CSRF)
+Internet ──► Coolify Traefik (TLS, 3evda.com, www → apex)
+               │
                ▼
-            api: Django 5.2 LTS + DRF (gunicorn/uvicorn)
-               │──► PostgreSQL 17
-               │──► Redis 7 ◄── worker: Celery (images, watermark, ZIP, PDF, cleanup)
-               └──► MinIO (private bucket: originals · public bucket: variants)
+           gateway (Caddy, :80)
+            ├── /api/*, /django-admin/*, /static/*  ──► api     (Django 5.2 + DRF, gunicorn)
+            ├── /media/*                             ──► storage (S3, public bucket فقط واریانت‌ها)
+            └── /*                                   ──► web     (Next.js standalone)
+                                                       api ──► postgres (17)
+                                                       api ──► redis (7) ◄── worker (Celery + beat)
+                                                       api/worker ──► storage (private: originals, ZIP)
 ```
 
-- **Backend:** Django 5.2 LTS، DRF، drf-spectacular، django-modeltranslation (فیلدهای fa/en)، django-storages + boto3 (MinIO)، Pillow + pyvips، WeasyPrint، jdatetime، Celery، django-otp، django-axes (محدودیت ورود)، pytest-django، ruff و mypy.
-- **Frontend:** Next.js App Router، React 19، TypeScript strict، Tailwind 4 (توکن‌های بخش ۴)، next-intl، TanStack Query (پنل)، React Hook Form + Zod، تایپ‌ها و کلاینت API تولیدشده از OpenAPI (orval)، Vitest و Playwright.
-- **احراز هویت:** Session کوکی Django (HttpOnly، Secure، SameSite=Lax) + CSRF، TOTP اجباری برای ادمین، ساخت ادمین فقط با دستور `manage.py bootstrap_admin`. Django Admin فقط برای پشتیبانی، پشت مسیر مخفی.
+| سرویس | ایمیج/بیلد | Volume | Health check |
+|---|---|---|---|
+| `gateway` | `caddy` (پین‌شده) + `infra/caddy/Caddyfile` | — | `/healthz` |
+| `web` | `frontend/Dockerfile` (multi-stage، کاربر غیر root) | — | `/api/health` در Next |
+| `api` | `backend/Dockerfile` (multi-stage، کاربر غیر root) | — | `/api/health/live` و `/api/health/ready` |
+| `worker` | همان ایمیج api، با فرمان `celery worker -B` | — | `celery inspect ping` |
+| `postgres` | `postgres:17-alpine` | `pgdata` | `pg_isready` |
+| `redis` | `redis:7-alpine` | `redisdata` | `redis-cli ping` |
+| `storage` | سرویس S3-سازگار (بخش ۶.۲) | `objects` | endpoint سلامت |
+
+- **مهاجرت دیتابیس:** فرمان `migrate` در entrypoint سرویس `api` و قبل از gunicorn اجرا می‌شود. اگر شکست بخورد، کانتینر بالا نمی‌آید و Coolify دیپلوی را ناموفق نشان می‌دهد. چون `api` یک replica دارد، اجرای همزمان مهاجرت پیش نمی‌آید.
+- **تنظیمات:** همه‌ی متغیرها در `.env.example` مستند می‌شوند. در Coolify مقدارها از بخش Environment Variables وارد می‌شوند و compose فقط `${VAR:?}` می‌خواند. هیچ رمزی در مخزن نیست.
+- **توسعه‌ی محلی:** فایل `compose.dev.yml` روی همان فایل اصلی override می‌شود (پورت‌های باز، hot reload و mount سورس).
+- **CI:** دقیقاً همان `docker-compose.yml` در GitHub Actions بالا می‌آید و تست‌های E2E روی آن اجرا می‌شوند. «روی CI کار می‌کند ولی روی سرور نه» به حداقل می‌رسد.
+
+### ۶.۱ کتابخانه‌ها
+
+- **Backend:** Python 3.13، Django 5.2 LTS، DRF، drf-spectacular، django-modeltranslation (فیلدهای fa/en)، django-storages + boto3، Pillow + pyvips، WeasyPrint، jdatetime، Celery، django-otp، django-axes، nh3 (پاک‌سازی HTML)، uv برای مدیریت وابستگی‌ها، pytest-django، ruff و mypy.
+- **Frontend:** Node 24، pnpm 10، Next.js 16 App Router، React 19، TypeScript strict، Tailwind 4 (توکن‌های بخش ۴)، next-intl، TanStack Query (پنل)، React Hook Form + Zod، TipTap، date-fns-jalali، کلاینت API تولیدشده از OpenAPI (orval)، Vitest، Testing Library، Playwright و axe.
+- **احراز هویت:** Session کوکی Django (HttpOnly، Secure، SameSite=Lax) + CSRF، TOTP اجباری برای ادمین، ساخت ادمین فقط با دستور `manage.py bootstrap_admin`. Django Admin فقط برای پشتیبانی، پشت مسیر `/django-admin/` و همان MFA.
 - **دسترسی مشتری:** توکن تصادفی ۳۲ بایتی در URL + رمز اختیاری، با rate limit و کوکی کوتاه‌مدت مختص همان گالری.
 
-### ۶.۱ ساختار مخزن
+### ۶.۲ ذخیره‌سازی فایل
+
+کد فقط از رابط S3 (django-storages) استفاده می‌کند، پس سرویس ذخیره‌سازی قابل تعویض است. MinIO نسخه‌ی Community دیگر ایمیج رسمی به‌روز منتشر نمی‌کند. در فاز ۰ بین «MinIO با نسخه‌ی پین‌شده» و یک جایگزین متن‌باز فعال (SeaweedFS یا Garage) با این معیارها انتخاب می‌کنیم: پایداری روی یک سرور، سادگی بکاپ، پشتیبانی از presigned URL، و در دسترس بودن ایمیج از سرور ایران. تصمیم در `docs/adr/0001-object-storage.md` ثبت می‌شود.
+
+### ۶.۳ ساختار مخزن
 
 ```text
-backend/   config/  apps/{core,accounts,cms,portfolio,media,pricing,inquiries,
-                         booking,proformas,galleries,audit}
-frontend/  src/app/[locale]/(site)  src/app/panel  src/app/g/[token]  src/lib/api (generated)
-infra/     compose.dev.yml  compose.prod.yml  docker/  backup/  coolify.md
-docs/
+docker-compose.yml          (production — Coolify)
+compose.dev.yml             (override توسعه)
+.env.example
+backend/   pyproject.toml uv.lock Dockerfile config/
+           apps/{core,accounts,media,cms,portfolio,pricing,blog,inquiries,
+                 proformas,booking,galleries,audit}
+frontend/  package.json pnpm-lock.yaml Dockerfile
+           src/app/[locale]/(site)  src/app/panel  src/app/g/[token]  src/lib/api (generated)
+infra/     caddy/Caddyfile  backup/  scripts/
+e2e/       Playwright tests (روی compose کامل)
+.github/   workflows/{ci.yml,deploy.yml}  dependabot.yml  pull_request_template.md
+docs/      specs  plans  adr  runbooks
 ```
 
 ## ۷. ملاحظات سرور داخل ایران
 
-- **بیلد:** دسترسی سرور به Docker Hub، npm و PyPI ممکن است قطع یا کند باشد. راه‌حل این است که ایمیج‌ها در GitHub Actions ساخته و به رجیستری قابل‌دسترس از سرور push شوند (پرسش ۱). در غیر این صورت از میرورهای داخلی (مثلاً میرور Docker و PyPI و npm ابر آروان/رانفلر) در Coolify استفاده می‌شود.
+- **بیلد روی سرور:** Coolify ایمیج‌ها را روی خود سرور بیلد می‌کند، پس سرور باید به ایمیج‌های پایه، PyPI و npm دسترسی داشته باشد. برای همین Dockerfileها آرگومان‌های `PIP_INDEX_URL`، `NPM_CONFIG_REGISTRY` و `BASE_REGISTRY` دارند. پیش‌فرض‌شان مخازن عمومی است و در Coolify می‌توان آن‌ها را روی میرورهای داخلی (مثلاً آروان یا رانفلر) تنظیم کرد. تنظیم `registry-mirrors` داکرِ سرور هم در ران‌بوک مستند می‌شود.
+- **دیپلوی خودکار:** پس از سبز شدن CI روی `main`، workflow `deploy.yml` وبهوک دیپلوی Coolify را صدا می‌زند. توکن و آدرس وبهوک در GitHub Secrets نگه‌داری می‌شوند. اگر GitHub نتواند به سرور ایران وصل شود، از «Auto Deploy» اپ GitHub در Coolify یا دکمه‌ی Redeploy استفاده می‌شود (در فاز ۰ تست می‌شود).
 - **منابع خارجی در زمان اجرا صفر است:** فونت، اسکریپت، نقشه و آنالیتیکس همه self-host یا داخلی‌اند (نقشه با نشان یا لینک مستقیم، بدون Google Maps).
 - **دسترسی کاربران خارج از ایران:** برای نسخه انگلیسی در صورت نیاز CDN (مثلاً آروان) جلوی سایت قرار می‌گیرد.
-- **بکاپ:** بکاپ روزانه PostgreSQL و MinIO روی دیسک یا سرور دوم داخلی، با تمرین ریستور.
+- **بکاپ:** بکاپ روزانه‌ی PostgreSQL (قابلیت داخلی Coolify یا اسکریپت `pg_dump`) و فضای فایل‌ها روی دیسک یا سرور دوم، با تمرین ریستور.
 
 ## ۸. فازبندی
 
-| فاز | محتوا | گیت |
-|---|---|---|
-| **0** | Monorepo، Compose (postgres، redis، minio)، اسکلت Django و Next، lint و تست، CI، Dockerfileها، health check | CI سبز و Compose سالم |
-| **1** | Auth ادمین + TOTP، مدل‌های core، Media pipeline (واریانت، EXIF، واترمارک)، اسکلت پنل | تست‌های auth و آپلود |
-| **2** | سایت عمومی fa/en + CMS و پورتفولیو + پکیج‌ها، با توکن‌های طراحی | E2E دسکتاپ و موبایل، axe، Lighthouse ≥ ۹۰ |
-| **3** | استعلام و ماشین‌حساب قیمت + پیش‌فاکتور (PDF و لینک تأیید) | تست محاسبه، PDF RTL و E2E |
-| **4** | رزرو و تقویم شمسی | تست تداخل زمانی و E2E |
-| **5** | گالری مشتری و Proofing و ZIP | تست دسترسی توکن، انقضا، قفل انتخاب و حجم بالا |
-| **6** | سخت‌سازی، بکاپ و ریستور، استقرار Coolify، ران‌بوک فارسی | استقرار HTTPS سالم و ریستور موفق |
-| بعداً | بلاگ، اعلان (پیامک یا ربات)، درگاه پرداخت، CRM، لایسنس تصاویر | — |
+جزئیات کامل هر فاز، تست‌ها و گیت CI در `docs/superpowers/plans/2026-10-02-roadmap.md` آمده است.
+
+| فاز | محتوا |
+|---|---|
+| **0** | زیرساخت: monorepo، compose، اسکلت Django و Next، gateway، CI/CD، اولین دیپلوی Coolify |
+| **1** | احراز هویت ادمین + TOTP، Media pipeline، اسکلت پنل |
+| **2** | سیستم طراحی + سایت عمومی fa/en + CMS، پورتفولیو و پکیج‌ها |
+| **3** | بلاگ و سئو |
+| **4** | استعلام، ماشین‌حساب قیمت و پیش‌فاکتور |
+| **5** | رزرو و تقویم شمسی |
+| **6** | گالری مشتری و Proofing |
+| **7** | سخت‌سازی، بکاپ و ریستور، انتشار نهایی |
+| بعداً | اعلان (پیامک یا ربات)، درگاه پرداخت، CRM، لایسنس تصاویر |
 
 ## ۹. موارد باز
 
-1. **رجیستری ایمیج:** آیا سرور به `ghcr.io` یا Docker Hub دسترسی دارد؟ اگر نه، رجیستری داخلی (مثلاً آروان) یا بیلد روی خود Coolify با میرور.
-2. **لوگو:** فایل SVG یا PNG با کیفیت بالا.
-3. **محتوا:** ۳۰ تا ۶۰ عکس منتخب با کیفیت اصلی، متن «درباره من»، و فهرست خدمات و قیمت‌های اولیه.
-4. **تأیید پالت و فونت** در `docs/design/brand-preview.html`.
+1. **دسترسی سرور:** آیا سرور به Docker Hub، PyPI و npm دسترسی دارد یا میرور لازم است؟ (در فاز ۰ با اولین دیپلوی مشخص می‌شود)
+2. **لوگو:** فایل SVG یا PNG با کیفیت بالا (تا فاز ۲).
+3. **محتوا:** ۳۰ تا ۶۰ عکس منتخب با کیفیت اصلی، متن «درباره من»، و فهرست خدمات و قیمت‌های اولیه (تا فاز ۲).
+4. **تأیید پالت و فونت** در `docs/design/brand-preview.html` (تا فاز ۲).
