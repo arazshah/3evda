@@ -1,0 +1,47 @@
+@import "tailwindcss";
+@import "@fontsource/vazirmatn/400.css";
+@import "@fontsource/vazirmatn/600.css";
+@import "@fontsource/vazirmatn/800.css";
+
+/* Brand tokens — see docs/design/brand-preview.html */
+@theme {
+  --color-bg: #0f0d0b;
+  --color-surface: #1a1612;
+  --color-elevated: #262019;
+  --color-line: #3a3128;
+  --color-text: #f2eadf;
+  --color-muted: #b3a594;
+  --color-accent: #e3a33b;
+  --color-accent-2: #b4473c;
+  --color-success: #7e9a6c;
+  --radius-brand: 6px;
+  --font-sans: "Vazirmatn", system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.9;
+  background-image: radial-gradient(ellipse 80% 50% at 70% 0%, rgb(227 163 59 / 0.1), transparent 70%);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
