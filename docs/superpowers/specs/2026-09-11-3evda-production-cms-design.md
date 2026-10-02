@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-11
 
-**Status:** Approved in conversation; awaiting review of this written specification
+**Status:** Superseded on 2026-10-02 by `2026-10-02-photographer-platform-design.md` (stack changed to Django + Next.js). Security, accessibility, SEO, backup and Coolify requirements remain applicable.
 
 **Source artifact:** `Sevda.html`
 
