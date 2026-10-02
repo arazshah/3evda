@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.audit",
+    "apps.media",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -145,6 +146,16 @@ STORAGES = {
     "public": {"BACKEND": "apps.core.storage.PublicStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+
+# Media uploads and processing
+MEDIA_MAX_IMAGE_BYTES = env.int("MEDIA_MAX_IMAGE_BYTES", default=50 * 1024 * 1024)
+MEDIA_MAX_VIDEO_BYTES = env.int("MEDIA_MAX_VIDEO_BYTES", default=100 * 1024 * 1024)
+MEDIA_MAX_PIXELS = env.int("MEDIA_MAX_PIXELS", default=150_000_000)
+MEDIA_IMAGE_WIDTHS = [480, 960, 1600, 2400]
+MEDIA_ARTIST = env("MEDIA_ARTIST", default="Sevda Rahimpour")
+MEDIA_COPYRIGHT = env("MEDIA_COPYRIGHT", default="(c) Sevda Rahimpour - 3evda.com")
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # larger request bodies are streamed to temporary files
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = None

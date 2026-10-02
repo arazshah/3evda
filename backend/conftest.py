@@ -24,3 +24,17 @@ def owner_user(db):
 def owner_client(owner_user) -> APIClient:
     """API client for the owner, password and TOTP verified."""
     return verify_client(APIClient(), owner_user)
+
+
+@pytest.fixture
+def s3_buckets(settings):  # type: ignore[no-untyped-def]
+    """In-memory S3 (moto) with the private and public buckets created."""
+    import boto3
+    from moto import mock_aws
+
+    from apps.core.management.commands.ensure_buckets import ensure_buckets
+
+    settings.S3_ENDPOINT_URL = None  # moto intercepts the default AWS endpoint
+    with mock_aws():
+        ensure_buckets()
+        yield boto3.client("s3", region_name=settings.S3_REGION)
