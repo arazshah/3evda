@@ -1,0 +1,20 @@
+# Local development / CI override:
+#   docker compose -f docker-compose.yml -f compose.dev.yml up --build --wait
+# Publishes the gateway on http://localhost:8080 and the backing services on localhost
+# so `manage.py runserver` and `pnpm dev` can also run natively against them.
+services:
+  gateway:
+    ports:
+      - "127.0.0.1:8080:80"
+  api:
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+  storage:
+    ports:
+      - "127.0.0.1:8333:8333"

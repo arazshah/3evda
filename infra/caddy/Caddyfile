@@ -1,0 +1,67 @@
+# Internal gateway. TLS and the public domain are handled by Coolify's proxy in front of it.
+{
+	admin off
+	auto_https off
+	servers {
+		# Trust X-Forwarded-* only from the Docker/Coolify network.
+		trusted_proxies static private_ranges
+		client_ip_headers X-Forwarded-For
+	}
+}
+
+:80 {
+	encode zstd gzip
+
+	request_body {
+		max_size {$GATEWAY_MAX_BODY:100MB}
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	@no_request_id not header X-Request-ID *
+	request_header @no_request_id X-Request-ID {http.request.uuid}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle /django-admin* {
+		reverse_proxy api:8000
+	}
+
+	handle /static/* {
+		reverse_proxy api:8000
+	}
+
+	# Public, derived media only. The private bucket is never routed.
+	handle_path /media/* {
+		@not_read not method GET HEAD
+		respond @not_read 405
+
+		rewrite * /{$S3_PUBLIC_BUCKET:public}{path}
+		reverse_proxy storage:8333 {
+			header_up -Authorization
+			header_up -Cookie
+			header_down -Server
+
+			# Variants have content-addressed names, so successful responses are immutable.
+			@found status 2xx
+			handle_response @found {
+				header Cache-Control "public, max-age=31536000, immutable"
+				copy_response
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}
