@@ -124,6 +124,8 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "3evda API",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # The schema documents admin endpoints, so it is only served to staff.
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
 }
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
