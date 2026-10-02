@@ -47,7 +47,9 @@ def auth_state(request: HttpRequest) -> str:
     user = request.user
     if not user.is_authenticated:
         return "anonymous"
-    if user.is_verified():  # type: ignore[attr-defined]  # added by django_otp's OTPMiddleware
+    # OTPMiddleware adds is_verified() to request.user; a user just returned by authenticate() lacks it.
+    is_verified = getattr(user, "is_verified", None)
+    if callable(is_verified) and is_verified():
         return "verified"
     return "otp_required" if _has_confirmed_totp(user) else "enrollment_required"
 
@@ -145,6 +147,7 @@ class LoginView(APIView):
         if user is None:
             return _error("invalid_credentials", "نام کاربری یا رمز عبور درست نیست.")
         login(request._request, user)
+        request.user = user  # DRF cached the anonymous user before login
         return Response(_state_body(request))
 
 

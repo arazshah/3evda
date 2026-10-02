@@ -5,6 +5,16 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from rest_framework.test import APIClient
 
 
+@pytest.fixture(autouse=True)
+def _clear_cache():  # type: ignore[no-untyped-def]
+    """Throttle counters live in the cache; every test starts from zero."""
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()
+
+
 def verify_client(client: APIClient, user) -> APIClient:  # type: ignore[no-untyped-def]
     """Log `client` in as `user` with a verified second factor (skips the HTTP sign-in flow)."""
     device, _ = TOTPDevice.objects.get_or_create(user=user, name="authenticator", defaults={"confirmed": True})

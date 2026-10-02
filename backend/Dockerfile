@@ -20,12 +20,22 @@ RUN DJANGO_SECRET_KEY=build-only-not-a-secret-build-only-not-a-secret-0000 \
 
 FROM ${BASE_REGISTRY}/python:3.13-slim-bookworm AS runtime
 ARG APP_VERSION=dev
+# Optional Debian mirror, e.g. https://mirror.example.ir (replaces deb.debian.org).
+ARG DEBIAN_MIRROR=
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.prod \
     APP_VERSION=${APP_VERSION}
-RUN groupadd --gid 10001 app && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
+# ffmpeg: video metadata stripping and posters. libfribidi0: Persian text shaping for watermarks
+# (Pillow's bundled raqm loads it at runtime).
+RUN if [ -n "$DEBIAN_MIRROR" ]; then \
+      sed -i "s|http://deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources; \
+    fi \
+ && apt-get update \
+ && apt-get install --yes --no-install-recommends ffmpeg libfribidi0 \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --gid 10001 app && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 WORKDIR /app
 COPY --from=build /opt/venv /opt/venv
 COPY --from=build --chown=root:root /app /app

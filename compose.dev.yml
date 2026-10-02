@@ -7,8 +7,12 @@ services:
     ports:
       - "127.0.0.1:8080:80"
   api:
-    environment:
+    environment: &dev-env
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      COOKIE_SECURE: "false"  # plain http on localhost
+      TRUSTED_PROXY_COUNT: "1"  # no Coolify proxy in front of the gateway
+  worker:
+    environment: *dev-env
   postgres:
     ports:
       - "127.0.0.1:5432:5432"

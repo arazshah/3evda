@@ -5,6 +5,7 @@
 x-build-args: &build-args
   APP_VERSION: ${SOURCE_COMMIT:-dev}
   BASE_REGISTRY: ${BASE_REGISTRY:-docker.io/library}
+  DEBIAN_MIRROR: ${DEBIAN_MIRROR:-}
 
 x-backend-env: &backend-env
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set a random string of at least 50 characters}
@@ -12,6 +13,10 @@ x-backend-env: &backend-env
   PUBLIC_URL: ${PUBLIC_URL:-https://3evda.com}
   DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.prod}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  COOKIE_SECURE: ${COOKIE_SECURE:-true}
+  TRUSTED_PROXY_COUNT: ${TRUSTED_PROXY_COUNT:-2}
+  MEDIA_MAX_IMAGE_BYTES: ${MEDIA_MAX_IMAGE_BYTES:-52428800}
+  MEDIA_MAX_VIDEO_BYTES: ${MEDIA_MAX_VIDEO_BYTES:-104857600}
   POSTGRES_HOST: postgres
   POSTGRES_DB: ${POSTGRES_DB:-threevda}
   POSTGRES_USER: ${POSTGRES_USER:-threevda}
@@ -32,7 +37,8 @@ services:
     restart: unless-stopped
     environment:
       S3_PUBLIC_BUCKET: ${S3_PUBLIC_BUCKET:-public}
-      GATEWAY_MAX_BODY: ${GATEWAY_MAX_BODY:-100MB}
+      S3_PRIVATE_BUCKET: ${S3_PRIVATE_BUCKET:-private}
+      GATEWAY_MAX_BODY: ${GATEWAY_MAX_BODY:-110MB}
     expose:
       - "80"
     depends_on:

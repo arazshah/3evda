@@ -20,7 +20,7 @@
 | ورودی مجاز | تصویر: JPEG، PNG، WebP، AVIF و TIFF تا ۵۰MB و ۱۵۰ مگاپیکسل (ضد decompression bomb). ویدیو: MP4 و WebM تا ۱۰۰MB. نوع فایل با محتوای واقعی (magic bytes) تشخیص داده می‌شود، نه با پسوند |
 | ویدیو | ffmpeg: حذف متادیتا با remux بدون فشرده‌سازی مجدد (`-map_metadata -1 -c copy`)، پوستر از ثانیه‌ی ۱ که همان مسیر تصویر را طی می‌کند، و مدت و ابعاد با ffprobe |
 | واترمارک | تنظیمات singleton شامل فعال/غیرفعال، متن، شفافیت، موقعیت و اندازه‌ی نسبی، با فونت Vazirmatn. در صورت فعال بودن روی واریانت‌های عمومی اعمال می‌شود (گالری مشتری در فاز ۶ از همین تابع استفاده می‌کند) |
-| دانلود اصل فایل (پیگیری ADR 0001) | Django مجوز را بررسی و یک URL امضاشده‌ی داخلی ۶۰ثانیه‌ای می‌سازد و در هدر `X-Accel-Redirect` برمی‌گرداند. Caddy با `handle_response` همان را از storage می‌گیرد و به کاربر می‌دهد. کلید S3 هرگز به مرورگر نمی‌رسد و مسیر خصوصی از بیرون route ندارد |
+| دانلود اصل فایل (پیگیری ADR 0001) | Django مجوز را بررسی و با 302 به یک مسیر امضاشده‌ی ۶۰ثانیه‌ای زیر `/storage-signed/` هدایت می‌کند. gateway فقط GET/HEAD امضاشده‌ی bucket خصوصی را به storage می‌فرستد. هیچ کلید S3 یا آدرس داخلی به مرورگر نمی‌رسد (جزئیات و دلیل رد `X-Accel-Redirect` در ADR 0001) |
 | حذف امن | `MediaReference` ثبت می‌کند هر فایل کجا استفاده شده است. حذف فایل در حال استفاده ← 409 |
 | قرارداد API | schema از drf-spectacular در `backend/openapi.json`، و تایپ‌های TypeScript با `openapi-typescript` و کلاینت `openapi-fetch` (سبک‌تر از orval). job `contract` در CI هم‌خوانی هر دو را بررسی می‌کند |
 | پنل | Next.js در `/panel` (فارسی، RTL، `noindex`)، TanStack Query برای داده. صفحه‌ها: ورود / ثبت TOTP / کدهای بازیابی، داشبورد، کتابخانه‌ی Media (آپلود گروهی کشیدنی با نوار پیشرفت، جست‌وجو، فیلتر، ویرایش alt دوزبانه، حذف)، تنظیمات واترمارک، امنیت (تغییر رمز، ساخت مجدد کدهای بازیابی) |
@@ -40,7 +40,7 @@
 | `POST /api/auth/logout` | خروج |
 | `GET/POST /api/admin/media/` | فهرست (جست‌وجو، فیلتر نوع و وضعیت، صفحه‌بندی) و آپلود |
 | `GET/PATCH/DELETE /api/admin/media/{id}/` | جزئیات، ویرایش، حذف |
-| `GET /api/admin/media/{id}/original` | دانلود اصل فایل (X-Accel-Redirect) |
+| `GET /api/admin/media/{id}/original/` | دانلود اصل فایل (302 به مسیر امضاشده) |
 | `POST /api/admin/media/{id}/reprocess` | پردازش مجدد |
 | `GET/PUT /api/admin/settings/watermark` | تنظیمات واترمارک |
 
@@ -52,7 +52,7 @@
 2. **APIهای auth** و throttle، به‌همراه `OTPAdminSite`
 3. **media: اعتبارسنجی و ذخیره‌ی اصل فایل:** تست فایل جعلی (پسوند jpg با محتوای دیگر)، حجم زیاد، bomb، و SVG/HTML
 4. **media: پردازش در worker:** واریانت‌ها، LQIP، حذف GPS (تست با JPEG دارای GPS)، چرخش EXIF، تبدیل ICC به sRGB، واترمارک، و ویدیو و پوستر
-5. **media: API، ارجاع‌ها، حذف امن، دانلود اصل فایل** و مسیر `X-Accel-Redirect` در Caddy
+5. **media: API، ارجاع‌ها، حذف امن، دانلود اصل فایل** و مسیر `/storage-signed/` در Caddy
 6. **ماتریس مجوز:** تستی که همه‌ی URLهای `/api/admin/*` را از resolver استخراج می‌کند و برای ناشناس، کاربر بدون TOTP و ادمین تأییدشده بررسی می‌کند (endpoint جدیدی که محافظت نشده باشد تست را می‌شکند)
 7. **قرارداد API:** `openapi.json`، تایپ‌های فرانت، و job `contract`
 8. **پنل:** ورود، TOTP، چیدمان، Media، واترمارک و امنیت، همراه تست‌های Vitest

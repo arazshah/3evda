@@ -13,7 +13,7 @@
 	encode zstd gzip
 
 	request_body {
-		max_size {$GATEWAY_MAX_BODY:100MB}
+		max_size {$GATEWAY_MAX_BODY:110MB}
 	}
 
 	header {
@@ -31,6 +31,32 @@
 
 	handle /api/* {
 		reverse_proxy api:8000
+	}
+
+	# Short-lived signed downloads of private originals. Django authorises the request and redirects
+	# here; the storage service validates the signature. Only GET/HEAD of the private bucket with a
+	# signature is forwarded, and the request reaches storage exactly as signed.
+	handle_path /storage-signed/* {
+		@signed {
+			method GET HEAD
+			path /{$S3_PRIVATE_BUCKET:private}/*
+			query X-Amz-Signature=*
+		}
+		handle @signed {
+			reverse_proxy storage:8333 {
+				# The signature covers the host; SeaweedFS also honours X-Forwarded-Host, so drop it.
+				header_up Host storage:8333
+				header_up -X-Forwarded-Host
+				header_up -X-Forwarded-Proto
+				header_up -X-Forwarded-For
+				header_up -Cookie
+				header_up -Authorization
+				header_down -Server
+			}
+			header Cache-Control "no-store"
+			header Referrer-Policy "no-referrer"
+		}
+		respond 404
 	}
 
 	handle /django-admin* {

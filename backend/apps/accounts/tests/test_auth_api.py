@@ -33,6 +33,18 @@ def test_wrong_password_is_rejected_without_detail(api, enrolled_owner):
     assert state(api) == "anonymous"
 
 
+def test_login_response_reports_the_next_step(api, enrolled_owner, owner):
+    csrf(api)
+    response = api.post("/api/auth/login", {"username": "owner", "password": PASSWORD}, format="json")
+    assert response.json() == {"state": "otp_required", "user": {"username": "owner", "display_name": ""}}
+
+
+def test_login_response_asks_for_enrollment_on_first_sign_in(api, owner):
+    csrf(api)
+    response = api.post("/api/auth/login", {"username": "owner", "password": PASSWORD}, format="json")
+    assert response.json()["state"] == "enrollment_required"
+
+
 def test_password_alone_does_not_grant_admin_access(logged_in):
     assert state(logged_in) == "otp_required"
     assert logged_in.get("/api/schema/").status_code == 403
