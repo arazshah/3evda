@@ -53,9 +53,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
       - name: requirements.txt matches uv.lock
-        run: |
-          uv export --frozen --no-dev --no-emit-project --format requirements-txt -o /tmp/requirements.txt -q
-          diff -u requirements.txt /tmp/requirements.txt
+        # Comment lines are ignored: the generated header records the output path.
+        run: >-
+          diff -u
+          <(grep -v '^#' requirements.txt)
+          <(uv export --frozen --no-dev --no-emit-project --format requirements-txt -q | grep -v '^#')
       - name: Lint
         run: uv run ruff check .
       - name: Format
