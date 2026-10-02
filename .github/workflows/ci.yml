@@ -1,0 +1,197 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.28.0"
+  UV_VERSION: "0.8.17"
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: threevda
+          POSTGRES_USER: threevda
+          POSTGRES_PASSWORD: threevda
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U threevda" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: requirements.txt matches uv.lock
+        run: |
+          uv export --frozen --no-dev --no-emit-project --format requirements-txt -o /tmp/requirements.txt -q
+          diff -u requirements.txt /tmp/requirements.txt
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format
+        run: uv run ruff format --check .
+      - name: Type check
+        run: uv run mypy .
+      - name: Migrations are up to date
+        run: uv run python manage.py makemigrations --check --dry-run
+      - name: Tests
+        run: uv run pytest --cov-report=xml
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Format
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: Type check
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test:run
+      - name: Build
+        run: pnpm build
+
+  e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate throwaway secrets
+        run: |
+          {
+            echo "DJANGO_SECRET_KEY=$(openssl rand -hex 40)"
+            echo "DJANGO_ALLOWED_HOSTS=localhost"
+            echo "PUBLIC_URL=http://localhost:8080"
+            echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)"
+            echo "S3_ACCESS_KEY=$(openssl rand -hex 12)"
+            echo "S3_SECRET_KEY=$(openssl rand -hex 24)"
+            echo "SOURCE_COMMIT=${GITHUB_SHA}"
+          } > .env
+      - name: Start the production stack
+        run: docker compose -f docker-compose.yml -f compose.dev.yml up --build --wait --wait-timeout 300 -d
+      - name: Containers run as non-root
+        run: |
+          for svc in api worker web; do
+            uid=$(docker compose exec -T "$svc" id -u)
+            echo "$svc uid=$uid"
+            test "$uid" = "10001"
+          done
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: e2e/pnpm-lock.yaml
+      - name: Install Playwright
+        working-directory: e2e
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+      - name: End-to-end tests
+        working-directory: e2e
+        env:
+          CI: "true"
+          E2E_BASE_URL: http://localhost:8080
+          E2E_EXPECTED_VERSION: ${{ github.sha }}
+        run: pnpm test
+      - name: Collect service logs
+        if: failure()
+        run: docker compose logs --no-color --timestamps > compose-logs.txt
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: e2e-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+            compose-logs.txt
+          retention-days: 7
+      - name: Stop the stack
+        if: always()
+        run: docker compose down --volumes
+
+  security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Secret scan (full history)
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.30.1 git /repo --redact --no-banner
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: ${{ env.UV_VERSION }}
+      - name: Python dependency audit
+        run: uvx pip-audit==2.10.1 -r backend/requirements.txt --require-hashes --disable-pip --progress-spinner off
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Node dependency audit
+        run: |
+          (cd frontend && pnpm audit --audit-level high)
+          (cd e2e && pnpm audit --audit-level high)
