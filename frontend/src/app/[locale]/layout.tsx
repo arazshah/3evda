@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: Omit<Props, "children">): Pro
     title: t("title"),
     description: t("description"),
     alternates: { languages: { fa: "/", en: "/en" } },
+    icons: { icon: "/favicon.svg" },
   };
 }
 

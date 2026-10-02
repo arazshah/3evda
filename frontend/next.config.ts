@@ -5,7 +5,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 // Persian is served without a prefix (/about), English under /en (/en/about).
 // Internally every page lives under app/[locale]; these rules map the public URLs onto it.
-const UNPREFIXED = "/:path((?!en(?:/|$)|fa(?:/|$)|api/|django-admin/|static/|media/|health$|_next/).*)";
+// Paths with a file extension (favicon.svg, robots.txt, …) are public files and are not rewritten.
+const UNPREFIXED =
+  "/:path((?!en(?:/|$)|fa(?:/|$)|api/|django-admin/|static/|media/|health$|_next/|.*\\.[^/]+$).*)";
 
 const nextConfig: NextConfig = {
   output: "standalone",

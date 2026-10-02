@@ -10,7 +10,8 @@ env = environ.Env()
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = False
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
+# Internal names are always allowed: container health checks and service-to-service calls.
+ALLOWED_HOSTS = [*env.list("DJANGO_ALLOWED_HOSTS", default=[]), "127.0.0.1", "localhost", "api"]
 PUBLIC_URL = env("PUBLIC_URL", default="http://localhost:8080")
 APP_VERSION = env("APP_VERSION", default="dev")
 
