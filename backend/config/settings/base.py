@@ -119,6 +119,17 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("CACHE_URL", default=REDIS_URL.rsplit("/", 1)[0] + "/1"),
+        "TIMEOUT": 300,
+    }
+}
+
+SESSION_COOKIE_NAME = "threevda_session"
+SESSION_COOKIE_AGE = 60 * 60 * 12
+
 # Object storage (S3 API). Originals and archives live in the private bucket;
 # the public bucket only holds derived, metadata-stripped variants.
 S3_ENDPOINT_URL = env("S3_ENDPOINT_URL", default="http://storage:8333")
@@ -144,7 +155,10 @@ CELERY_TIMEZONE = TIME_ZONE
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAdminUser"],
+    "DEFAULT_PERMISSION_CLASSES": ["apps.accounts.permissions.IsVerifiedOwner"],
+    "NUM_PROXIES": TRUSTED_PROXY_COUNT,
+    "DEFAULT_THROTTLE_RATES": {"login": "20/min", "otp": "10/min"},
+    "EXCEPTION_HANDLER": "apps.core.errors.exception_handler",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
 }
 
@@ -153,7 +167,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     # The schema documents admin endpoints, so it is only served to staff.
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SERVE_PERMISSIONS": ["apps.accounts.permissions.IsVerifiedOwner"],
 }
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
