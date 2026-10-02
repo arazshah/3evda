@@ -72,6 +72,24 @@ cd backend
 uv export --frozen --no-dev --no-emit-project --format requirements-txt -o requirements.txt
 ```
 
+وقتی API در backend تغییر می‌کند، قرارداد API را دوباره بسازید و commit کنید (job ‏`contract` در CI این را بررسی می‌کند):
+
+```bash
+cd backend && uv run python manage.py spectacular --settings=config.settings.test \
+  --format openapi-json --file openapi.json --validate --fail-on-warn
+cd frontend && pnpm api:types
+```
+
+## ساخت ادمین
+
+فقط یک کاربر (صاحب سایت) وجود دارد و ثبت‌نام عمومی نیست. یک‌بار روی سرور اجرا کنید:
+
+```bash
+docker compose exec api python manage.py bootstrap_admin --username sevda   # رمز را می‌پرسد
+```
+
+سپس در `/panel` وارد شوید و ورود دومرحله‌ای (TOTP) را فعال کنید. اگر دسترسی به اپ authenticator از دست رفت، بخش «بازیابی دسترسی ادمین» در ران‌بوک را ببینید.
+
 ## روند کار
 
 1. برای هر فاز یا تغییر یک branch بسازید و Pull Request به `main` باز کنید.

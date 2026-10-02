@@ -9,10 +9,16 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const UNPREFIXED =
   "/:path((?!en(?:/|$)|fa(?:/|$)|api/|django-admin/|static/|media/|health$|_next/|.*\\.[^/]+$).*)";
 
+// `next dev` only: forward API/media requests to the compose gateway (production routes them in Caddy).
+const DEV_GATEWAY = process.env.DEV_GATEWAY_URL ?? "http://localhost:8080";
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
+  // DRF URLs end with "/"; Next must not strip it while proxying in development.
+  skipTrailingSlashRedirect: isDev,
   async redirects() {
     return [
       { source: "/fa", destination: "/", permanent: true },
@@ -25,7 +31,12 @@ const nextConfig: NextConfig = {
         { source: "/", destination: "/fa" },
         { source: UNPREFIXED, destination: "/fa/:path" },
       ],
-      afterFiles: [],
+      afterFiles: isDev
+        ? ["api", "media", "storage-signed", "static", "django-admin"].map((prefix) => ({
+            source: `/${prefix}/:path*`,
+            destination: `${DEV_GATEWAY}/${prefix}/:path*`,
+          }))
+        : [],
       fallback: [],
     };
   },
