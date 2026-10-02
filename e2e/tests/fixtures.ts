@@ -19,6 +19,8 @@ export const test = base.extend<{ page: Page }>({
       }
     });
     page.on("requestfailed", (req) => {
+      // Requests cancelled by a client-side navigation (e.g. a redirect to the login page) are not failures.
+      if (req.failure()?.errorText === "net::ERR_ABORTED") return;
       if (baseURL && req.url().startsWith(baseURL)) problems.push(`request failed: ${req.url()}`);
     });
     await use(page);

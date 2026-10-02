@@ -1,0 +1,86 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
+import { totp } from "./totp";
+
+const USERNAME = process.env.E2E_ADMIN_USER ?? "e2e-admin";
+const PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? "";
+const PHOTO = new URL("../fixtures/photo-with-gps.jpg", import.meta.url).pathname;
+const sha256 = (data: Buffer) => createHash("sha256").update(data).digest("hex");
+
+// The owner account is enrolled once, so the whole journey runs serially in one project.
+test.describe.configure({ mode: "serial" });
+test.skip(({ isMobile }) => isMobile, "the sign-in journey runs once, on desktop");
+test.skip(!PASSWORD, "E2E_ADMIN_PASSWORD is not set");
+
+test("panel requires sign-in", async ({ page }) => {
+  await page.goto("/panel/media");
+  await expect(page).toHaveURL(/\/panel\/login$/);
+  await expect(page.getByRole("heading", { name: "ورود به پنل" })).toBeVisible();
+});
+
+test("admin APIs refuse anonymous visitors", async ({ request }) => {
+  expect((await request.get("/api/admin/media/")).status()).toBe(403);
+  expect((await request.get("/api/schema/")).status()).toBe(403);
+});
+
+test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request }) => {
+  await page.goto("/panel/login");
+  await page.getByLabel("نام کاربری").fill(USERNAME);
+  await page.getByLabel("رمز عبور").fill(PASSWORD);
+  await page.getByRole("button", { name: "ادامه" }).click();
+
+  // First sign-in: enrol the authenticator.
+  const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
+  await expect(page.getByRole("img", { name: "کد QR برای اپ احراز هویت" })).toBeVisible();
+  await page.getByLabel("کد ۶ رقمی").fill(totp(secret));
+  await page.getByRole("button", { name: "فعال‌سازی" }).click();
+  await expect(page.getByRole("list", { name: "کدهای بازیابی" }).getByRole("listitem")).toHaveCount(10);
+  await page.getByRole("button", { name: "کدها را ذخیره کردم، ادامه" }).click();
+  await expect(page.getByRole("heading", { name: "داشبورد" })).toBeVisible();
+
+  // Upload through the library.
+  await page.getByRole("link", { name: "کتابخانه رسانه" }).click();
+  await page.getByLabel("انتخاب فایل برای آپلود").setInputFiles(PHOTO);
+  await expect(page.getByRole("list", { name: "صف آپلود" })).toContainText("آپلود شد");
+  const tile = page.getByRole("list", { name: "فایل‌ها" }).getByRole("button", { name: /photo-with-gps\.jpg/ });
+  await expect(tile).toBeVisible();
+  await expect(tile.locator("img")).toBeVisible({ timeout: 30_000 }); // processed by the worker
+  await expectNoHorizontalOverflow(page);
+
+  // Public variant: WebP, cacheable, and stripped of the camera's metadata.
+  const listing = await (await page.request.get("/api/admin/media/?q=photo-with-gps")).json();
+  const asset = listing.results[0];
+  expect(asset.status).toBe("ready");
+  const variant = asset.variants.find((v: { format: string }) => v.format === "webp");
+  const served = await request.get(variant.url);
+  expect(served.status()).toBe(200);
+  expect(served.headers()["content-type"]).toBe("image/webp");
+  expect(served.headers()["cache-control"]).toContain("immutable");
+  expect((await served.body()).includes("TestCamera")).toBe(false);
+
+  // Edit alt texts in the detail dialog.
+  await tile.click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("متن جایگزین فارسی").fill("قهوه در فنجان سفالی");
+  await dialog.getByLabel("متن جایگزین انگلیسی").fill("Coffee in a clay cup");
+  await dialog.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(dialog.getByText("ذخیره شد.")).toBeVisible();
+
+  // The private original downloads unchanged for the owner only.
+  const download = await page.request.get(`/api/admin/media/${asset.id}/original/`);
+  expect(download.status()).toBe(200);
+  expect(download.headers()["content-disposition"]).toContain("attachment");
+  expect(sha256(await download.body())).toBe(sha256(readFileSync(PHOTO)));
+  expect((await request.get(`/api/admin/media/${asset.id}/original/`)).status()).toBe(403);
+
+  // Delete it again.
+  page.once("dialog", (confirm) => confirm.accept());
+  await dialog.getByRole("button", { name: "حذف" }).click();
+  await expect(tile).toHaveCount(0);
+
+  // Sign out.
+  await page.getByRole("button", { name: "خروج" }).first().click();
+  await expect(page).toHaveURL(/\/panel\/login$/);
+  expect((await page.request.get("/api/admin/media/")).status()).toBe(403);
+});

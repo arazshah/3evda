@@ -49,6 +49,7 @@ python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 | `BASE_REGISTRY` | آدرس میرور ایمیج‌های رسمی، با پیشوند `library` |
 | `PIP_INDEX_URL` | آدرس میرور PyPI (`.../simple`) |
 | `NPM_CONFIG_REGISTRY` | آدرس میرور npm |
+| `DEBIAN_MIRROR` | آدرس میرور Debian برای `apt` در ایمیج api (جایگزین `deb.debian.org`) |
 | `SEAWEEDFS_IMAGE` | آدرس کامل ایمیج SeaweedFS در میرور |
 
 گزینه‌ی دیگر این است که در خود سرور برای Docker میرور تعریف کنید (`/etc/docker/daemon.json` و سپس `systemctl restart docker`):
@@ -57,7 +58,7 @@ python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 { "registry-mirrors": ["https://<docker-mirror-address>"] }
 ```
 
-نتیجه‌ی اولین بیلد (کدام دسترسی وجود داشت و کدام میرور لازم شد) را در بخش ۷ همین سند ثبت کنید.
+نتیجه‌ی اولین بیلد (کدام دسترسی وجود داشت و کدام میرور لازم شد) را در بخش ۸ همین سند ثبت کنید.
 
 ## ۴. دیپلوی خودکار پس از CI
 
@@ -77,16 +78,40 @@ python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 - workflow دیپلوی را trigger نمی‌کند ولی همچنان منتظر نسخه‌ی جدید می‌ماند و smoke test را اجرا می‌کند.
 - در این حالت Coolify با push به `main` دیپلوی می‌کند. چون merge فقط با CI سبز ممکن است، کد تست‌نشده وارد `main` نمی‌شود.
 
-## ۵. محافظت از `main` در GitHub
+## ۵. ساخت ادمین (یک‌بار)
+
+بعد از اولین دیپلوی، در Coolify به **Terminal** سرویس `api` بروید (یا روی سرور `docker exec -it <api-container> sh`) و اجرا کنید:
+
+```bash
+python manage.py bootstrap_admin --username sevda
+```
+
+رمز را دو بار می‌پرسد (حداقل ۱۲ کاراکتر). سپس به `https://3evda.com/panel` بروید، وارد شوید، کد QR را با اپ authenticator اسکن کنید و **کدهای بازیابی را جای امن ذخیره کنید**.
+
+- دستور فقط وقتی کار می‌کند که هیچ کاربری وجود نداشته باشد. پایگاه داده هم اجازه‌ی ساخت کاربر دوم را نمی‌دهد.
+- اگر رمز را با متغیر `ADMIN_BOOTSTRAP_PASSWORD` داده‌اید، بلافاصله آن را از Coolify پاک کنید.
+
+### بازیابی دسترسی ادمین
+
+| مشکل | راه‌حل |
+|---|---|
+| گوشی یا اپ authenticator گم شده ولی کد بازیابی دارید | در صفحه‌ی ورود به‌جای کد ۶ رقمی یک کد بازیابی وارد کنید، سپس از «امنیت» کدهای جدید بسازید |
+| نه اپ و نه کد بازیابی | در Terminal سرویس `api`: `python manage.py reset_admin_mfa`. همه‌ی sessionها بسته و TOTP حذف می‌شود؛ در ورود بعدی دوباره ثبت کنید |
+| رمز فراموش شده | در Terminal سرویس `api`: `python manage.py changepassword sevda` |
+| قفل‌شدن بعد از ۵ تلاش ناموفق | ۱۵ دقیقه صبر کنید، یا در Terminal: `python manage.py axes_reset` |
+
+همه‌ی این اقدام‌ها در Audit Log ثبت می‌شوند.
+
+## ۶. محافظت از `main` در GitHub
 
 در **Settings → Branches → Add branch ruleset** (یا Branch protection rule) برای `main`:
 - **Require a pull request before merging**
-- **Require status checks to pass:** `backend`، `frontend`، `e2e`، `security` و گزینه‌ی *Require branches to be up to date*
+- **Require status checks to pass:** `backend`، `frontend`، `contract`، `e2e`، `security` و گزینه‌ی *Require branches to be up to date*
 - **Require conversation resolution**
 - **Block force pushes** و **Restrict deletions**
 - در **Settings → General → Pull Requests** فقط *Allow squash merging* را فعال بگذارید.
 
-## ۶. بررسی پس از دیپلوی
+## ۷. بررسی پس از دیپلوی
 
 ```bash
 curl -s https://3evda.com/api/health/live     # {"status":"ok","version":"<commit>"}
@@ -104,7 +129,7 @@ curl -sI https://3evda.com/en | head -1       # 200
 1. در GitHub، commit خراب را revert کنید و با PR به `main` merge کنید.
 2. در موارد اضطراری، از صفحه‌ی **Deployments** در Coolify روی دیپلوی سالم قبلی **Redeploy** بزنید.
 
-## ۷. یادداشت‌های سرور (پس از اولین دیپلوی تکمیل شود)
+## ۸. یادداشت‌های سرور (پس از اولین دیپلوی تکمیل شود)
 
 | مورد | نتیجه |
 |---|---|
