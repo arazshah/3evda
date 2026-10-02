@@ -7,13 +7,17 @@ dependencies = [
     "boto3>=1.43.108",
     "celery>=5.6.3",
     "django>=5.2,<5.3",
+    "django-axes>=8.3.1",
     "django-environ>=0.14.0",
+    "django-otp>=1.7.3",
     "django-storages>=1.14.6",
     "djangorestframework>=3.18.1",
     "drf-spectacular>=0.30.0",
     "gunicorn>=26.2.0",
+    "pillow>=12.3.0",
     "psycopg[binary]>=3.3.6",
     "redis>=8.1.0",
+    "segno>=1.6.6",
     "whitenoise>=6.12.0",
 ]
 
@@ -44,10 +48,12 @@ omit = ["*/tests/*", "*/migrations/*", "config/wsgi.py", "manage.py"]
 [tool.ruff]
 line-length = 120
 target-version = "py313"
+extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "DJ", "SIM", "RUF"]
-ignore = ["RUF012"]
+# RUF001-003: Persian text legitimately uses Arabic-script digits and letters.
+ignore = ["RUF001", "RUF002", "RUF003", "RUF012"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "S105", "S106", "S603", "B017"]

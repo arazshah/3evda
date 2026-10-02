@@ -24,8 +24,34 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_static",
+    "axes",
     "apps.core",
+    "apps.accounts",
+    "apps.audit",
 ]
+
+AUTH_USER_MODEL = "accounts.User"
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Number of reverse proxies that append to X-Forwarded-For in front of Django
+# (production: Coolify's Traefik + the Caddy gateway).
+TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT", default=2)
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 0.25  # hours
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+AXES_CLIENT_IP_CALLABLE = "apps.accounts.ip.axes_client_ip"
+AXES_LOCKOUT_CALLABLE = "apps.accounts.api.lockout_response"
+AXES_VERBOSE = False
+
+OTP_TOTP_ISSUER = "3evda.com"
 
 MIDDLEWARE = [
     "apps.core.middleware.RequestIDMiddleware",
@@ -36,8 +62,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
