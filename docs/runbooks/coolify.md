@@ -123,7 +123,7 @@ curl -sI https://3evda.com/en | head -1       # 200
 - لاگ هر سرویس در Coolify، بخش **Logs** همان Resource، قابل مشاهده است.
 - اگر `ready` خطای ۵۰۳ برگرداند، نام سرویس خراب در پاسخ آمده است (`database`، `redis` یا `storage`).
 - اگر سرویس `api` بالا نمی‌آید، معمولاً migration شکست خورده است. پیام خطا در لاگ api آمده است.
-- volumeهای `pgdata`، `redisdata` و `objects` بین دیپلوی‌ها حفظ می‌شوند. هرگز Resource را با گزینه‌ی حذف volumeها پاک نکنید.
+- volumeهای `pgdata_v2`، `redisdata` و `objects` بین دیپلوی‌ها حفظ می‌شوند. هرگز Resource را با گزینه‌ی حذف volumeها پاک نکنید.
 
 **بازگشت به نسخه‌ی قبل (Rollback):**
 1. در GitHub، commit خراب را revert کنید و با PR به `main` merge کنید.
@@ -138,3 +138,7 @@ curl -sI https://3evda.com/en | head -1       # 200
 | دسترسی به npm | |
 | دسترسی GitHub Actions به وبهوک Coolify | |
 | میرورهای استفاده‌شده | |
+
+## یادداشت: رمز Postgres و volume
+
+Postgres رمز را فقط هنگام ساخت اولیه‌ی volume ذخیره می‌کند. اگر `POSTGRES_PASSWORD` بعد از اولین دیپلوی عوض شود، `api` با خطای `password authentication failed` بالا نمی‌آید. به همین دلیل volume از `pgdata` به `pgdata_v2` تغییر کرد (دیتابیس خالی بود). پس از این، `POSTGRES_PASSWORD` را عوض نکنید.
