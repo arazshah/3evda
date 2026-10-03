@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
-import { fallbackSrc } from "./media";
-import { href, pick } from "./text";
+import { fallbackSrc, fallbackVariant } from "./media";
+import { href, instagramUrl, pick } from "./text";
 import type { BlogArticle, BlogArticleDetail, Media, ProjectDetail, SiteData, SitemapData } from "./types";
 
 /** Pages that exist once per language, in the order they appear in the menu. */
@@ -94,7 +94,8 @@ export function buildRss(site: SiteData, locale: Locale, articles: BlogArticle[]
   const items = articles
     .map((a) => {
       const link = absoluteUrl(locale, `/blog/${encodeURIComponent(a.slug)}`);
-      const cover = a.cover ? absoluteMedia(fallbackSrc(a.cover)) : "";
+      const variant = a.cover ? fallbackVariant(a.cover) : undefined;
+      const cover = variant ? absoluteMedia(variant.url) : "";
       return [
         "    <item>",
         `      <title>${escapeXml(a.title)}</title>`,
@@ -102,7 +103,10 @@ export function buildRss(site: SiteData, locale: Locale, articles: BlogArticle[]
         `      <guid isPermaLink="true">${escapeXml(link)}</guid>`,
         a.published_at ? `      <pubDate>${new Date(a.published_at).toUTCString()}</pubDate>` : "",
         `      <description>${escapeXml(a.summary)}</description>`,
-        cover ? `      <enclosure url="${escapeXml(cover)}" type="image/webp" length="0"/>` : "",
+        // `length` is the file size in bytes (RSS 2.0); without a real size the enclosure is left out.
+        variant && cover && variant.size_bytes > 0
+          ? `      <enclosure url="${escapeXml(cover)}" type="image/${variant.format}" length="${variant.size_bytes}"/>`
+          : "",
         "    </item>",
       ]
         .filter(Boolean)
@@ -132,10 +136,12 @@ export function jsonLdScript(data: JsonLd | JsonLd[]): string {
 
 export function photographerLd(site: SiteData, locale: Locale): JsonLd {
   const s = site.settings;
-  const sameAs = s.instagram ? [`https://instagram.com/${s.instagram.replace(/^@/, "")}`] : [];
+  const sameAs = s.instagram ? [instagramUrl(s.instagram)] : [];
   return {
     "@context": "https://schema.org",
-    "@type": ["Photographer", "LocalBusiness"],
+    // schema.org has no Photographer type; ProfessionalService is a LocalBusiness subtype.
+    "@type": "ProfessionalService",
+    serviceType: "Photography",
     name: pick(locale, s.brand_name_fa, s.brand_name_en),
     description: pick(locale, s.description_fa, s.description_en) || undefined,
     url: absoluteUrl(locale, "/"),

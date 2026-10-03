@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { absoluteUrl, buildRss, buildSitemap, escapeXml, jsonLdScript } from "./seo";
+import { absoluteUrl, buildRss, buildSitemap, escapeXml, jsonLdScript, photographerLd } from "./seo";
 import type { BlogArticle, SiteData } from "./types";
 
 // Set before anything runs: buildSitemap is evaluated while the tests are being collected.
@@ -65,6 +65,54 @@ describe("buildRss", () => {
     expect(xml).toContain("<language>en</language>");
     expect(xml).toContain("Fri, 02 Oct 2026 10:00:00 GMT");
     expect(xml).toContain('href="https://3evda.com/en/rss.xml"');
+  });
+});
+
+describe("rss enclosure", () => {
+  const site = {
+    settings: { brand_name_fa: "س", brand_name_en: "S", description_fa: "", description_en: "" },
+  } as unknown as SiteData;
+  const withCover = (size: number) =>
+    ({
+      slug: "a",
+      title: "T",
+      summary: "",
+      published_at: null,
+      cover: {
+        kind: "image",
+        variants: [
+          { name: "w800", format: "webp", url: "/media/c.webp", width: 800, height: 600, size_bytes: size },
+        ],
+      },
+    }) as unknown as BlogArticle;
+
+  it("reports the real byte size of the cover it links to", () => {
+    const xml = buildRss(site, "en", [withCover(12345)]);
+    expect(xml).toContain(
+      '<enclosure url="https://3evda.com/media/c.webp" type="image/webp" length="12345"/>',
+    );
+  });
+
+  it("omits the enclosure when the size is unknown", () => {
+    expect(buildRss(site, "en", [withCover(0)])).not.toContain("<enclosure");
+  });
+});
+
+describe("photographerLd", () => {
+  const site = (instagram: string) =>
+    ({
+      settings: { brand_name_fa: "س", brand_name_en: "S", description_fa: "", description_en: "", instagram },
+    }) as unknown as SiteData;
+
+  it("uses a type schema.org defines", () => {
+    expect(photographerLd(site(""), "en")["@type"]).toBe("ProfessionalService");
+  });
+
+  it("builds sameAs from a handle or keeps a full URL as entered", () => {
+    expect(photographerLd(site("@3evda.r"), "en").sameAs).toEqual(["https://www.instagram.com/3evda.r/"]);
+    expect(photographerLd(site("https://www.instagram.com/3evda.r/"), "en").sameAs).toEqual([
+      "https://www.instagram.com/3evda.r/",
+    ]);
   });
 });
 

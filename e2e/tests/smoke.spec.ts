@@ -134,7 +134,7 @@ test.describe("search engines", () => {
       await page.goto(path);
       return (await page.locator('script[type="application/ld+json"]').allTextContents()).join("\n");
     };
-    expect(await ld("/")).toContain('"Photographer"');
+    expect(await ld("/")).toContain('"ProfessionalService"');
     const article = await ld("/blog/sample-article");
     expect(article).toContain('"@type":"Article"');
     expect(article).toContain('"BreadcrumbList"');
