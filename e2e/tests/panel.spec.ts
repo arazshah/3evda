@@ -139,7 +139,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.goto("/portfolio");
   await expect(page.getByRole("link", { name: "پروژه‌ی ویرایش‌شده" })).toHaveCount(0);
 
-  // Sign out.
+  // Sign out (the button lives in the panel, and the journey above ended on a public page).
+  await page.goto("/panel");
   await page.getByRole("button", { name: "خروج" }).first().click();
   await expect(page).toHaveURL(/\/panel\/login$/);
   expect((await page.request.get("/api/admin/media/")).status()).toBe(403);
