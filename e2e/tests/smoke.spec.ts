@@ -15,6 +15,13 @@ const pages = [
   { path: "/en/about", lang: "en", dir: "ltr", heading: "About me" },
   { path: "/contact", lang: "fa", dir: "rtl", heading: "تماس" },
   { path: "/en/contact", lang: "en", dir: "ltr", heading: "Contact" },
+  // The journal pages; the articles come from `seed_blog_demo`, which CI runs before the tests.
+  { path: "/blog", lang: "fa", dir: "rtl", heading: "مجله" },
+  { path: "/en/blog", lang: "en", dir: "ltr", heading: "Journal" },
+  { path: "/blog/sample-article", lang: "fa", dir: "rtl", heading: "مقاله‌ی نمونه" },
+  { path: "/en/blog/sample-article", lang: "en", dir: "ltr", heading: "Sample article" },
+  { path: "/blog/category/sample", lang: "fa", dir: "rtl", heading: "نمونه" },
+  { path: "/en/blog/tag/sample", lang: "en", dir: "ltr", heading: "sample" },
 ] as const;
 
 for (const p of pages) {
@@ -55,4 +62,37 @@ test("unknown pages return a localized 404", async ({ page }) => {
   const response = await page.goto("/this-page-does-not-exist");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("صفحه‌ای که دنبالش بودید پیدا نشد");
+});
+
+test.describe("journal", () => {
+  test("an article lists itself in the journal, with its category and reading time", async ({ page }) => {
+    await page.goto("/en/blog");
+    const card = page.getByRole("article").filter({ hasText: "Sample article" });
+    await expect(card.getByRole("link", { name: "Sample article" })).toHaveAttribute("href", "/en/blog/sample-article");
+    await expect(card.getByRole("link", { name: "Sample", exact: true })).toHaveAttribute("href", "/en/blog/category/sample");
+    await expect(card).toContainText("min read");
+  });
+
+  test("the article page has absolute canonical and hreflang links to both languages", async ({ page }) => {
+    await page.goto("/blog/sample-article");
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+    expect(canonical).toMatch(/^https?:\/\/.+\/blog\/sample-article$/);
+    const hreflang = async (lang: string) => page.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href");
+    expect(await hreflang("fa")).toMatch(/^https?:\/\/.+\/blog\/sample-article$/);
+    expect(await hreflang("en")).toMatch(/^https?:\/\/.+\/en\/blog\/sample-article$/);
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
+  });
+
+  test("the language switch opens the same article in the other language", async ({ page }) => {
+    await page.goto("/blog/sample-article");
+    await page.getByRole("banner").getByRole("link", { name: "English" }).click();
+    await expect(page).toHaveURL(/\/en\/blog\/sample-article$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sample article");
+  });
+
+  test("unknown articles, categories and preview links are 404s", async ({ page }) => {
+    for (const path of ["/blog/does-not-exist", "/blog/category/nothing", "/blog/tag/nothing", "/blog/preview/garbage"]) {
+      expect((await page.goto(path))?.status(), path).toBe(404);
+    }
+  });
 });

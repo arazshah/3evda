@@ -53,3 +53,14 @@ export function whatsappUrl(number: string): string {
   if (!number) return "";
   return /^https?:\/\//.test(number) ? number : `https://wa.me/${number.replace(/[^\d]/g, "")}`;
 }
+
+/** A long date in the reader's calendar (Persian pages use the Jalali calendar). */
+export function formatDate(iso: string | null | undefined, locale: Locale): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", {
+    dateStyle: "long",
+    timeZone: "Asia/Tehran",
+  }).format(date);
+}

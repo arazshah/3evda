@@ -27,6 +27,7 @@ GROUPS = {
     "packages": "پکیج‌ها",
     "about": "درباره‌ی من",
     "contact": "تماس",
+    "blog": "مجله",
     "footer": "پایین صفحه",
 }
 
@@ -86,6 +87,8 @@ BLOCKS: tuple[BlockDef, ...] = (
     BlockDef("about.photo", "about", "عکس", "image"),
     BlockDef("contact.title", "contact", "عنوان صفحه", "text", "تماس", "Contact"),
     BlockDef("contact.intro", "contact", "متن مقدمه", "longtext"),
+    BlockDef("blog.title", "blog", "عنوان صفحه", "text", "مجله", "Journal"),
+    BlockDef("blog.intro", "blog", "متن مقدمه", "longtext"),
     BlockDef("footer.about", "footer", "متن کوتاه پایین صفحه", "longtext"),
 )
 
