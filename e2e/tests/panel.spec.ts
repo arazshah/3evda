@@ -25,6 +25,7 @@ test("admin APIs refuse anonymous visitors", async ({ request }) => {
 });
 
 test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request }) => {
+  test.setTimeout(120_000); // one long journey: sign-in, media, site content, portfolio
   await page.goto("/panel/login");
   await page.getByLabel("نام کاربری").fill(USERNAME);
   await page.getByLabel("رمز عبور").fill(PASSWORD);
@@ -96,7 +97,56 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await block.getByRole("button", { name: "ذخیره" }).click();
   await expect(block.getByText("ذخیره شد.")).toBeVisible();
 
-  // Sign out.
+  // Portfolio journey: create a category and a project in the panel, see them on the site,
+  // rename the project, then delete both again.
+  const acceptNextDialog = () => page.once("dialog", (d) => d.accept());
+  await page.goto("/panel/categories");
+  await page.getByRole("button", { name: "افزودن دسته" }).click();
+  await page.getByLabel("نام دسته (فارسی)").fill("دسته‌ی آزمایشی");
+  await page.getByLabel("نام دسته (English)").fill("E2E category");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.getByRole("list", { name: "دسته‌ها" })).toContainText("دسته‌ی آزمایشی");
+
+  await page.goto("/panel/projects");
+  await page.getByRole("button", { name: "افزودن پروژه" }).click();
+  await page.getByLabel("عنوان (فارسی)").fill("پروژه‌ی آزمایشی");
+  await page.getByLabel("عنوان (English)").fill("E2E project");
+  await page.getByRole("combobox", { name: /^دسته/ }).selectOption({ label: "دسته‌ی آزمایشی" });
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.getByRole("list", { name: "پروژه‌ها" })).toContainText("پروژه‌ی آزمایشی");
+
+  await page.goto("/portfolio");
+  await expect(page.getByRole("button", { name: "دسته‌ی آزمایشی" })).toBeVisible();
+  await page.getByRole("link", { name: "پروژه‌ی آزمایشی" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "پروژه‌ی آزمایشی" })).toBeVisible();
+
+  await page.goto("/panel/projects");
+  await page.getByRole("button", { name: "ویرایش پروژه‌ی آزمایشی" }).click();
+  await page.getByLabel("عنوان (فارسی)").fill("پروژه‌ی ویرایش‌شده");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.getByRole("list", { name: "پروژه‌ها" })).toContainText("پروژه‌ی ویرایش‌شده");
+  await page.goto("/portfolio");
+  await expect(page.getByRole("link", { name: "پروژه‌ی ویرایش‌شده" })).toBeVisible();
+
+  await page.goto("/panel/projects");
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف پروژه‌ی ویرایش‌شده" }).click();
+  await expect(page.getByRole("list", { name: "پروژه‌ها" })).toHaveCount(0);
+  await page.goto("/panel/categories");
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف دسته‌ی آزمایشی" }).click();
+  await expect(page.getByRole("list", { name: "دسته‌ها" })).toHaveCount(0);
+  await page.goto("/portfolio");
+  await expect(page.getByRole("link", { name: "پروژه‌ی ویرایش‌شده" })).toHaveCount(0);
+
+  // Sign out (the button lives in the panel, and the journey above ended on a public page).
+  await page.goto("/panel");
   await page.getByRole("button", { name: "خروج" }).first().click();
   await expect(page).toHaveURL(/\/panel\/login$/);
   expect((await page.request.get("/api/admin/media/")).status()).toBe(403);

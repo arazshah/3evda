@@ -24,7 +24,7 @@ export function MediaPicker({
   label: string;
   value: PickedMedia | null;
   onChange: (next: PickedMedia | null) => void;
-  kind?: "image" | "video";
+  kind?: "image" | "video" | "any";
   required?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -81,13 +81,13 @@ function PickerBody({
   selectedId,
   onPick,
 }: {
-  kind: "image" | "video";
+  kind: "image" | "video" | "any";
   selectedId?: string;
   onPick: (asset: MediaAsset) => void;
 }) {
   const [page, setPage] = useState(1);
   // Not filtered by status: a fresh upload is pending, and only a result containing it keeps the list polling.
-  const list = useMediaList({ kind, page });
+  const list = useMediaList({ kind: kind === "any" ? undefined : kind, page });
   const pages = Math.max(1, Math.ceil((list.data?.count ?? 0) / 40));
 
   return (
