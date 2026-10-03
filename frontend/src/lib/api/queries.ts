@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type ApiError, type MediaAsset, type WatermarkSetting } from "./client";
+import { revalidatePublic } from "./revalidate";
 import type { components } from "./schema";
 
 type Result<T> = { data?: T; error?: unknown; response: Response };
@@ -20,6 +21,8 @@ export const keys = {
   media: ["media"] as const,
   mediaList: (params: MediaListParams) => ["media", "list", params] as const,
   watermark: ["watermark"] as const,
+  settings: ["cms", "settings"] as const,
+  blocks: ["cms", "blocks"] as const,
 };
 
 export function useMe() {
@@ -84,5 +87,50 @@ export function useSaveWatermark() {
     mutationFn: (body: Omit<WatermarkSetting, "updated_at">) =>
       unwrap(api.PUT("/api/admin/settings/watermark", { body: body as WatermarkSetting })),
     onSuccess: (data) => client.setQueryData(keys.watermark, data),
+  });
+}
+
+export function useSettings() {
+  return useQuery({
+    queryKey: keys.settings,
+    queryFn: () => unwrap(api.GET("/api/admin/cms/settings")),
+  });
+}
+
+export function useSaveSettings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: components["schemas"]["PatchedSiteSettings"]) =>
+      unwrap(api.PATCH("/api/admin/cms/settings", { body })),
+    onSuccess: async (data) => {
+      client.setQueryData(keys.settings, data);
+      await revalidatePublic("site");
+    },
+  });
+}
+
+export function useBlocks() {
+  return useQuery({
+    queryKey: keys.blocks,
+    queryFn: () => unwrap(api.GET("/api/admin/cms/blocks/")),
+  });
+}
+
+export function useSaveBlock() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      key,
+      ...body
+    }: {
+      key: string;
+      text_fa?: string;
+      text_en?: string;
+      media?: string | null;
+    }) => unwrap(api.PATCH("/api/admin/cms/blocks/{key}/", { params: { path: { key } }, body })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.blocks });
+      await revalidatePublic("site");
+    },
   });
 }

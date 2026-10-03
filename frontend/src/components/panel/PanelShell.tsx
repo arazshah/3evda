@@ -10,6 +10,8 @@ import { Button } from "./ui";
 
 const NAV = [
   { href: "/panel", label: "داشبورد" },
+  { href: "/panel/content", label: "متن‌ها و تصاویر" },
+  { href: "/panel/settings", label: "تنظیمات سایت" },
   { href: "/panel/media", label: "کتابخانه رسانه" },
   { href: "/panel/watermark", label: "واترمارک" },
   { href: "/panel/security", label: "امنیت" },

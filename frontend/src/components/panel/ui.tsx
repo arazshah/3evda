@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import { useId } from "react";
 
 export function Button({
@@ -69,5 +69,40 @@ export function Alert({ children, tone = "error" }: { children: ReactNode; tone?
     >
       {children}
     </p>
+  );
+}
+
+export function TextArea({
+  label,
+  hint,
+  error,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; hint?: string; error?: string }) {
+  const id = useId();
+  const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor={id} className="text-sm text-muted">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        rows={4}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        className="rounded-brand border border-line bg-elevated px-3 py-2 text-text outline-none focus:border-accent"
+        {...props}
+      />
+      {hint && (
+        <p id={`${id}-hint`} className="text-xs text-muted">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={`${id}-error`} className="text-sm text-accent-2" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
