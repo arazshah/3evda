@@ -184,7 +184,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.goto("/packages");
   await expect(page.getByText(/^از .+ تومان$/)).toHaveCount(0);
-  await expect(page.getByText("استعلام بگیرید")).toBeVisible();
+  await expect(page.getByText("استعلام بگیرید", { exact: true })).toBeVisible();
 
   await page.goto("/panel/packages");
   acceptNextDialog();
