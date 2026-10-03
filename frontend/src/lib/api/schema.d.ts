@@ -700,6 +700,151 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/proformas/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_proformas_list"];
+    put?: never;
+    post: operations["admin_proformas_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_proformas_retrieve"];
+    put?: never;
+    post?: never;
+    delete: operations["admin_proformas_destroy"];
+    options?: never;
+    head?: never;
+    patch: operations["admin_proformas_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/cancel/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_proformas_cancel_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/issue/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_proformas_issue_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/new-link/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_proformas_new_link_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/pdf/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["proformas_pdf"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/{id}/revise/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_proformas_revise_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/from-inquiry/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A draft prefilled from an enquiry. */
+    post: operations["proformas_from_inquiry"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/proformas/settings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_proformas_settings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_proformas_settings_partial_update"];
+    trace?: never;
+  };
   "/api/admin/settings/watermark": {
     parameters: {
       query?: never;
@@ -985,6 +1130,87 @@ export interface paths {
     get: operations["public_project_retrieve"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/proformas/{token}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Reading never changes anything: link checkers and previews must not mark a proforma «seen». */
+    get: operations["public_proformas_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/proformas/{token}/approve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_proformas_approve"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/proformas/{token}/pdf": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_proformas_pdf"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/proformas/{token}/reject": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_proformas_reject"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/proformas/{token}/seen": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_proformas_seen"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1442,6 +1668,21 @@ export interface components {
       previous?: string | null;
       results: components["schemas"]["MediaAsset"][];
     };
+    PaginatedProformaListList: {
+      /** @example 123 */
+      count: number;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null;
+      results: components["schemas"]["ProformaList"][];
+    };
     Password: {
       password: string;
     };
@@ -1639,6 +1880,67 @@ export interface components {
       is_published?: boolean;
       readonly package_count?: number;
     };
+    PatchedProforma: {
+      readonly id?: number;
+      readonly number?: string | null;
+      readonly status?: string;
+      language?: components["schemas"]["LanguageEnum"];
+      customer_name?: string;
+      customer_company?: string;
+      customer_contact?: string;
+      readonly inquiry?: number | null;
+      readonly replaces?: number | null;
+      readonly replaces_number?: string;
+      /**
+       * Format: int64
+       * @description Toman; use this or the percent, not both
+       */
+      discount_amount?: number;
+      /** Format: decimal */
+      discount_percent?: string;
+      /** Format: decimal */
+      tax_percent?: string;
+      readonly subtotal?: number;
+      readonly discount?: number;
+      readonly tax?: number;
+      readonly total?: number;
+      terms?: string;
+      /** Format: date */
+      valid_until?: string | null;
+      /** Format: date */
+      readonly issue_date?: string | null;
+      /** Format: date-time */
+      readonly issued_at?: string | null;
+      /** @description Who issued it, frozen when it was issued */
+      readonly issuer?: unknown;
+      /** Format: date-time */
+      readonly seen_at?: string | null;
+      /** Format: date-time */
+      readonly responded_at?: string | null;
+      readonly rejection_reason?: string;
+      readonly link?: string | null;
+      items?: components["schemas"]["ProformaItem"][];
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
+    PatchedProformaSettings: {
+      issuer_name_fa?: string;
+      issuer_name_en?: string;
+      phone?: string;
+      address_fa?: string;
+      address_en?: string;
+      terms_fa?: string;
+      terms_en?: string;
+      footer_fa?: string;
+      footer_en?: string;
+      default_validity_days?: number;
+      /** Format: decimal */
+      default_tax_percent?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     PatchedProject: {
       readonly id?: number;
@@ -1740,6 +2042,94 @@ export interface components {
      * @enum {string}
      */
     PriceModeEnum: "from" | "fixed" | "inquiry";
+    Proforma: {
+      readonly id: number;
+      readonly number: string | null;
+      readonly status: string;
+      language?: components["schemas"]["LanguageEnum"];
+      customer_name: string;
+      customer_company?: string;
+      customer_contact?: string;
+      readonly inquiry: number | null;
+      readonly replaces: number | null;
+      readonly replaces_number: string;
+      /**
+       * Format: int64
+       * @description Toman; use this or the percent, not both
+       */
+      discount_amount?: number;
+      /** Format: decimal */
+      discount_percent?: string;
+      /** Format: decimal */
+      tax_percent?: string;
+      readonly subtotal: number;
+      readonly discount: number;
+      readonly tax: number;
+      readonly total: number;
+      terms?: string;
+      /** Format: date */
+      valid_until?: string | null;
+      /** Format: date */
+      readonly issue_date: string | null;
+      /** Format: date-time */
+      readonly issued_at: string | null;
+      /** @description Who issued it, frozen when it was issued */
+      readonly issuer: unknown;
+      /** Format: date-time */
+      readonly seen_at: string | null;
+      /** Format: date-time */
+      readonly responded_at: string | null;
+      readonly rejection_reason: string;
+      readonly link: string | null;
+      items?: components["schemas"]["ProformaItem"][];
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    ProformaFromInquiry: {
+      inquiry: number;
+      language?: components["schemas"]["LanguageEnum"];
+    };
+    ProformaItem: {
+      description: string;
+      quantity: number;
+      /**
+       * Format: int64
+       * @description Toman
+       */
+      unit_price: number;
+      readonly line_total: number;
+    };
+    ProformaList: {
+      readonly id: number;
+      readonly number: string | null;
+      readonly status: string;
+      readonly language: components["schemas"]["LanguageEnum"];
+      readonly customer_name: string;
+      readonly customer_company: string;
+      readonly total: number;
+      /** Format: date */
+      readonly valid_until: string | null;
+      /** Format: date-time */
+      readonly created_at: string;
+    };
+    ProformaSettings: {
+      issuer_name_fa?: string;
+      issuer_name_en?: string;
+      phone?: string;
+      address_fa?: string;
+      address_en?: string;
+      terms_fa?: string;
+      terms_en?: string;
+      footer_fa?: string;
+      footer_en?: string;
+      default_validity_days?: number;
+      /** Format: decimal */
+      default_tax_percent?: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     Project: {
       readonly id: number;
@@ -1923,6 +2313,38 @@ export interface components {
       categories: components["schemas"]["PublicCategory"][];
       projects: components["schemas"]["PublicProject"][];
     };
+    /** @description Everything the customer needs, and nothing internal (no ids, inquiry, IP or owner notes). */
+    PublicProforma: {
+      number: string;
+      status: string;
+      language: string;
+      customer_name: string;
+      customer_company: string;
+      items: components["schemas"]["PublicProformaItem"][];
+      subtotal: number;
+      discount: number;
+      /** Format: decimal */
+      discount_percent: string;
+      tax: number;
+      /** Format: decimal */
+      tax_percent: string;
+      total: number;
+      terms: string;
+      /** Format: date */
+      issue_date: string;
+      /** Format: date */
+      valid_until: string | null;
+      issuer: unknown;
+      rejection_reason: string;
+      /** Format: date-time */
+      responded_at: string | null;
+    };
+    PublicProformaItem: {
+      description: string;
+      quantity: number;
+      unit_price: number;
+      line_total: number;
+    };
     PublicProject: {
       readonly slug: string;
       readonly category: string;
@@ -2066,6 +2488,10 @@ export interface components {
     };
     RecoveryCodes: {
       recovery_codes: string[];
+    };
+    Reject: {
+      /** @default  */
+      reason: string;
     };
     Reorder: {
       collection: components["schemas"]["CollectionEnum"];
@@ -4161,6 +4587,335 @@ export interface operations {
       };
     };
   };
+  admin_proformas_list: {
+    parameters: {
+      query?: {
+        /** @description یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده. */
+        page?: number;
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedProformaListList"];
+        };
+      };
+    };
+  };
+  admin_proformas_create: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Proforma"];
+        "application/x-www-form-urlencoded": components["schemas"]["Proforma"];
+        "multipart/form-data": components["schemas"]["Proforma"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_retrieve: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_destroy: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_proformas_partial_update: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedProforma"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedProforma"];
+        "multipart/form-data": components["schemas"]["PatchedProforma"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_cancel_create: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_issue_create: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_new_link_create: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  proformas_pdf: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+    };
+  };
+  admin_proformas_revise_create: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این proforma را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  proformas_from_inquiry: {
+    parameters: {
+      query?: {
+        q?: string;
+        status?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProformaFromInquiry"];
+        "application/x-www-form-urlencoded": components["schemas"]["ProformaFromInquiry"];
+        "multipart/form-data": components["schemas"]["ProformaFromInquiry"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Proforma"];
+        };
+      };
+    };
+  };
+  admin_proformas_settings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProformaSettings"];
+        };
+      };
+    };
+  };
+  admin_proformas_settings_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedProformaSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedProformaSettings"];
+        "multipart/form-data": components["schemas"]["PatchedProformaSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProformaSettings"];
+        };
+      };
+    };
+  };
   admin_settings_watermark_retrieve: {
     parameters: {
       query?: never;
@@ -4634,6 +5389,117 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicProjectDetail"];
+        };
+      };
+    };
+  };
+  public_proformas_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicProforma"];
+        };
+      };
+    };
+  };
+  public_proformas_approve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicProforma"];
+        };
+      };
+    };
+  };
+  public_proformas_pdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+    };
+  };
+  public_proformas_reject: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Reject"];
+        "application/x-www-form-urlencoded": components["schemas"]["Reject"];
+        "multipart/form-data": components["schemas"]["Reject"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicProforma"];
+        };
+      };
+    };
+  };
+  public_proformas_seen: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicProforma"];
         };
       };
     };

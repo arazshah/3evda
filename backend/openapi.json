@@ -3945,6 +3945,653 @@
                 }
             }
         },
+        "/api/admin/proformas/": {
+            "get": {
+                "operationId": "admin_proformas_list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedProformaListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_proformas_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Proforma"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Proforma"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Proforma"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/": {
+            "get": {
+                "operationId": "admin_proformas_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_proformas_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProforma"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProforma"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProforma"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_proformas_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/cancel/": {
+            "post": {
+                "operationId": "admin_proformas_cancel_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/issue/": {
+            "post": {
+                "operationId": "admin_proformas_issue_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/new-link/": {
+            "post": {
+                "operationId": "admin_proformas_new_link_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/pdf/": {
+            "get": {
+                "operationId": "proformas_pdf",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/{id}/revise/": {
+            "post": {
+                "operationId": "admin_proformas_revise_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این proforma را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/from-inquiry/": {
+            "post": {
+                "operationId": "proformas_from_inquiry",
+                "description": "A draft prefilled from an enquiry.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProformaFromInquiry"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProformaFromInquiry"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProformaFromInquiry"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Proforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/proformas/settings/": {
+            "get": {
+                "operationId": "admin_proformas_settings_retrieve",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProformaSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_proformas_settings_partial_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProformaSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProformaSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProformaSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProformaSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/settings/watermark": {
             "get": {
                 "operationId": "admin_settings_watermark_retrieve",
@@ -4679,6 +5326,177 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PublicProjectDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/proformas/{token}": {
+            "get": {
+                "operationId": "public_proformas_retrieve",
+                "description": "Reading never changes anything: link checkers and previews must not mark a proforma «seen».",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/proformas/{token}/approve": {
+            "post": {
+                "operationId": "public_proformas_approve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/proformas/{token}/pdf": {
+            "get": {
+                "operationId": "public_proformas_pdf",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/proformas/{token}/reject": {
+            "post": {
+                "operationId": "public_proformas_reject",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reject"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reject"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reject"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProforma"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/proformas/{token}/seen": {
+            "post": {
+                "operationId": "public_proformas_seen",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProforma"
                                 }
                             }
                         },
@@ -6198,6 +7016,37 @@
                     }
                 }
             },
+            "PaginatedProformaListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProformaList"
+                        }
+                    }
+                }
+            },
             "Password": {
                 "type": "object",
                 "properties": {
@@ -6919,6 +7768,201 @@
                     }
                 }
             },
+            "PatchedProforma": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "number": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "customer_name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "customer_company": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "customer_contact": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "inquiry": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "replaces": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "replaces_number": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "discount_amount": {
+                        "type": "integer",
+                        "maximum": 1000000000000,
+                        "minimum": 0,
+                        "format": "int64",
+                        "description": "Toman; use this or the percent, not both"
+                    },
+                    "discount_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "tax_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "subtotal": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "discount": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "tax": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "terms": {
+                        "type": "string"
+                    },
+                    "valid_until": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "issue_date": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "issued_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "issuer": {
+                        "readOnly": true,
+                        "description": "Who issued it, frozen when it was issued"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "responded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "rejection_reason": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "link": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProformaItem"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedProformaSettings": {
+                "type": "object",
+                "properties": {
+                    "issuer_name_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "issuer_name_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "address_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "address_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "terms_fa": {
+                        "type": "string"
+                    },
+                    "terms_en": {
+                        "type": "string"
+                    },
+                    "footer_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "footer_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "default_validity_days": {
+                        "type": "integer",
+                        "maximum": 365,
+                        "minimum": 1
+                    },
+                    "default_tax_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PatchedProject": {
                 "type": "object",
                 "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
@@ -7262,6 +8306,331 @@
                 ],
                 "type": "string",
                 "description": "* `from` - از … شروع می‌شود\n* `fixed` - قیمت ثابت\n* `inquiry` - استعلام"
+            },
+            "Proforma": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "number": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "customer_name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "customer_company": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "customer_contact": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "inquiry": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "replaces": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "replaces_number": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "discount_amount": {
+                        "type": "integer",
+                        "maximum": 1000000000000,
+                        "minimum": 0,
+                        "format": "int64",
+                        "description": "Toman; use this or the percent, not both"
+                    },
+                    "discount_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "tax_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "subtotal": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "discount": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "tax": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "terms": {
+                        "type": "string"
+                    },
+                    "valid_until": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "issue_date": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "issued_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "issuer": {
+                        "readOnly": true,
+                        "description": "Who issued it, frozen when it was issued"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "responded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "rejection_reason": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "link": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProformaItem"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "customer_name",
+                    "discount",
+                    "id",
+                    "inquiry",
+                    "issue_date",
+                    "issued_at",
+                    "issuer",
+                    "link",
+                    "number",
+                    "rejection_reason",
+                    "replaces",
+                    "replaces_number",
+                    "responded_at",
+                    "seen_at",
+                    "status",
+                    "subtotal",
+                    "tax",
+                    "total",
+                    "updated_at"
+                ]
+            },
+            "ProformaFromInquiry": {
+                "type": "object",
+                "properties": {
+                    "inquiry": {
+                        "type": "integer"
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    }
+                },
+                "required": [
+                    "inquiry"
+                ]
+            },
+            "ProformaItem": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "maximum": 100000,
+                        "minimum": 1
+                    },
+                    "unit_price": {
+                        "type": "integer",
+                        "maximum": 1000000000000,
+                        "minimum": 0,
+                        "format": "int64",
+                        "description": "Toman"
+                    },
+                    "line_total": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "description",
+                    "line_total",
+                    "quantity",
+                    "unit_price"
+                ]
+            },
+            "ProformaList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "number": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "customer_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "customer_company": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "valid_until": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "customer_company",
+                    "customer_name",
+                    "id",
+                    "language",
+                    "number",
+                    "status",
+                    "total",
+                    "valid_until"
+                ]
+            },
+            "ProformaSettings": {
+                "type": "object",
+                "properties": {
+                    "issuer_name_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "issuer_name_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "address_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "address_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "terms_fa": {
+                        "type": "string"
+                    },
+                    "terms_en": {
+                        "type": "string"
+                    },
+                    "footer_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "footer_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "default_validity_days": {
+                        "type": "integer",
+                        "maximum": 365,
+                        "minimum": 1
+                    },
+                    "default_tax_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "updated_at"
+                ]
             },
             "Project": {
                 "type": "object",
@@ -8179,6 +9548,119 @@
                     "projects"
                 ]
             },
+            "PublicProforma": {
+                "type": "object",
+                "description": "Everything the customer needs, and nothing internal (no ids, inquiry, IP or owner notes).",
+                "properties": {
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "customer_name": {
+                        "type": "string"
+                    },
+                    "customer_company": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicProformaItem"
+                        }
+                    },
+                    "subtotal": {
+                        "type": "integer"
+                    },
+                    "discount": {
+                        "type": "integer"
+                    },
+                    "discount_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "tax": {
+                        "type": "integer"
+                    },
+                    "tax_percent": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "terms": {
+                        "type": "string"
+                    },
+                    "issue_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "valid_until": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "issuer": {},
+                    "rejection_reason": {
+                        "type": "string"
+                    },
+                    "responded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "customer_company",
+                    "customer_name",
+                    "discount",
+                    "discount_percent",
+                    "issue_date",
+                    "issuer",
+                    "items",
+                    "language",
+                    "number",
+                    "rejection_reason",
+                    "responded_at",
+                    "status",
+                    "subtotal",
+                    "tax",
+                    "tax_percent",
+                    "terms",
+                    "total",
+                    "valid_until"
+                ]
+            },
+            "PublicProformaItem": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "integer"
+                    },
+                    "unit_price": {
+                        "type": "integer"
+                    },
+                    "line_total": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "description",
+                    "line_total",
+                    "quantity",
+                    "unit_price"
+                ]
+            },
             "PublicProject": {
                 "type": "object",
                 "properties": {
@@ -8806,6 +10288,16 @@
                 "required": [
                     "recovery_codes"
                 ]
+            },
+            "Reject": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "default": "",
+                        "maxLength": 500
+                    }
+                }
             },
             "Reorder": {
                 "type": "object",

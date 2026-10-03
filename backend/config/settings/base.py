@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.pricing",
     "apps.blog",
     "apps.inquiries",
+    "apps.proformas",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -178,6 +179,7 @@ REST_FRAMEWORK = {
         "otp": "10/min",
         "estimate": "60/min",
         "inquiry": env("INQUIRY_RATE", default="5/hour"),
+        "proforma": "60/min",
     },
     "EXCEPTION_HANDLER": "apps.core.errors.exception_handler",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
@@ -196,6 +198,7 @@ SPECTACULAR_SETTINGS = {
         "KindEnum": "apps.media.models.MediaAsset.Kind",
         "QuoteRuleKindEnum": "apps.pricing.models.QuoteRule.Kind",
         "InquiryStatusEnum": "apps.inquiries.models.Inquiry.Status",
+        "ProformaStatusEnum": "apps.proformas.models.Proforma.Status",
     },
 }
 
@@ -215,4 +218,6 @@ LOGGING = {
         "console": {"class": "logging.StreamHandler", "formatter": "json", "filters": ["request_id"]},
     },
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+    # PDF rendering reports every step at INFO; that is noise, not information.
+    "loggers": {"weasyprint": {"level": "WARNING"}, "fontTools": {"level": "WARNING"}},
 }

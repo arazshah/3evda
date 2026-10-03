@@ -34,7 +34,7 @@ RUN if [ -n "$DEBIAN_MIRROR" ]; then \
       sed -i "s|http://deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources; \
     fi \
  && apt-get update \
- && apt-get install --yes --no-install-recommends ffmpeg libfribidi0 \
+ && apt-get install --yes --no-install-recommends ffmpeg libfribidi0 libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
  && rm -rf /var/lib/apt/lists/* \
  && groupadd --gid 10001 app && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 WORKDIR /app
