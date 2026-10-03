@@ -169,6 +169,37 @@ describe("ContentBlocks", () => {
   });
 });
 
+describe("MediaPicker uploads", () => {
+  it("keeps polling while a new upload is processing and enables it once ready", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const pending = {
+        ...asset,
+        id: "22222222-2222-2222-2222-222222222222",
+        status: "pending",
+        title: "Fresh",
+        variants: [],
+      };
+      const api = fakeApi([
+        { method: "GET", path: "/api/admin/media/", body: { count: 1, results: [pending] } },
+        {
+          method: "GET",
+          path: "/api/admin/media/",
+          body: { count: 1, results: [{ ...pending, status: "ready", variants: [variant] }] },
+        },
+      ]);
+      vi.stubGlobal("fetch", api.fetchImpl);
+      renderWithQuery(<MediaPicker label="لوگو" value={null} onChange={() => {}} />);
+      fireEvent.click(screen.getByRole("button", { name: "انتخاب لوگو" }));
+      expect(await screen.findByRole("button", { name: "Fresh (در صف)" })).toBeDisabled();
+      await vi.advanceTimersByTimeAsync(3500);
+      expect(await screen.findByRole("button", { name: "Fresh" })).toBeEnabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("MediaPicker", () => {
   it("shows the chosen picture, hides remove when required and clears otherwise", () => {
     const value: PickedMedia = { id: "x", src: "/media/a.webp", label: "A" };

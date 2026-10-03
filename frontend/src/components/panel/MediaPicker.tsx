@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import type { MediaAsset } from "@/lib/api/client";
 import { useMediaList } from "@/lib/api/queries";
-import { previewUrl } from "./media-utils";
+import { previewUrl, STATUS_LABELS } from "./media-utils";
 import { Alert, Button } from "./ui";
 import { Uploader } from "./Uploader";
 
@@ -86,7 +86,8 @@ function PickerBody({
   onPick: (asset: MediaAsset) => void;
 }) {
   const [page, setPage] = useState(1);
-  const list = useMediaList({ kind, status: "ready", page });
+  // Not filtered by status: a fresh upload is pending, and only a result containing it keeps the list polling.
+  const list = useMediaList({ kind, page });
   const pages = Math.max(1, Math.ceil((list.data?.count ?? 0) / 40));
 
   return (
@@ -101,20 +102,26 @@ function PickerBody({
         {list.data?.results.map((asset) => {
           const src = previewUrl(asset);
           const name = asset.title || asset.original_filename;
+          const ready = asset.status === "ready";
           return (
             <li key={asset.id}>
               <button
                 type="button"
                 onClick={() => onPick(asset)}
+                disabled={!ready}
                 aria-pressed={asset.id === selectedId}
-                aria-label={name}
-                className={`block w-full overflow-hidden rounded-brand border bg-elevated hover:border-accent ${
+                aria-label={ready ? name : `${name} (${STATUS_LABELS[asset.status]})`}
+                className={`relative block w-full overflow-hidden rounded-brand border bg-elevated enabled:hover:border-accent disabled:opacity-60 ${
                   asset.id === selectedId ? "border-accent" : "border-line"
                 }`}
               >
-                {src && (
+                {src ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={src} alt="" loading="lazy" className="aspect-square w-full object-cover" />
+                ) : (
+                  <span className="flex aspect-square items-center justify-center p-2 text-xs text-muted">
+                    {STATUS_LABELS[asset.status]}
+                  </span>
                 )}
               </button>
             </li>
