@@ -215,8 +215,8 @@ def test_the_preview_shows_how_the_number_is_built(owner_client):
     )
     body = response.json()
     assert response.status_code == 200
-    assert (body["base"], body["tier_factor"], body["total"]) == (10_000_000, "0.900", 16_500_000)
-    assert body["addons"] == [["video", "2000000"]] and body["multipliers"] == [["urgent", "1.500"]]
+    assert (body["base"], body["tier_factor"], body["total"]) == (10_000_000, "0.90", 16_500_000)
+    assert body["addons"] == [["video", "2000000"]] and body["multipliers"] == [["urgent", "1.50"]]
 
 
 def test_rules_can_be_reordered_and_deleted_and_changes_are_audited(owner_client):
@@ -229,3 +229,20 @@ def test_rules_can_be_reordered_and_deleted_and_changes_are_audited(owner_client
     assert owner_client.delete(f"{RULES_URL}{ids[0]}/").status_code == 204
     actions = set(AuditLog.objects.values_list("action", flat=True))
     assert {"pricing.quoterule.reorder", "pricing.quoterule.delete"} <= actions
+
+
+def test_factors_have_two_decimals_at_most(owner_client):
+    base = {"key": "f", "label_fa": "ض", "kind": "multiplier"}
+    assert owner_client.post(RULES_URL, {**base, "factor": "1.255"}, format="json").status_code == 400
+    ok = owner_client.post(RULES_URL, {**base, "factor": "1.25"}, format="json")
+    assert ok.status_code == 201 and ok.json()["factor"] == "1.25"
+
+
+def test_the_configured_maximum_is_capped_and_is_what_the_estimate_enforces(client, owner_client):
+    seed()
+    url = "/api/admin/pricing/quote-settings"
+    assert owner_client.patch(url, {"max_quantity": 100_001}, format="json").status_code == 400
+    assert owner_client.patch(url, {"max_quantity": 100_000}, format="json").status_code == 200
+    assert client.post(ESTIMATE, {"service": "food", "quantity": 100_000}, format="json").status_code == 200
+    over = client.post(ESTIMATE, {"service": "food", "quantity": 100_001}, format="json")
+    assert over.status_code == 400 and over.json()["code"] == "bad_quantity"

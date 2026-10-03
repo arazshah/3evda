@@ -4,6 +4,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 
+MAX_QUANTITY = 100_000  # the most items one estimate may ask for, whatever the owner configures
+
 
 class PackageGroup(models.Model):
     """A kind of service the packages belong to (menu photography, e-commerce, campaign, …)."""
@@ -80,8 +82,8 @@ class QuoteRule(models.Model):
     label_en = models.CharField(max_length=120, blank=True)
     amount = models.PositiveBigIntegerField(null=True, blank=True, help_text="Toman")
     factor = models.DecimalField(
-        max_digits=7,
-        decimal_places=3,
+        max_digits=5,
+        decimal_places=2,
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.01")), MaxValueValidator(Decimal("20"))],
@@ -122,8 +124,12 @@ class QuoteSettings(models.Model):
         validators=[MinValueValidator(1)],
         help_text="Both ends of the range are rounded to this many toman",
     )
-    min_quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-    max_quantity = models.PositiveIntegerField(default=200, validators=[MinValueValidator(1)])
+    min_quantity = models.PositiveIntegerField(
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(MAX_QUANTITY)]
+    )
+    max_quantity = models.PositiveIntegerField(
+        default=200, validators=[MinValueValidator(1), MaxValueValidator(MAX_QUANTITY)]
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

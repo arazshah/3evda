@@ -113,7 +113,8 @@ class QuoteInputSerializer(serializers.Serializer):  # type: ignore[type-arg]
     """What a visitor (or the owner's preview) sends: choices only, never prices."""
 
     service = serializers.SlugField(max_length=40)
-    quantity = serializers.IntegerField(min_value=1, max_value=100_000)
+    # The upper limit is the owner's `max_quantity` (itself capped), checked when the estimate is made.
+    quantity = serializers.IntegerField(min_value=1)
     addons = serializers.ListField(child=serializers.SlugField(max_length=40), max_length=20, default=list)
     multipliers = serializers.ListField(child=serializers.SlugField(max_length=40), max_length=20, default=list)
 

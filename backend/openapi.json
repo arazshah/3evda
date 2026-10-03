@@ -5957,7 +5957,7 @@
                     "factor": {
                         "type": "string",
                         "format": "decimal",
-                        "pattern": "^-?\\d{0,4}(?:\\.\\d{0,3})?$",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$",
                         "nullable": true
                     },
                     "min_quantity": {
@@ -5992,12 +5992,12 @@
                     },
                     "min_quantity": {
                         "type": "integer",
-                        "maximum": 2147483647,
+                        "maximum": 100000,
                         "minimum": 1
                     },
                     "max_quantity": {
                         "type": "integer",
-                        "maximum": 2147483647,
+                        "maximum": 100000,
                         "minimum": 1
                     }
                 }
@@ -7444,7 +7444,6 @@
                     },
                     "quantity": {
                         "type": "integer",
-                        "maximum": 100000,
                         "minimum": 1
                     },
                     "addons": {
@@ -7622,7 +7621,7 @@
                     "factor": {
                         "type": "string",
                         "format": "decimal",
-                        "pattern": "^-?\\d{0,4}(?:\\.\\d{0,3})?$",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$",
                         "nullable": true
                     },
                     "min_quantity": {
@@ -7675,12 +7674,12 @@
                     },
                     "min_quantity": {
                         "type": "integer",
-                        "maximum": 2147483647,
+                        "maximum": 100000,
                         "minimum": 1
                     },
                     "max_quantity": {
                         "type": "integer",
-                        "maximum": 2147483647,
+                        "maximum": 100000,
                         "minimum": 1
                     }
                 }

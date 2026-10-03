@@ -337,6 +337,11 @@ function PreviewSection({ rules }: { rules: QuoteRule[] }) {
   const [result, setResult] = useState<QuotePreview | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // A rule can be deleted, deactivated or changed after it was ticked: only what is still on offer is sent.
+  const activeService = services.some((s) => s.key === service) ? service : (services[0]?.key ?? "");
+  const pickAvailable = (chosen: string[], offered: QuoteRule[]) =>
+    chosen.filter((key) => offered.some((r) => r.key === key));
+
   const toggle = (list: string[], set: (v: string[]) => void, key: string) =>
     set(list.includes(key) ? list.filter((k) => k !== key) : [...list, key]);
 
@@ -347,10 +352,10 @@ function PreviewSection({ rules }: { rules: QuoteRule[] }) {
     try {
       setResult(
         await preview.mutateAsync({
-          service: service || services[0]?.key || "",
+          service: activeService,
           quantity: Number(quantity),
-          addons: chosenAddons,
-          multipliers: chosenMultipliers,
+          addons: pickAvailable(chosenAddons, addons),
+          multipliers: pickAvailable(chosenMultipliers, multipliers),
         }),
       );
     } catch (err) {
@@ -377,7 +382,7 @@ function PreviewSection({ rules }: { rules: QuoteRule[] }) {
               <label className="flex flex-col gap-1 text-sm text-muted">
                 خدمت
                 <select
-                  value={service || services[0]?.key}
+                  value={activeService}
                   onChange={(e) => setService(e.target.value)}
                   className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
                 >

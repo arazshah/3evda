@@ -186,4 +186,41 @@ describe("QuoteRulesManager", () => {
       multipliers: [],
     });
   });
+
+  it("does not send a choice whose rule has since gone away", async () => {
+    const food = rule(1, "food", "service", { amount: 1_000_000 });
+    const video = rule(2, "video", "addon_fixed", { amount: 2_000_000 });
+    const api = fakeApi([
+      { method: "GET", path: RULES, body: [food, video] },
+      { method: "GET", path: SETTINGS, body: settings },
+      { method: "DELETE", path: `${RULES}2/`, status: 204 },
+      { method: "GET", path: RULES, body: [food] },
+      {
+        method: "POST",
+        path: `${RULES}preview/`,
+        body: {
+          low: 850_000,
+          high: 1_150_000,
+          currency: "toman",
+          approximate: true,
+          total: 1_000_000,
+          base: 1_000_000,
+          tier_factor: "1.00",
+          addons: [],
+          multipliers: [],
+        },
+      },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    vi.stubGlobal("confirm", () => true);
+    renderWithQuery(<QuoteRulesManager />);
+
+    fireEvent.click(await screen.findByLabelText("قاعده video")); // tick the add-on …
+    fireEvent.click(screen.getByRole("button", { name: "حذف قاعده video" })); // … then delete its rule
+    await waitFor(() => expect(screen.queryByLabelText("قاعده video")).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "محاسبه" }));
+
+    expect(await screen.findByLabelText("نتیجه‌ی برآورد")).toBeInTheDocument();
+    expect(api.calls.find((c) => c.path.endsWith("preview/"))?.body).toMatchObject({ addons: [] });
+  });
 });
