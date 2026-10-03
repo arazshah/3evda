@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.blog",
     "apps.inquiries",
     "apps.proformas",
+    "apps.booking",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -180,6 +181,8 @@ REST_FRAMEWORK = {
         "estimate": "60/min",
         "inquiry": env("INQUIRY_RATE", default="5/hour"),
         "proforma": "60/min",
+        "booking": env("BOOKING_RATE", default="10/hour"),
+        "booking_read": "60/min",
     },
     "EXCEPTION_HANDLER": "apps.core.errors.exception_handler",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
@@ -199,6 +202,7 @@ SPECTACULAR_SETTINGS = {
         "QuoteRuleKindEnum": "apps.pricing.models.QuoteRule.Kind",
         "InquiryStatusEnum": "apps.inquiries.models.Inquiry.Status",
         "ProformaStatusEnum": "apps.proformas.models.Proforma.Status",
+        "BookingStatusEnum": "apps.booking.models.Booking.Status",
     },
 }
 
