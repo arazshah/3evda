@@ -19,6 +19,7 @@ const GROUP_LABELS: Record<string, string> = {
   about: "درباره‌ی من",
   contact: "تماس",
   blog: "مجله",
+  quote: "استعلام قیمت",
   footer: "پایین صفحه",
 };
 

@@ -56,7 +56,7 @@ export function PackageCard({
           </li>
         ))}
       </ul>
-      <ButtonLink href={href(locale, "/contact")} variant={pkg.is_featured ? "primary" : "secondary"}>
+      <ButtonLink href={href(locale, "/quote")} variant={pkg.is_featured ? "primary" : "secondary"}>
         {labels.quote}
       </ButtonLink>
     </Card>

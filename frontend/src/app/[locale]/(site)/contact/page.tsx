@@ -6,7 +6,7 @@ import { PageTitle, Section } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
-import { block, instagramUrl, localized, telHref, telegramUrl, whatsappUrl } from "@/lib/site/text";
+import { block, href, instagramUrl, localized, telHref, telegramUrl, whatsappUrl } from "@/lib/site/text";
 
 export async function generateMetadata({
   params,
@@ -71,6 +71,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               </div>
             ) : null}
           </dl>
+          <ButtonLink href={href(locale, "/quote")}>{t("contact.quoteCta")}</ButtonLink>
           {channels.length ? (
             <div className="flex flex-wrap gap-3" role="group" aria-label={t("contact.channels")}>
               {channels.map((c) => (

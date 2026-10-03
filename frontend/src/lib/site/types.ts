@@ -16,3 +16,5 @@ export type BlogArticleDetail = S["PublicBlogArticleDetail"];
 export type BlogPage = S["PublicBlogArticlePage"];
 export type BlogTaxonomy = S["PublicBlogTaxonomy"];
 export type SitemapData = S["PublicSitemap"];
+export type QuoteOptions = S["QuoteOptions"];
+export type QuoteOption = S["QuoteOption"];

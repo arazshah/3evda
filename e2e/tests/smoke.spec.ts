@@ -15,6 +15,8 @@ const pages = [
   { path: "/en/about", lang: "en", dir: "ltr", heading: "About me" },
   { path: "/contact", lang: "fa", dir: "rtl", heading: "تماس" },
   { path: "/en/contact", lang: "en", dir: "ltr", heading: "Contact" },
+  { path: "/quote", lang: "fa", dir: "rtl", heading: "استعلام قیمت" },
+  { path: "/en/quote", lang: "en", dir: "ltr", heading: "Get a quote" },
   // The journal pages; the articles come from `seed_blog_demo`, which CI runs before the tests.
   { path: "/blog", lang: "fa", dir: "rtl", heading: "مجله" },
   { path: "/en/blog", lang: "en", dir: "ltr", heading: "Journal" },
@@ -138,5 +140,53 @@ test.describe("search engines", () => {
     const article = await ld("/blog/sample-article");
     expect(article).toContain('"@type":"Article"');
     expect(article).toContain('"BreadcrumbList"');
+  });
+});
+
+test.describe("quote form", () => {
+  // The sample price rules come from `seed_quote_demo`, which CI runs before the tests.
+  test("the calculator shows an approximate range and a visitor can send an inquiry", async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "one submission is enough; each one counts against the rate limit");
+    await page.goto("/en/quote");
+    await expect(page.getByTestId("estimate")).toHaveText(/^From .+ to .+ toman$/);
+
+    const estimate = await page.getByTestId("estimate").textContent();
+    await page.getByLabel("Short video").check();
+    await expect(page.getByTestId("estimate")).not.toHaveText(estimate ?? ""); // a new choice, a new range
+
+    await page.getByLabel("Full name").fill("E2E Visitor");
+    await page.getByLabel("Phone").fill("09120000000");
+    await page.getByLabel("Details").fill("Sent by the automated browser test.");
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByRole("heading", { name: "Your request was received" })).toBeVisible();
+  });
+
+  test("the form refuses a missing name and shows the problem", async ({ page }) => {
+    await page.goto("/en/quote");
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByText("Please fix the following").locator("..")).toBeFocused(); // the summary box
+    await expect(page.getByText("Required.").first()).toBeVisible();
+  });
+
+  test("the API refuses a disguised file and a body beyond the gateway limit", async ({ request }, info) => {
+    test.skip(info.project.name !== "desktop", "each request counts against the rate limit");
+    const fake = await request.post("/api/public/inquiries", {
+      multipart: {
+        name: "E2E",
+        phone: "09120000000",
+        attachments: { name: "photo.jpg", mimeType: "image/jpeg", buffer: Buffer.from("not really an image") },
+      },
+    });
+    expect(fake.status()).toBe(400);
+
+    // The gateway cuts the body off at 32 MB before it reaches the API.
+    const huge = await request.post("/api/public/inquiries", {
+      multipart: {
+        name: "E2E",
+        phone: "09120000000",
+        attachments: { name: "big.pdf", mimeType: "application/pdf", buffer: Buffer.alloc(33 * 1024 * 1024, 0x25) },
+      },
+    });
+    expect(huge.status()).toBe(413);
   });
 });

@@ -73,7 +73,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         slides={heroSlides}
         locale={locale}
         eyebrow={pick(locale, site.settings.tagline_fa, site.settings.tagline_en) || brand}
-        primary={{ href: href(locale, "/contact"), label: b("home.cta_primary") || t("nav.quote") }}
+        primary={{ href: href(locale, "/quote"), label: b("home.cta_primary") || t("nav.quote") }}
         secondary={{ href: href(locale, "/portfolio"), label: b("home.cta_secondary") || t("nav.portfolio") }}
         slideLabelTemplate={t.raw("common.slide") as string}
         groupLabel={t("common.slides")}
@@ -255,7 +255,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Card className="space-y-4 border-accent bg-elevated p-10 text-center">
           <h2 className="font-display text-3xl font-extrabold">{b("home.cta_title")}</h2>
           <p className="mx-auto max-w-prose text-muted">{b("home.cta_body")}</p>
-          <ButtonLink href={href(locale, "/contact")}>{b("home.cta_primary") || t("nav.quote")}</ButtonLink>
+          <ButtonLink href={href(locale, "/quote")}>{b("home.cta_primary") || t("nav.quote")}</ButtonLink>
         </Card>
       </Section>
     </SitePage>

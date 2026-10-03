@@ -173,7 +173,12 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["apps.accounts.permissions.IsVerifiedOwner"],
     "NUM_PROXIES": TRUSTED_PROXY_COUNT,
-    "DEFAULT_THROTTLE_RATES": {"login": "20/min", "otp": "10/min", "estimate": "60/min", "inquiry": "5/hour"},
+    "DEFAULT_THROTTLE_RATES": {
+        "login": "20/min",
+        "otp": "10/min",
+        "estimate": "60/min",
+        "inquiry": env("INQUIRY_RATE", default="5/hour"),
+    },
     "EXCEPTION_HANDLER": "apps.core.errors.exception_handler",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
 }

@@ -1,30 +1,8 @@
 import { notFound, permanentRedirect } from "next/navigation";
-import { connection } from "next/server";
 import type { Locale } from "@/i18n/config";
+import { get, json } from "./fresh";
 import { href } from "./text";
 import type { BlogArticleDetail, BlogPage, BlogTaxonomy, SitemapData } from "./types";
-
-const BASE = process.env.INTERNAL_API_URL ?? "http://localhost:8000";
-
-/**
- * The journal is read without any cache on this side: a scheduled article must appear at its
- * publication time, and the API caches (and invalidates) its own responses for exactly that reason.
- */
-async function get(path: string): Promise<Response> {
-  await connection();
-  try {
-    return await fetch(`${BASE}${path}`, { cache: "no-store", redirect: "manual" });
-  } catch (error) {
-    throw new Error(`Public API unavailable: ${String(error)}`);
-  }
-}
-
-async function json<T>(path: string): Promise<T> {
-  const res = await get(path);
-  if (res.status === 404) notFound();
-  if (!res.ok) throw new Error(`${path} → ${res.status}`);
-  return (await res.json()) as T;
-}
 
 export function getArticles(
   lang: Locale,
