@@ -35,6 +35,27 @@ def test_bootstrap_refuses_when_an_admin_exists(monkeypatch):
 
 
 @pytest.mark.django_db
+def test_bootstrap_if_missing_is_a_noop_when_an_admin_exists(monkeypatch):
+    owner = User.objects.create_superuser("owner", password="a-long-password-123")
+    monkeypatch.setenv("ADMIN_BOOTSTRAP_PASSWORD", "a-very-long-password-42")
+    out = StringIO()
+    call_command("bootstrap_admin", "--username", "other", "--if-missing", stdout=out)
+
+    assert User.objects.count() == 1
+    owner.refresh_from_db()
+    assert owner.check_password("a-long-password-123")
+    assert "nothing to do" in out.getvalue()
+
+
+@pytest.mark.django_db
+def test_bootstrap_if_missing_still_fails_on_a_weak_password(monkeypatch):
+    monkeypatch.setenv("ADMIN_BOOTSTRAP_PASSWORD", "short")
+    with pytest.raises(CommandError):
+        call_command("bootstrap_admin", "--username", "sevda", "--if-missing")
+    assert not User.objects.exists()
+
+
+@pytest.mark.django_db
 def test_bootstrap_rejects_a_weak_password(monkeypatch):
     monkeypatch.setenv("ADMIN_BOOTSTRAP_PASSWORD", "short")
     with pytest.raises(CommandError):

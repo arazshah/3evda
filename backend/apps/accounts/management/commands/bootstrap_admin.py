@@ -18,10 +18,18 @@ class Command(BaseCommand):
         parser.add_argument("--username", default=os.environ.get("ADMIN_BOOTSTRAP_USERNAME", "admin"))
         parser.add_argument("--email", default="")
         parser.add_argument("--no-input", action="store_true", help="Never prompt; read ADMIN_BOOTSTRAP_PASSWORD.")
+        parser.add_argument(
+            "--if-missing",
+            action="store_true",
+            help="Exit successfully without changes when an owner already exists (other errors still fail).",
+        )
 
     def handle(self, *args: Any, **options: Any) -> None:
         User = get_user_model()
         if User.objects.exists():
+            if options["if_missing"]:
+                self.stdout.write("An administrator already exists; nothing to do.")
+                return
             raise CommandError("An administrator already exists; bootstrap can only run once.")
 
         password = os.environ.get("ADMIN_BOOTSTRAP_PASSWORD") or self._prompt(options["no_input"])

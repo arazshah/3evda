@@ -6,9 +6,10 @@ case "${1:-web}" in
     python manage.py migrate --noinput
     python manage.py ensure_buckets
     # Optional: create the owner at start-up when ADMIN_BOOTSTRAP_PASSWORD is set (for hosts without a shell).
-    # bootstrap_admin refuses once an owner exists, so this is a no-op afterwards; remove the variable after first sign-in.
+    # --if-missing makes an existing owner a no-op; any other failure (e.g. a weak password) stops the container.
+    # Remove the variable after the first sign-in.
     if [ -n "${ADMIN_BOOTSTRAP_PASSWORD:-}" ]; then
-      python manage.py bootstrap_admin --no-input || echo "bootstrap_admin skipped (see message above)"
+      python manage.py bootstrap_admin --no-input --if-missing
     fi
     exec gunicorn config.wsgi:application \
       --bind 0.0.0.0:8000 \
