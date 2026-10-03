@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PackageCard } from "@/components/site/PackageCard";
+import { JsonLd } from "@/components/site/JsonLd";
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { Photo } from "@/components/site/Photo";
 import { ProjectCard } from "@/components/site/ProjectCard";
@@ -10,6 +11,7 @@ import { Section } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { featuredPackages, getPackageGroups, getPortfolio, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
+import { photographerLd } from "@/lib/site/seo";
 import { block, blockMedia, href, localized, pick } from "@/lib/site/text";
 
 export async function generateMetadata({
@@ -66,6 +68,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <SitePage site={site} locale={locale} path="/">
+      <JsonLd data={photographerLd(site, locale)} />
       <HeroSlides
         slides={heroSlides}
         locale={locale}

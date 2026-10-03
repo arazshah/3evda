@@ -224,6 +224,25 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   expect(preview.status()).toBe(200);
   expect((await preview.json()).body_html).toContain("<h2>تیتر آزمایشی</h2>");
 
+  // Publishing puts the article in the sitemap and the feed; renaming it keeps the old address working.
+  const text = async (path: string) => (await page.request.get(path)).text();
+  expect(await text("/sitemap.xml")).not.toContain("mazmoon-azmayeshi");
+  await page.getByLabel("وضعیت").selectOption("published");
+  await page.getByLabel("نشانی مقاله (اختیاری)").fill("mazmoon-azmayeshi");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("ذخیره شد.")).toBeVisible();
+  expect(await text("/sitemap.xml")).toMatch(/<loc>[^<]+\/blog\/mazmoon-azmayeshi<\/loc>/);
+  expect(await text("/rss.xml")).toContain("<title>مقاله‌ی آزمایشی</title>");
+
+  await page.getByLabel("نشانی مقاله (اختیاری)").fill("mazmoon-jadid");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("ذخیره شد.")).toBeVisible();
+  const moved = await page.request.get("/blog/mazmoon-azmayeshi", { maxRedirects: 0 });
+  expect([301, 308]).toContain(moved.status());
+  expect(moved.headers()["location"]).toContain("/blog/mazmoon-jadid");
+  expect(await text("/sitemap.xml")).not.toContain("mazmoon-azmayeshi");
+  expect(await text("/sitemap.xml")).toContain("/blog/mazmoon-jadid");
+
   await page.getByRole("button", { name: "ساخت نسخه‌ی English" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("English");
   await expect(page.getByRole("link", { name: "ویرایش نسخه‌ی فارسی" })).toBeVisible();

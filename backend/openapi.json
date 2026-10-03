@@ -3749,6 +3749,27 @@
                     }
                 }
             }
+        },
+        "/api/public/sitemap": {
+            "get": {
+                "operationId": "public_sitemap_retrieve",
+                "description": "Raw material for sitemap.xml: only what visitors can actually open (never drafts or scheduled).",
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicSitemap"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -6882,6 +6903,27 @@
                     "settings"
                 ]
             },
+            "PublicSitemap": {
+                "type": "object",
+                "properties": {
+                    "projects": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SitemapProject"
+                        }
+                    },
+                    "articles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SitemapArticle"
+                        }
+                    }
+                },
+                "required": [
+                    "articles",
+                    "projects"
+                ]
+            },
             "RecoveryCodes": {
                 "type": "object",
                 "properties": {
@@ -7047,6 +7089,64 @@
                 "required": [
                     "logo_detail",
                     "og_image_detail",
+                    "updated_at"
+                ]
+            },
+            "SitemapAlternate": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "language",
+                    "slug"
+                ]
+            },
+            "SitemapArticle": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "alternates": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SitemapAlternate"
+                        }
+                    }
+                },
+                "required": [
+                    "alternates",
+                    "language",
+                    "slug",
+                    "updated_at"
+                ]
+            },
+            "SitemapProject": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "slug",
                     "updated_at"
                 ]
             },

@@ -23,9 +23,13 @@ export function srcSet(media: Media, format: string): string {
 }
 
 /** The largest webp, used as the plain `src` fallback and for social cards. */
-export function fallbackSrc(media: Media): string {
+export function fallbackVariant(media: Media) {
   const list = byFormat(media, "webp");
-  return (list.at(-1) ?? media.variants.find((v) => stillName(media).test(v.name)))?.url ?? "";
+  return list.at(-1) ?? media.variants.find((v) => stillName(media).test(v.name));
+}
+
+export function fallbackSrc(media: Media): string {
+  return fallbackVariant(media)?.url ?? "";
 }
 
 export function altText(media: Media, locale: Locale, fallback = ""): string {

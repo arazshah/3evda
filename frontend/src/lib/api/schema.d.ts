@@ -817,6 +817,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/sitemap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Raw material for sitemap.xml: only what visitors can actually open (never drafts or scheduled). */
+    get: operations["public_sitemap_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1590,6 +1607,10 @@ export interface components {
       };
       collections: components["schemas"]["PublicCollections"];
     };
+    PublicSitemap: {
+      projects: components["schemas"]["SitemapProject"][];
+      articles: components["schemas"]["SitemapArticle"][];
+    };
     RecoveryCodes: {
       recovery_codes: string[];
     };
@@ -1626,6 +1647,22 @@ export interface components {
       footer_text_en?: string;
       /** Format: date-time */
       readonly updated_at: string;
+    };
+    SitemapAlternate: {
+      language: string;
+      slug: string;
+    };
+    SitemapArticle: {
+      language: string;
+      slug: string;
+      /** Format: date-time */
+      updated_at: string;
+      alternates: components["schemas"]["SitemapAlternate"][];
+    };
+    SitemapProject: {
+      slug: string;
+      /** Format: date-time */
+      updated_at: string;
     };
     State: {
       state: components["schemas"]["StateEnum"];
@@ -3702,6 +3739,25 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicSite"];
+        };
+      };
+    };
+  };
+  public_sitemap_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicSitemap"];
         };
       };
     };
