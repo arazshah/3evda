@@ -12,8 +12,9 @@ import {
   type InquiryStatus,
 } from "@/lib/api/queries";
 import { formatBytes, formatDate, formatNumber } from "@/lib/format";
-import { telHref, telegramUrl, whatsappUrl } from "@/lib/site/text";
+import { telHref } from "@/lib/site/text";
 import { Alert, Button, Card, TextArea } from "../ui";
+import { telegramLink, whatsappLink } from "./links";
 import { rangeText, STATUS_LABELS, STATUS_ORDER } from "./status";
 
 type Choice = { key: string; label: string };
@@ -40,6 +41,22 @@ export function InquiryDetailPage({ id }: { id: number }) {
         <InquiryView key={inquiry.data.id} inquiry={inquiry.data} onDeleted={() => setDeleted(true)} />
       )}
     </div>
+  );
+}
+
+/** A link when the value is a plain handle or number; otherwise the text as typed, never a link. */
+function ContactValue({ value, href }: { value: string; href: string | null }) {
+  if (!href) return <span dir="ltr">{value}</span>;
+  return (
+    <a
+      className="text-accent hover:underline"
+      dir="ltr"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {value}
+    </a>
   );
 }
 
@@ -116,28 +133,12 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
           )}
           {inquiry.whatsapp && (
             <Row label="واتس‌اپ">
-              <a
-                className="text-accent hover:underline"
-                dir="ltr"
-                href={whatsappUrl(inquiry.whatsapp)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {inquiry.whatsapp}
-              </a>
+              <ContactValue value={inquiry.whatsapp} href={whatsappLink(inquiry.whatsapp)} />
             </Row>
           )}
           {inquiry.telegram && (
             <Row label="تلگرام">
-              <a
-                className="text-accent hover:underline"
-                dir="ltr"
-                href={telegramUrl(inquiry.telegram)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {inquiry.telegram}
-              </a>
+              <ContactValue value={inquiry.telegram} href={telegramLink(inquiry.telegram)} />
             </Row>
           )}
           {inquiry.email && (

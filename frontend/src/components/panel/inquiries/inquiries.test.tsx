@@ -4,6 +4,7 @@ import { fakeApi, renderWithQuery } from "@/test/render";
 import { InquiriesManager } from "./InquiriesManager";
 import { InquiryBadge } from "./InquiryBadge";
 import { InquiryDetailPage } from "./InquiryDetail";
+import { telegramLink, whatsappLink } from "./links";
 
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, replace: vi.fn() }) }));
@@ -328,5 +329,49 @@ describe("InquiryDetailPage", () => {
     renderWithQuery(<InquiryDetailPage id={7} />);
     expect(await screen.findByText(/ماشین‌حساب استفاده نشده/)).toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "پیوست‌ها" })).not.toBeInTheDocument();
+  });
+});
+
+describe("contact links from visitors", () => {
+  it("links a real Telegram handle and a real number, with the address built here", () => {
+    expect(telegramLink("@sara_photo")).toBe("https://t.me/sara_photo");
+    expect(telegramLink("sara_photo")).toBe("https://t.me/sara_photo");
+    expect(whatsappLink("+98 912 111 1111")).toBe("https://wa.me/989121111111");
+    expect(whatsappLink("0912-111-1111")).toBe("https://wa.me/09121111111");
+  });
+
+  it.each([
+    "https://evil.example/login",
+    "javascript:alert(1)",
+    "t.me/x/../../evil",
+    "@a",
+    "نام کاربری",
+    "@sara photo",
+  ])("never makes a Telegram link out of %s", (value) => {
+    expect(telegramLink(value)).toBeNull();
+  });
+
+  it.each(["https://evil.example/login", "javascript:alert(1)", "call me", "12", "99999999999999999999999"])(
+    "never makes a WhatsApp link out of %s",
+    (value) => {
+      expect(whatsappLink(value)).toBeNull();
+    },
+  );
+
+  it("shows an address typed into the Telegram field as plain text, not a link", async () => {
+    const api = fakeApi([
+      {
+        method: "GET",
+        path: "/api/admin/inquiries/7/",
+        body: detail({ telegram: "https://evil.example/login", whatsapp: "javascript:alert(1)" }),
+      },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<InquiryDetailPage id={7} />);
+
+    expect(await screen.findByText("https://evil.example/login")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "https://evil.example/login" })).not.toBeInTheDocument();
+    expect(screen.getByText("javascript:alert(1)")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "javascript:alert(1)" })).not.toBeInTheDocument();
   });
 });
