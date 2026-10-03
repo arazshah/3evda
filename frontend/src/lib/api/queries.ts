@@ -32,6 +32,8 @@ export const keys = {
   quoteSettings: ["pricing", "quote-settings"] as const,
   inquiries: ["inquiries"] as const,
   inquirySummary: ["inquiries", "summary"] as const,
+  proformas: ["proformas"] as const,
+  proformaSettings: ["proformas", "settings"] as const,
   articles: ["blog", "articles"] as const,
   blogCategories: ["blog", "categories"] as const,
   blogTags: ["blog", "tags"] as const,
@@ -51,6 +53,9 @@ export type QuoteInput = Schemas["QuoteInput"];
 export type Inquiry = Schemas["Inquiry"];
 export type InquiryListItem = Schemas["InquiryList"];
 export type InquiryStatus = Schemas["InquiryStatusEnum"];
+export type Proforma = Schemas["Proforma"];
+export type ProformaListItem = Schemas["ProformaList"];
+export type ProformaSettings = Schemas["ProformaSettings"];
 export type Article = Schemas["Article"];
 export type BlogCategory = Schemas["BlogCategory"];
 export type BlogTag = Schemas["BlogTag"];
@@ -531,6 +536,102 @@ export function useInquirySummary() {
     queryFn: () => unwrap(api.GET("/api/admin/inquiries/summary/")),
     refetchInterval: 60_000,
     staleTime: 30_000,
+  });
+}
+
+// ---- proformas -------------------------------------------------------------------------------------
+
+export type ProformaFilters = { status?: string; q?: string; page?: number };
+
+export function useProformas(filters: ProformaFilters) {
+  return useQuery({
+    queryKey: [...keys.proformas, "list", filters],
+    queryFn: () => unwrap(api.GET("/api/admin/proformas/", { params: { query: filters } })),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useProforma(id: number | null) {
+  return useQuery({
+    queryKey: [...keys.proformas, "detail", id],
+    queryFn: () => unwrap(api.GET("/api/admin/proformas/{id}/", { params: { path: { id: id as number } } })),
+    enabled: id !== null,
+  });
+}
+
+function useProformaWrite<V>(run: (variables: V) => Promise<Proforma>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: async (proforma) => {
+      client.setQueryData([...keys.proformas, "detail", proforma.id], proforma);
+      await client.invalidateQueries({ queryKey: [...keys.proformas, "list"] });
+      // Issuing moves the enquiry to «proforma sent»; its page and the list must not show the old state.
+      await client.invalidateQueries({ queryKey: [...keys.inquiries, "list"] });
+    },
+  });
+}
+
+export type ProformaDraft = Schemas["PatchedProforma"];
+
+export function useCreateProforma() {
+  return useProformaWrite((body: ProformaDraft) =>
+    unwrap(api.POST("/api/admin/proformas/", { body: body as Schemas["Proforma"] })),
+  );
+}
+
+export function useSaveProforma() {
+  return useProformaWrite(({ id, ...body }: ProformaDraft & { id: number }) =>
+    unwrap(api.PATCH("/api/admin/proformas/{id}/", { params: { path: { id } }, body })),
+  );
+}
+
+export function useFromInquiry() {
+  return useProformaWrite((inquiry: number) =>
+    unwrap(api.POST("/api/admin/proformas/from-inquiry/", { body: { inquiry } })),
+  );
+}
+
+export type ProformaAction = "issue" | "revise" | "new-link" | "cancel";
+
+export function useProformaAction() {
+  return useProformaWrite(({ id, action }: { id: number; action: ProformaAction }) => {
+    const params = { params: { path: { id } } };
+    switch (action) {
+      case "issue":
+        return unwrap(api.POST("/api/admin/proformas/{id}/issue/", params));
+      case "revise":
+        return unwrap(api.POST("/api/admin/proformas/{id}/revise/", params));
+      case "new-link":
+        return unwrap(api.POST("/api/admin/proformas/{id}/new-link/", params));
+      case "cancel":
+        return unwrap(api.POST("/api/admin/proformas/{id}/cancel/", params));
+    }
+  });
+}
+
+export function useDeleteProforma() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/proformas/{id}/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: [...keys.proformas, "list"] }),
+  });
+}
+
+export function useProformaSettings() {
+  return useQuery({
+    queryKey: keys.proformaSettings,
+    queryFn: () => unwrap(api.GET("/api/admin/proformas/settings/")),
+  });
+}
+
+export function useSaveProformaSettings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas["PatchedProformaSettings"]) =>
+      unwrap(api.PATCH("/api/admin/proformas/settings/", { body })),
+    onSuccess: (data) => client.setQueryData(keys.proformaSettings, data),
   });
 }
 
