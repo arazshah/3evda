@@ -245,6 +245,93 @@ export interface paths {
     patch: operations["admin_cms_settings_partial_update"];
     trace?: never;
   };
+  "/api/admin/inquiries/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_inquiries_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/inquiries/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_inquiries_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    delete: operations["admin_inquiries_destroy"];
+    options?: never;
+    head?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    patch: operations["admin_inquiries_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/inquiries/{id}/attachments/{attachment_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Redirects to a 60-second signed download via the gateway. */
+    get: operations["admin_inquiries_attachments_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/inquiries/export/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description CSV of the filtered enquiries (spreadsheet formulas are neutralised). */
+    get: operations["inquiries_export"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/inquiries/summary/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description How many enquiries are still new (for the badge on the panel menu). */
+    get: operations["inquiries_summary"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/media/": {
     parameters: {
       query?: never;
@@ -838,6 +925,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/inquiries": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Anyone can send an enquiry; spam is limited by a rate limit, a honeypot field and strict file checks. */
+    post: operations["public_inquiries_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/packages": {
     parameters: {
       query?: never;
@@ -1026,6 +1130,12 @@ export interface components {
      * @enum {string}
      */
     ArticleStatusEnum: "draft" | "published";
+    Attachment: {
+      readonly id: number;
+      readonly original_name: string;
+      readonly mime: string;
+      readonly size: number;
+    };
     AuthUser: {
       username: string;
       display_name: string;
@@ -1139,6 +1249,83 @@ export interface components {
       /** @description False shows the line as not included */
       included?: boolean;
     };
+    Inquiry: {
+      readonly id: number;
+      readonly name: string;
+      readonly brand: string;
+      readonly phone: string;
+      readonly whatsapp: string;
+      readonly telegram: string;
+      /** Format: email */
+      readonly email: string;
+      readonly language: string;
+      readonly service_key: string;
+      readonly service_label: string;
+      readonly quantity: number | null;
+      readonly options: unknown;
+      readonly estimate_low: number | null;
+      readonly estimate_high: number | null;
+      readonly message: string;
+      status?: components["schemas"]["InquiryStatusEnum"];
+      internal_note?: string;
+      /**
+       * Format: date-time
+       * @description First time the owner opened it
+       */
+      readonly seen_at: string | null;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+      readonly attachments: components["schemas"]["Attachment"][];
+      readonly history: components["schemas"]["StatusChange"][];
+    };
+    InquiryCreate: {
+      name: string;
+      brand?: string;
+      phone?: string;
+      whatsapp?: string;
+      telegram?: string;
+      email?: string;
+      /** @default fa */
+      language: components["schemas"]["LanguageEnum"];
+      service?: string;
+      quantity?: number;
+      addons?: string[];
+      multipliers?: string[];
+      message?: string;
+      website?: string;
+      attachments?: string[];
+    };
+    InquiryList: {
+      readonly id: number;
+      readonly name: string;
+      readonly brand: string;
+      readonly service_label: string;
+      readonly quantity: number | null;
+      readonly estimate_low: number | null;
+      readonly estimate_high: number | null;
+      readonly status: components["schemas"]["InquiryStatusEnum"];
+      /** Format: date-time */
+      readonly created_at: string;
+      readonly is_new: boolean;
+      readonly attachment_count: number;
+    };
+    InquiryReceived: {
+      received: boolean;
+    };
+    /**
+     * @description * `new` - جدید
+     *     * `reviewing` - در بررسی
+     *     * `proforma_sent` - پیش‌فاکتور ارسال شد
+     *     * `converted` - تبدیل شد (رزرو یا پروژه)
+     *     * `closed` - بسته
+     * @enum {string}
+     */
+    InquiryStatusEnum: "new" | "reviewing" | "proforma_sent" | "converted" | "closed";
+    InquirySummary: {
+      new: number;
+    };
     /**
      * @description * `image` - تصویر
      *     * `video` - ویدیو
@@ -1224,6 +1411,21 @@ export interface components {
       readonly position: number;
       is_published?: boolean;
       readonly package_count: number;
+    };
+    PaginatedInquiryListList: {
+      /** @example 123 */
+      count: number;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null;
+      results: components["schemas"]["InquiryList"][];
     };
     PaginatedMediaAssetList: {
       /** @example 123 */
@@ -1344,6 +1546,37 @@ export interface components {
       readonly created_at?: string;
       /** Format: date-time */
       readonly updated_at?: string;
+    };
+    PatchedInquiry: {
+      readonly id?: number;
+      readonly name?: string;
+      readonly brand?: string;
+      readonly phone?: string;
+      readonly whatsapp?: string;
+      readonly telegram?: string;
+      /** Format: email */
+      readonly email?: string;
+      readonly language?: string;
+      readonly service_key?: string;
+      readonly service_label?: string;
+      readonly quantity?: number | null;
+      readonly options?: unknown;
+      readonly estimate_low?: number | null;
+      readonly estimate_high?: number | null;
+      readonly message?: string;
+      status?: components["schemas"]["InquiryStatusEnum"];
+      internal_note?: string;
+      /**
+       * Format: date-time
+       * @description First time the owner opened it
+       */
+      readonly seen_at?: string | null;
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+      readonly attachments?: components["schemas"]["Attachment"][];
+      readonly history?: components["schemas"]["StatusChange"][];
     };
     PatchedMediaAsset: {
       /** Format: uuid */
@@ -1896,6 +2129,12 @@ export interface components {
      * @enum {string}
      */
     StateEnum: "anonymous" | "otp_required" | "enrollment_required" | "verified";
+    StatusChange: {
+      readonly from_status: components["schemas"]["InquiryStatusEnum"];
+      readonly to_status: components["schemas"]["InquiryStatusEnum"];
+      /** Format: date-time */
+      readonly at: string;
+    };
     /**
      * @description * `pending` - در صف
      *     * `processing` - در حال پردازش
@@ -2700,6 +2939,228 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SiteSettings"];
+        };
+      };
+    };
+  };
+  admin_inquiries_list: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده. */
+        page?: number;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedInquiryListList"];
+        };
+      };
+    };
+  };
+  admin_inquiries_retrieve: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این inquiry را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Inquiry"];
+        };
+      };
+    };
+  };
+  admin_inquiries_destroy: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این inquiry را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_inquiries_partial_update: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این inquiry را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedInquiry"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedInquiry"];
+        "multipart/form-data": components["schemas"]["PatchedInquiry"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Inquiry"];
+        };
+      };
+    };
+  };
+  admin_inquiries_attachments_retrieve: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        attachment_id: number;
+        /** @description یک مقداد عدد یکتا که این inquiry را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      302: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  inquiries_export: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/csv": string;
+        };
+      };
+    };
+  };
+  inquiries_summary: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD */
+        from?: string;
+        /** @description Name, brand, contact or message */
+        q?: string;
+        /** @description Service key */
+        service?: string;
+        status?: "closed" | "converted" | "new" | "proforma_sent" | "reviewing";
+        /** @description YYYY-MM-DD */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InquirySummary"];
         };
       };
     };
@@ -4084,6 +4545,31 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicBlogTaxonomy"];
+        };
+      };
+    };
+  };
+  public_inquiries_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InquiryCreate"];
+        "application/x-www-form-urlencoded": components["schemas"]["InquiryCreate"];
+        "multipart/form-data": components["schemas"]["InquiryCreate"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InquiryReceived"];
         };
       };
     };

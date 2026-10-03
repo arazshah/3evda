@@ -27,6 +27,7 @@ from .serializers import (
     QuoteRuleSerializer,
     QuoteSettingsSerializer,
 )
+from .service import limits, run_estimate
 
 PUBLIC_CACHE = "public, max-age=30"
 
@@ -75,29 +76,6 @@ class PackageViewSet(AuditedPositionedMixin, GuardedDeleteMixin, ReorderMixin, v
 # ---- price calculator ------------------------------------------------------------------------------
 
 
-def _rules() -> list[quote.Rule]:
-    return [
-        quote.Rule(r.key, r.kind, r.amount, r.factor, r.min_quantity) for r in QuoteRule.objects.filter(is_active=True)
-    ]
-
-
-def _limits() -> quote.Limits:
-    s = QuoteSettings.load()
-    return quote.Limits(s.range_percent, s.rounding_step, s.min_quantity, s.max_quantity)
-
-
-def run_estimate(data: dict[str, Any]) -> quote.Estimate:
-    """The estimate for validated input; raises `quote.QuoteError` for choices that do not exist."""
-    return quote.estimate(
-        _rules(),
-        _limits(),
-        service=data["service"],
-        quantity=data["quantity"],
-        addons=data["addons"],
-        multipliers=data["multipliers"],
-    )
-
-
 def _quote_error(error: quote.QuoteError) -> Response:
     return Response({"code": error.code, "detail": error.detail}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -111,7 +89,7 @@ class PublicQuoteOptionsView(APIView):
     @extend_schema(responses=QuoteOptionsSerializer, operation_id="public_quote_options_retrieve", auth=[])
     def get(self, request: Request) -> Response:
         active = QuoteRule.objects.filter(is_active=True)
-        limits = _limits()
+        current = limits()
         response = Response(
             {
                 "services": active.filter(kind=QuoteRule.Kind.SERVICE).values("key", "label_fa", "label_en"),
@@ -119,8 +97,8 @@ class PublicQuoteOptionsView(APIView):
                     "key", "label_fa", "label_en"
                 ),
                 "multipliers": active.filter(kind=QuoteRule.Kind.MULTIPLIER).values("key", "label_fa", "label_en"),
-                "min_quantity": limits.min_quantity,
-                "max_quantity": limits.max_quantity,
+                "min_quantity": current.min_quantity,
+                "max_quantity": current.max_quantity,
             }
         )
         response["Cache-Control"] = PUBLIC_CACHE

@@ -11,11 +11,13 @@ urlpatterns = [
     path("api/admin/portfolio/", include("apps.portfolio.urls")),
     path("api/admin/blog/", include("apps.blog.urls")),
     path("api/admin/pricing/", include("apps.pricing.urls")),
+    path("api/admin/inquiries/", include("apps.inquiries.urls")),
     path("api/admin/", include("apps.media.urls")),
     path("api/public/", include("apps.cms.public_urls")),
     path("api/public/", include("apps.portfolio.public_urls")),
     path("api/public/", include("apps.blog.public_urls")),
     path("api/public/", include("apps.pricing.public_urls")),
+    path("api/public/", include("apps.inquiries.public_urls")),
     path("api/", include("apps.core.urls")),
     path("django-admin/", admin.site.urls),
 ]

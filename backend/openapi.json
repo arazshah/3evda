@@ -1470,6 +1470,579 @@
                 }
             }
         },
+        "/api/admin/inquiries/": {
+            "get": {
+                "operationId": "admin_inquiries_list",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedInquiryListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/inquiries/{id}/": {
+            "get": {
+                "operationId": "admin_inquiries_retrieve",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این inquiry را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inquiry"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_inquiries_partial_update",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این inquiry را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedInquiry"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedInquiry"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedInquiry"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inquiry"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_inquiries_destroy",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این inquiry را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/inquiries/{id}/attachments/{attachment_id}/": {
+            "get": {
+                "operationId": "admin_inquiries_attachments_retrieve",
+                "description": "Redirects to a 60-second signed download via the gateway.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "attachment_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این inquiry را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/inquiries/export/": {
+            "get": {
+                "operationId": "inquiries_export",
+                "description": "CSV of the filtered enquiries (spreadsheet formulas are neutralised).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/inquiries/summary/": {
+            "get": {
+                "operationId": "inquiries_summary",
+                "description": "How many enquiries are still new (for the badge on the panel menu).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Name, brand, contact or message"
+                    },
+                    {
+                        "in": "query",
+                        "name": "service",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Service key"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "closed",
+                                "converted",
+                                "new",
+                                "proforma_sent",
+                                "reviewing"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InquirySummary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/media/": {
             "get": {
                 "operationId": "admin_media_list",
@@ -3973,6 +4546,47 @@
                 }
             }
         },
+        "/api/public/inquiries": {
+            "post": {
+                "operationId": "public_inquiries_create",
+                "description": "Anyone can send an enquiry; spam is limited by a rate limit, a honeypot field and strict file checks.",
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InquiryCreate"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InquiryCreate"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InquiryCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InquiryReceived"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/packages": {
             "get": {
                 "operationId": "public_packages_retrieve",
@@ -4453,6 +5067,33 @@
                 "type": "string",
                 "description": "* `draft` - پیش‌نویس\n* `published` - منتشرشده"
             },
+            "Attachment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "original_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "mime": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "size": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "mime",
+                    "original_name",
+                    "size"
+                ]
+            },
             "AuthUser": {
                 "type": "object",
                 "properties": {
@@ -4858,6 +5499,338 @@
                     "text_fa"
                 ]
             },
+            "Inquiry": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "service_key": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "service_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "options": {
+                        "readOnly": true
+                    },
+                    "estimate_low": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "estimate_high": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/InquiryStatusEnum"
+                    },
+                    "internal_note": {
+                        "type": "string"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true,
+                        "description": "First time the owner opened it"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Attachment"
+                        },
+                        "readOnly": true
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StatusChange"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "attachments",
+                    "brand",
+                    "created_at",
+                    "email",
+                    "estimate_high",
+                    "estimate_low",
+                    "history",
+                    "id",
+                    "language",
+                    "message",
+                    "name",
+                    "options",
+                    "phone",
+                    "quantity",
+                    "seen_at",
+                    "service_key",
+                    "service_label",
+                    "telegram",
+                    "updated_at",
+                    "whatsapp"
+                ]
+            },
+            "InquiryCreate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "brand": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "email": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "email",
+                                "maxLength": 254
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "default": "fa"
+                    },
+                    "service": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 40,
+                                "pattern": "^[-a-zA-Z0-9_]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "addons": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40,
+                            "pattern": "^[-a-zA-Z0-9_]+$"
+                        },
+                        "maxItems": 20
+                    },
+                    "multipliers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40,
+                            "pattern": "^[-a-zA-Z0-9_]+$"
+                        },
+                        "maxItems": 20
+                    },
+                    "message": {
+                        "type": "string",
+                        "maxLength": 4000
+                    },
+                    "website": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "maxLength": 200
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "writeOnly": true,
+                        "maxItems": 3
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "InquiryList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "service_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "estimate_low": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "estimate_high": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InquiryStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "is_new": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "attachment_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "attachment_count",
+                    "brand",
+                    "created_at",
+                    "estimate_high",
+                    "estimate_low",
+                    "id",
+                    "is_new",
+                    "name",
+                    "quantity",
+                    "service_label",
+                    "status"
+                ]
+            },
+            "InquiryReceived": {
+                "type": "object",
+                "properties": {
+                    "received": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "received"
+                ]
+            },
+            "InquiryStatusEnum": {
+                "enum": [
+                    "new",
+                    "reviewing",
+                    "proforma_sent",
+                    "converted",
+                    "closed"
+                ],
+                "type": "string",
+                "description": "* `new` - جدید\n* `reviewing` - در بررسی\n* `proforma_sent` - پیش‌فاکتور ارسال شد\n* `converted` - تبدیل شد (رزرو یا پروژه)\n* `closed` - بسته"
+            },
+            "InquirySummary": {
+                "type": "object",
+                "properties": {
+                    "new": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "new"
+                ]
+            },
             "KindEnum": {
                 "enum": [
                     "image",
@@ -5162,6 +6135,37 @@
                     "position",
                     "title_fa"
                 ]
+            },
+            "PaginatedInquiryListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InquiryList"
+                        }
+                    }
+                }
             },
             "PaginatedMediaAssetList": {
                 "type": "object",
@@ -5600,6 +6604,111 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedInquiry": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "service_key": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "service_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "options": {
+                        "readOnly": true
+                    },
+                    "estimate_low": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "estimate_high": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/InquiryStatusEnum"
+                    },
+                    "internal_note": {
+                        "type": "string"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true,
+                        "description": "First time the owner opened it"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Attachment"
+                        },
+                        "readOnly": true
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StatusChange"
+                        },
                         "readOnly": true
                     }
                 }
@@ -7939,6 +9048,37 @@
                 ],
                 "type": "string",
                 "description": "* `anonymous` - anonymous\n* `otp_required` - otp_required\n* `enrollment_required` - enrollment_required\n* `verified` - verified"
+            },
+            "StatusChange": {
+                "type": "object",
+                "properties": {
+                    "from_status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InquiryStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "to_status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InquiryStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "at",
+                    "from_status",
+                    "to_status"
+                ]
             },
             "StatusEnum": {
                 "enum": [
