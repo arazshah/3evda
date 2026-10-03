@@ -8,7 +8,7 @@ export const STATUS_LABELS: Record<MediaAsset["status"], string> = {
 };
 
 /** Smallest web variant wide enough for `minWidth` (WebP preferred, poster for videos). */
-export function previewUrl(asset: MediaAsset, minWidth = 480): string | undefined {
+export function previewUrl(asset: Pick<MediaAsset, "kind" | "variants">, minWidth = 480): string | undefined {
   const images = asset.variants
     .filter((v) => v.format === "webp" && (asset.kind === "image" || v.name.startsWith("poster-")))
     .sort((a, b) => a.width - b.width);

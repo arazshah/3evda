@@ -79,6 +79,23 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await dialog.getByRole("button", { name: "حذف" }).click();
   await expect(tile).toHaveCount(0);
 
+  // Edit a text block in the panel and see it on the public site at once (the panel revalidates the cache).
+  const original = "پروژه‌ی بعدی‌تان را شروع کنیم";
+  const edited = "عنوان ویرایش‌شده از پنل";
+  await page.goto("/panel/content");
+  const block = page.getByRole("form", { name: "دعوت پایانی: عنوان" });
+  await block.getByLabel("فارسی").fill(edited);
+  await block.getByRole("button", { name: "ذخیره" }).click();
+  await expect(block.getByText("ذخیره شد.")).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 2, name: edited })).toBeVisible();
+
+  // Put the default back so other specs see the seeded text.
+  await page.goto("/panel/content");
+  await block.getByLabel("فارسی").fill(original);
+  await block.getByRole("button", { name: "ذخیره" }).click();
+  await expect(block.getByText("ذخیره شد.")).toBeVisible();
+
   // Sign out.
   await page.getByRole("button", { name: "خروج" }).first().click();
   await expect(page).toHaveURL(/\/panel\/login$/);
