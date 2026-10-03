@@ -32,7 +32,7 @@ test("admin APIs refuse anonymous visitors", async ({ request }) => {
   expect((await request.get("/api/schema/")).status()).toBe(403);
 });
 
-test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request }) => {
+test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request, browser }) => {
   test.setTimeout(120_000); // one long journey: sign-in, media, site content, portfolio
   await page.goto("/panel/login");
   await page.getByLabel("نام کاربری").fill(USERNAME);
@@ -282,6 +282,83 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   expect(csv.headers()["content-type"]).toContain("text/csv");
   expect(await csv.text()).toContain(visitor);
 
+  // Proforma: from the enquiry to the customer's approval.
+  await page.goto("/panel/proformas/settings");
+  await page.getByLabel("نام صادرکننده (فارسی)", { exact: true }).fill("استودیو آزمایشی");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("ذخیره شد.")).toBeVisible();
+
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await found.getByRole("link").click();
+  await page.getByRole("button", { name: "ساخت پیش‌فاکتور" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "پیش‌نویس پیش‌فاکتور" })).toBeVisible();
+  await expect(page.getByLabel("نام مشتری", { exact: true })).toHaveValue(visitor); // prefilled from the enquiry
+  await page.getByLabel("شرح آیتم ۱", { exact: true }).fill("عکاسی منوی کافه");
+  await page.getByLabel("قیمت واحد آیتم ۱ (تومان)", { exact: true }).fill("250000");
+  await page.getByLabel("نوع تخفیف", { exact: true }).selectOption("percent");
+  await page.getByLabel("درصد تخفیف", { exact: true }).fill("10");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("ذخیره شد.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "جمع‌ها" })).toBeVisible();
+  await expect(page.getByText(/۹۰۰٬۰۰۰ تومان/)).toBeVisible(); // 4 × 250,000 less 10%
+  const draftUrl = page.url();
+  expect((await page.request.get(draftUrl.replace("/panel/proformas/", "/api/admin/proformas/") + "/pdf/")).status()).toBe(200);
+
+  acceptNextDialog();
+  await page.getByRole("button", { name: "صدور", exact: true }).click();
+  const link = await page.getByLabel("لینک عمومی", { exact: true }).inputValue();
+  expect(link).toMatch(/\/p\/[0-9a-f]{32}_/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("3E-");
+  await expectNoSeriousViolations(page, "issued proforma");
+  const path = new URL(link).pathname;
+
+  // The customer opens the link without signing in: reading changes nothing, the page then reports «seen».
+  const guest = await browser.newContext({ baseURL: page.url().split("/panel")[0] });
+  const customer = await guest.newPage();
+  const seen = customer.waitForResponse((r) => r.url().endsWith("/seen") && r.request().method() === "POST");
+  await customer.goto(path);
+  await expect(customer.getByRole("heading", { level: 1, name: "پیش‌فاکتور" })).toBeVisible();
+  expect((await seen).status()).toBe(200);
+  await expect(customer.getByText("عکاسی منوی کافه")).toBeVisible();
+  await expect(customer.getByText("استودیو آزمایشی")).toBeVisible();
+  await expectNoSeriousViolations(customer, "public proforma");
+  expect(await customer.locator('meta[name="robots"]').getAttribute("content")).toContain("noindex");
+  const token = path.split("/p/")[1]!;
+  const pdfResponse = await guest.request.get(`/api/public/proformas/${token}/pdf`);
+  expect(pdfResponse.status()).toBe(200);
+  expect(pdfResponse.headers()["content-type"]).toBe("application/pdf");
+  expect((await pdfResponse.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  expect((await guest.request.get(`/api/public/proformas/${token.slice(0, -3)}abc`)).status()).toBe(404); // forged signature
+
+  await page.reload();
+  await expect(page.getByText(/دیده‌شده · /)).toBeVisible();
+
+  await customer.getByRole("button", { name: "تأیید پیش‌فاکتور" }).click();
+  await expect(customer.getByText("پیش‌فاکتور تأیید شد")).toBeVisible();
+  await customer.reload();
+  await expect(customer.getByText("پیش‌فاکتور تأیید شد")).toBeVisible();
+  await expect(customer.getByRole("button", { name: "رد پیش‌فاکتور" })).toHaveCount(0); // answered once
+
+  await page.reload();
+  await expect(page.getByText(/تأییدشده · /)).toBeVisible();
+  await expect(page.getByRole("button", { name: "ساخت نسخه‌ی اصلاحی" })).toHaveCount(0);
+
+  // A new link cancels the old one at once.
+  acceptNextDialog();
+  await page.getByRole("button", { name: "لینک تازه" }).click();
+  await expect(page.getByText("لینک تازه ساخته شد.")).toBeVisible();
+  expect((await customer.request.get(`/api/public/proformas/${token}`)).status()).toBe(404);
+  await customer.goto(path);
+  await expect(customer.getByText("صفحه‌ای که دنبالش بودید پیدا نشد")).toBeVisible();
+  await guest.close();
+
+  // The enquiry moved on by itself.
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await found.getByRole("link").click();
+  await expect(page.getByLabel("وضعیت", { exact: true })).toHaveValue("proforma_sent");
+
   // Deleting it removes the row and the stored file.
   await found.getByRole("link").click();
   acceptNextDialog();
@@ -353,7 +430,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   }
 
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/proformas", "/panel/proformas/new", "/panel/proformas/settings", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);

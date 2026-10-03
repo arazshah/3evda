@@ -8,7 +8,7 @@ from .views import (
     PublicProformaView,
 )
 
-# The token is `<32 hex>.<signature>`, so it contains a dot: `[^/]+`.
+# The token is `<32 hex>_<signature>`.
 urlpatterns = [
     path("proformas/<str:token>", PublicProformaView.as_view(), name="public-proforma"),
     path("proformas/<str:token>/seen", PublicProformaSeenView.as_view(), name="public-proforma-seen"),

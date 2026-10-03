@@ -235,8 +235,18 @@ def test_settings_roundtrip(owner_client):
 def test_token_checks():
     p = Proforma.objects.create(customer_name="x", status="sent")
     assert find_by_token(make_token(p)) == p
-    pub, _, sig = make_token(p).partition(".")
-    for bad in ["", "x", f"{pub}.", f"{pub}.{sig[:-2]}ab", f"{'0' * 32}.{sig}", f"zz.{sig}", pub]:
+    pub, sig = make_token(p).split("_", 1)
+    for bad in [
+        "",
+        "x",
+        f"{pub}_",
+        f"{pub}_{sig[:-2]}ab",
+        f"{'0' * 32}_{sig}",
+        f"zz_{sig}",
+        pub,
+        f"{pub}.{sig}",
+        f"{pub}-{sig}",
+    ]:
         assert find_by_token(bad) is None
     p.status = "draft"
     p.save()
