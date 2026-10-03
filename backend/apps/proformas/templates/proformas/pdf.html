@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+<meta charset="utf-8">
+<title>{{ l.title }} {{ number_text }}</title>
+<style>
+  @font-face { font-family: Vazirmatn; font-weight: 400; src: url("{{ font_dir }}/Vazirmatn-Regular.ttf"); }
+  @font-face { font-family: Vazirmatn; font-weight: 700; src: url("{{ font_dir }}/Vazirmatn-Bold.ttf"); }
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Vazirmatn, sans-serif; font-size: 10.5pt; color: #1b1b1b; line-height: 1.7; overflow-wrap: anywhere; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1b1b1b; padding-bottom: 8px; margin-bottom: 14px; }
+  header img { max-height: 48px; max-width: 160px; }
+  h1 { font-size: 20pt; margin: 0; }
+  .meta { font-size: 10pt; }
+  .meta div { white-space: nowrap; }
+  .parties { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+  .parties > div { flex: 1; }
+  .label { color: #666; font-size: 9pt; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th { background: #f1ece4; font-weight: 700; text-align: start; }
+  th, td { border-bottom: 1px solid #d8d2c8; padding: 6px 8px; vertical-align: top; }
+  td.num, th.num { text-align: end; white-space: nowrap; }
+  .totals { margin-top: 10px; margin-inline-start: auto; width: 55%; }
+  .totals td { border: 0; padding: 3px 8px; }
+  .totals tr.grand td { border-top: 2px solid #1b1b1b; font-weight: 700; font-size: 12pt; }
+  .terms { margin-top: 18px; white-space: pre-line; }
+  .terms h2 { font-size: 11pt; margin: 0 0 4px; }
+  .stamp { margin-top: 14px; padding: 6px 10px; border: 1px solid #2e7d32; color: #2e7d32; display: inline-block; font-weight: 700; }
+  footer { position: fixed; bottom: -10mm; left: 0; right: 0; text-align: center; font-size: 8.5pt; color: #666; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    {% if logo %}<img src="{{ logo }}" alt="">{% endif %}
+    <div><strong>{{ issuer.name }}</strong></div>
+    {% if issuer.phone %}<div dir="ltr" style="text-align: start;">{{ issuer.phone }}</div>{% endif %}
+    {% if issuer.address %}<div>{{ issuer.address }}</div>{% endif %}
+  </div>
+  <div class="meta">
+    <h1>{{ l.title }}</h1>
+    <div><span class="label">{{ l.number }}:</span> <span dir="ltr">{{ number_text }}</span></div>
+    {% if issue_date %}<div><span class="label">{{ l.date }}:</span> {{ issue_date }}</div>{% endif %}
+    {% if valid_until %}<div><span class="label">{{ l.valid }}:</span> {{ valid_until }}</div>{% endif %}
+  </div>
+</header>
+
+<section class="parties">
+  <div>
+    <div class="label">{{ l.customer }}</div>
+    <div><strong>{{ p.customer_name }}</strong></div>
+    {% if p.customer_company %}<div>{{ p.customer_company }}</div>{% endif %}
+    {% if p.customer_contact %}<div class="label">{{ l.contact }}: <span dir="auto">{{ p.customer_contact }}</span></div>{% endif %}
+  </div>
+</section>
+
+<table>
+  <thead><tr>
+    <th>{{ l.description }}</th><th class="num">{{ l.quantity }}</th><th class="num">{{ l.unit_price }}</th><th class="num">{{ l.line_total }}</th>
+  </tr></thead>
+  <tbody>
+  {% for item in items %}
+    <tr><td>{{ item.description }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ item.unit_price }}</td><td class="num">{{ item.line_total }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<table class="totals">
+  <tr><td>{{ l.subtotal }}</td><td class="num">{{ subtotal }} {{ l.currency }}</td></tr>
+  {% if p.discount %}<tr><td>{{ l.discount }}</td><td class="num">− {{ discount }} {{ l.currency }}</td></tr>{% endif %}
+  {% if p.tax %}<tr><td>{{ l.tax }} ({{ tax_percent }}٪)</td><td class="num">{{ tax }} {{ l.currency }}</td></tr>{% endif %}
+  <tr class="grand"><td>{{ l.total }}</td><td class="num">{{ total }} {{ l.currency }}</td></tr>
+</table>
+
+{% if p.terms %}<section class="terms"><h2>{{ l.terms }}</h2>{{ p.terms }}</section>{% endif %}
+{% if approved_on %}<div class="stamp">{{ l.approved }} {{ approved_on }}</div>{% endif %}
+{% if issuer.footer %}<footer>{{ issuer.footer }}</footer>{% endif %}
+</body>
+</html>

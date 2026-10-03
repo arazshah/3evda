@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-import hashlib
-import hmac
 from typing import Any
 
-from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 from django.http import HttpRequest
 
-from apps.accounts.ip import client_ip
+from apps.core.privacy import ip_digest
 from apps.pricing.models import QuoteRule
 from apps.pricing.service import run_estimate
 
@@ -17,14 +14,6 @@ from . import attachments
 from .models import Inquiry, InquiryAttachment
 
 Upload = tuple["UploadedFile[bytes]", str, str]  # (file, mime, extension) — already inspected
-
-
-def ip_digest(request: HttpRequest) -> str:
-    """HMAC of the visitor's IP: enough to spot one source of abuse, but the address itself is never stored."""
-    ip = client_ip(request) or ""
-    if not ip:
-        return ""
-    return hmac.new(settings.SECRET_KEY.encode(), f"inquiry-ip:{ip}".encode(), hashlib.sha256).hexdigest()
 
 
 def _labels(keys: list[str], language: str) -> list[dict[str, str]]:
@@ -75,7 +64,7 @@ def create_inquiry(data: dict[str, Any], uploads: list[Upload], request: HttpReq
                 estimate_low=estimate.low if estimate else None,
                 estimate_high=estimate.high if estimate else None,
                 message=data.get("message", ""),
-                ip_hash=ip_digest(request),
+                ip_hash=ip_digest(request, "inquiry"),
             )
             for upload, mime, ext in uploads:
                 key = attachments.store(upload, ext)
