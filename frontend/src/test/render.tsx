@@ -13,12 +13,18 @@ type Route = { method: string; path: string; status?: number; body?: unknown };
 
 /** Minimal fetch fake: the first matching route (method + path) answers; calls are recorded. */
 export function fakeApi(routes: Route[]) {
-  const calls: { method: string; path: string; body: unknown }[] = [];
+  const calls: { method: string; path: string; search: string; body: unknown }[] = [];
   const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit) => {
     const request = input instanceof Request ? input : new Request(input, init);
-    const path = new URL(request.url).pathname;
+    const url = new URL(request.url);
+    const path = url.pathname;
     const text = request.method === "GET" ? "" : await request.text();
-    calls.push({ method: request.method, path, body: text ? JSON.parse(text) : undefined });
+    calls.push({
+      method: request.method,
+      path,
+      search: url.search,
+      body: text ? JSON.parse(text) : undefined,
+    });
     const index = routes.findIndex((r) => r.method === request.method && r.path === path);
     if (index === -1)
       return new Response(JSON.stringify({ code: "not_found", detail: "not found" }), { status: 404 });

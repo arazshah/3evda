@@ -30,6 +30,8 @@ export const keys = {
   packages: ["pricing", "packages"] as const,
   quoteRules: ["pricing", "rules"] as const,
   quoteSettings: ["pricing", "quote-settings"] as const,
+  inquiries: ["inquiries"] as const,
+  inquirySummary: ["inquiries", "summary"] as const,
   articles: ["blog", "articles"] as const,
   blogCategories: ["blog", "categories"] as const,
   blogTags: ["blog", "tags"] as const,
@@ -46,6 +48,9 @@ export type QuoteRule = Schemas["QuoteRule"];
 export type QuoteSettings = Schemas["QuoteSettings"];
 export type QuotePreview = Schemas["QuotePreview"];
 export type QuoteInput = Schemas["QuoteInput"];
+export type Inquiry = Schemas["Inquiry"];
+export type InquiryListItem = Schemas["InquiryList"];
+export type InquiryStatus = Schemas["InquiryStatusEnum"];
 export type Article = Schemas["Article"];
 export type BlogCategory = Schemas["BlogCategory"];
 export type BlogTag = Schemas["BlogTag"];
@@ -457,6 +462,75 @@ export function useSaveQuoteSettings() {
 export function usePreviewQuote() {
   return useMutation({
     mutationFn: (body: QuoteInput) => unwrap(api.POST("/api/admin/pricing/rules/preview/", { body })),
+  });
+}
+
+// ---- inquiries -------------------------------------------------------------------------------------
+
+export type InquiryFilters = {
+  status?: InquiryStatus;
+  q?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+};
+
+export function useInquiries(filters: InquiryFilters) {
+  return useQuery({
+    queryKey: [...keys.inquiries, "list", filters],
+    queryFn: () => unwrap(api.GET("/api/admin/inquiries/", { params: { query: filters } })),
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Opening an enquiry marks it as seen on the server, so the list and the menu badge are refreshed too. */
+export function useInquiry(id: number, enabled = true) {
+  const client = useQueryClient();
+  return useQuery({
+    enabled,
+    queryKey: [...keys.inquiries, "detail", id],
+    queryFn: async () => {
+      const inquiry = await unwrap(api.GET("/api/admin/inquiries/{id}/", { params: { path: { id } } }));
+      void client.invalidateQueries({ queryKey: [...keys.inquiries, "list"] });
+      void client.invalidateQueries({ queryKey: keys.inquirySummary });
+      return inquiry;
+    },
+  });
+}
+
+export function useSaveInquiry() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedInquiry"] & { id: number }) =>
+      unwrap(api.PATCH("/api/admin/inquiries/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async (inquiry) => {
+      client.setQueryData([...keys.inquiries, "detail", inquiry.id], inquiry);
+      await client.invalidateQueries({ queryKey: [...keys.inquiries, "list"] });
+      await client.invalidateQueries({ queryKey: keys.inquirySummary });
+    },
+  });
+}
+
+export function useDeleteInquiry() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/inquiries/{id}/", { params: { path: { id } } })),
+    // Only the list and the badge: the detail query of a deleted enquiry must not be fetched again (404).
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: [...keys.inquiries, "list"] });
+      await client.invalidateQueries({ queryKey: keys.inquirySummary });
+    },
+  });
+}
+
+/** How many enquiries nobody has opened yet; refreshed every minute for the menu badge. */
+export function useInquirySummary() {
+  return useQuery({
+    queryKey: keys.inquirySummary,
+    queryFn: () => unwrap(api.GET("/api/admin/inquiries/summary/")),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
   });
 }
 

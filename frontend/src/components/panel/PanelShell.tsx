@@ -6,10 +6,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { api } from "@/lib/api/client";
 import { useMe } from "@/lib/api/queries";
+import { InquiryBadge } from "./inquiries/InquiryBadge";
 import { Button } from "./ui";
 
 const NAV = [
   { href: "/panel", label: "داشبورد" },
+  { href: "/panel/inquiries", label: "استعلام‌ها" },
   { href: "/panel/content", label: "متن‌ها و تصاویر" },
   { href: "/panel/items", label: "بخش‌های تکرارشونده" },
   { href: "/panel/projects", label: "نمونه‌کارها" },
@@ -73,6 +75,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
                     }`}
                   >
                     {item.label}
+                    {item.href === "/panel/inquiries" && <InquiryBadge />}
                   </Link>
                 </li>
               );
