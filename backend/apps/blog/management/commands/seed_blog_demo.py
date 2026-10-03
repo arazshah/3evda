@@ -30,15 +30,20 @@ class Command(BaseCommand):
             slug="sample", defaults={"title_fa": "نمونه", "title_en": "Sample"}
         )
         tag, _ = Tag.objects.get_or_create(slug="sample", defaults={"title_fa": "نمونه", "title_en": "sample"})
-        group = None
+        existing = {a.language: a for a in Article.objects.filter(slug="sample-article")}
+        # Keep one translation group even when only one of the two samples is left (or they drifted apart).
+        group = (existing.get("fa") or existing.get("en") or Article(language="fa")).translation_group
         created = 0
         for language in ("fa", "en"):
-            existing = Article.objects.filter(language=language, slug="sample-article").first()
-            if existing:
-                group = existing.translation_group
+            article = existing.get(language)
+            if article is not None:
+                if article.translation_group != group:
+                    article.translation_group = group
+                    article.save()
                 continue
             article = Article(
                 language=language,
+                translation_group=group,
                 slug="sample-article",
                 title=TITLES[language],
                 summary=PARAGRAPH[language],
@@ -47,10 +52,8 @@ class Command(BaseCommand):
                 status=Article.Status.PUBLISHED,
                 published_at=timezone.now(),
                 reading_minutes=1,
-                **({"translation_group": group} if group else {}),
             )
             article.save()
             article.tags.add(tag)
-            group = article.translation_group
             created += 1
         self.stdout.write(self.style.SUCCESS(f"Sample articles ready ({created} created)."))

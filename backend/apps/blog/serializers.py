@@ -122,8 +122,13 @@ class PublicBlogArticleDetailSerializer(PublicBlogArticleSerializer):
 
         qs = Article.objects.visible().filter(language=obj.language).exclude(pk=obj.pk)
         tag_ids = list(obj.tags.values_list("pk", flat=True))
-        if obj.category_id or tag_ids:
-            qs = qs.filter(Q(category_id=obj.category_id) | Q(tags__in=tag_ids)).distinct()
+        shares = Q()
+        if obj.category_id is not None:  # `category_id=None` would match every uncategorised article
+            shares |= Q(category_id=obj.category_id)
+        if tag_ids:
+            shares |= Q(tags__in=tag_ids)
+        if shares:
+            qs = qs.filter(shares).distinct()
         related = qs.select_related("category", "cover").prefetch_related("tags", "cover__variants")[:3]
         return PublicBlogArticleSerializer(related, many=True).data
 

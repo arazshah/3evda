@@ -165,6 +165,19 @@ def test_neighbours_related_articles_and_projects(client):
     assert one
 
 
+def test_tag_only_recommendations_do_not_include_every_uncategorised_article(client):
+    tip = Tag.objects.create(slug="tips", title_fa="نکته")
+    base = timezone.now() - timedelta(days=5)
+    current = make_article(slug="current", published_at=base)  # no category, one tag
+    current.tags.add(tip)
+    sharing = make_article(slug="shares-the-tag", published_at=base + timedelta(days=1))
+    sharing.tags.add(tip)
+    make_article(slug="unrelated-uncategorised", published_at=base + timedelta(days=2))
+
+    related = client.get("/api/public/blog/articles/fa/current/").json()["related_articles"]
+    assert [a["slug"] for a in related] == ["shares-the-tag"]
+
+
 def test_old_slugs_redirect_permanently_to_the_current_one(client):
     article = make_article(slug="new-name")
     ArticleSlugRedirect.objects.create(article=article, language="fa", old_slug="old-name")
@@ -420,6 +433,26 @@ def test_the_owner_api_requires_a_verified_login(client):
     assert client.get(ARTICLES).status_code == 403
     assert client.post(ARTICLES, {"language": "fa", "title": "x"}, format="json").status_code == 403
     assert client.get("/api/admin/blog/categories/").status_code == 403
+
+
+def test_a_malformed_body_is_a_400_not_a_500(owner_client):
+    body = {"type": "doc", "content": [{"type": "image", "attrs": []}]}
+    response = create(owner_client, body=body)
+    assert response.status_code == 400 and "body" in response.json()["fields"]
+
+
+def test_seed_demo_keeps_the_translations_linked_after_a_partial_repair(client):
+    call_command("seed_blog_demo")
+    Article.objects.get(language="fa", slug="sample-article").delete()
+    call_command("seed_blog_demo")  # only the English sample is left: the new Persian one must join its group
+    fa, en = (Article.objects.get(language=lang, slug="sample-article") for lang in ("fa", "en"))
+    assert fa.translation_group == en.translation_group
+    # and records that had already drifted apart are brought back together
+    en.translation_group = uuid.uuid4()
+    en.save()
+    call_command("seed_blog_demo")
+    assert Article.objects.get(language="en").translation_group == Article.objects.get(language="fa").translation_group
+    assert client.get("/api/public/blog/articles/fa/sample-article/").json()["alternates"]
 
 
 def test_seed_demo_is_repeatable_and_public(client):

@@ -77,6 +77,18 @@ def test_documents_outside_the_vocabulary_are_rejected(bad):
         clean_doc(bad)
 
 
+@pytest.mark.parametrize("attrs", [[], "x", 7, True])
+def test_attrs_that_are_not_objects_are_a_validation_error_not_a_crash(attrs):
+    link = {"type": "text", "text": "x", "marks": [{"type": "link", "attrs": attrs}]}
+    for bad in (
+        doc(para(link)),
+        doc({"type": "heading", "attrs": attrs, "content": [text("h")]}),
+        doc({"type": "image", "attrs": attrs}),
+    ):
+        with pytest.raises(BodyError):
+            clean_doc(bad)
+
+
 @pytest.mark.parametrize(
     "href",
     [

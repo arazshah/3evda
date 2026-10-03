@@ -58,6 +58,16 @@ def safe_href(value: object) -> str:
     return href
 
 
+def _attrs(node: object) -> dict[str, Any]:
+    """The `attrs` of a node or mark: absent means empty, anything but an object is an error."""
+    attrs = node.get("attrs") if isinstance(node, dict) else None
+    if attrs is None:
+        return {}
+    if not isinstance(attrs, dict):
+        raise BodyError("ساختار متن مقاله نامعتبر است.")
+    return attrs
+
+
 def _clean_marks(raw: object) -> list[dict[str, Any]]:
     marks: list[dict[str, Any]] = []
     for mark in raw if isinstance(raw, list) else []:
@@ -65,8 +75,7 @@ def _clean_marks(raw: object) -> list[dict[str, Any]]:
         if kind not in MARKS:
             raise BodyError("قالب‌بندی ناشناخته در متن مقاله.")
         if kind == "link":
-            attrs = mark.get("attrs") or {}
-            marks.append({"type": "link", "attrs": {"href": safe_href(attrs.get("href", ""))}})
+            marks.append({"type": "link", "attrs": {"href": safe_href(_attrs(mark).get("href", ""))}})
         else:
             marks.append({"type": kind})
     return marks
@@ -94,16 +103,15 @@ def _clean_node(node: object, parent: str, depth: int) -> dict[str, Any]:
     if kind in ("hardBreak", "horizontalRule"):
         return {"type": kind}
     if kind == "image":
-        attrs = node.get("attrs") or {}
         try:
-            media_id = str(uuid.UUID(str(attrs.get("mediaId", ""))))
+            media_id = str(uuid.UUID(str(_attrs(node).get("mediaId", ""))))
         except ValueError:
             raise BodyError("شناسه‌ی تصویر نامعتبر است.") from None
         return {"type": "image", "attrs": {"mediaId": media_id}}
 
     out = {"type": kind}
     if kind == "heading":
-        level = (node.get("attrs") or {}).get("level")
+        level = _attrs(node).get("level")
         if level not in HEADING_LEVELS:
             raise BodyError("سطح عنوان باید ۲ تا ۴ باشد.")
         out["attrs"] = {"level": level}
