@@ -67,6 +67,8 @@ services:
     environment:
       <<: *backend-env
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+      ADMIN_BOOTSTRAP_USERNAME: ${ADMIN_BOOTSTRAP_USERNAME:-admin}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-}
     depends_on:
       postgres:
         condition: service_healthy
