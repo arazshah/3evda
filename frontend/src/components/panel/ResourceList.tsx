@@ -3,7 +3,14 @@
 import { moveId } from "@/lib/reorder";
 import { Button } from "./ui";
 
-export type Row = { id: number; title: string; detail?: string; published: boolean };
+export type Row = {
+  id: number;
+  title: string;
+  detail?: string;
+  published: boolean;
+  /** Overrides the default «منتشر شده» / «پیش‌نویس» text when a row has more states than that. */
+  stateLabel?: string;
+};
 
 /**
  * An ordered list of rows with move up/down, edit and delete. The order is changed with buttons
@@ -45,7 +52,7 @@ export function ResourceList({
             )}
           </div>
           <span className={`text-xs ${row.published ? "text-success" : "text-muted"}`}>
-            {row.published ? "منتشر شده" : "پیش‌نویس"}
+            {row.stateLabel ?? (row.published ? "منتشر شده" : "پیش‌نویس")}
           </span>
           <div className="flex flex-wrap gap-2">
             {onReorder && (

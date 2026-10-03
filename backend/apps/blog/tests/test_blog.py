@@ -344,6 +344,20 @@ def test_embedded_images_are_protected_from_deletion_and_released_on_edit(owner_
     assert not MediaReference.objects.filter(asset=kept).exists()
 
 
+def test_the_list_is_light_and_does_not_query_media_per_article(owner_client, django_assert_max_num_queries):
+    asset = make_asset("inline")
+    for n in range(6):
+        make_article(slug=f"a{n}", body=image_doc(asset))
+    with django_assert_max_num_queries(8):  # does not grow with the number of articles
+        response = owner_client.get(ARTICLES)
+    rows = response.json()
+    assert len(rows) == 6
+    assert not {"body", "body_media", "translations", "cover_detail"} & set(rows[0])
+    assert {"id", "title", "language", "status", "is_live", "slug"} <= set(rows[0])
+    # the full document is still there for a single article
+    assert "body" in owner_client.get(f"{ARTICLES}{rows[0]['id']}/").json()
+
+
 def test_the_editor_gets_library_data_for_embedded_images(owner_client):
     asset = make_asset("inline")
     article = create(owner_client, body=image_doc(asset)).json()

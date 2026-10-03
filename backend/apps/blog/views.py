@@ -17,6 +17,7 @@ from . import service
 from .cache import cached
 from .models import Article, Category, Language, Tag
 from .serializers import (
+    ArticleListSerializer,
     ArticleSerializer,
     BlogCategorySerializer,
     BlogTagSerializer,
@@ -230,6 +231,9 @@ class PublicTaxonomyView(APIView):
 class ArticleViewSet(GuardedDeleteMixin, viewsets.ModelViewSet):  # type: ignore[type-arg]
     serializer_class = ArticleSerializer
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def get_serializer_class(self) -> type[ArticleSerializer]:
+        return ArticleListSerializer if self.action == "list" else ArticleSerializer
 
     def get_queryset(self) -> QuerySet[Article]:
         qs = Article.objects.select_related("category", "cover", "og_image").prefetch_related(

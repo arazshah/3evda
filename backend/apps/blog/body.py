@@ -29,8 +29,8 @@ CONTAINERS: dict[str, set[str]] = {
     "heading": {"text", "hardBreak"},
     "bulletList": {"listItem"},
     "orderedList": {"listItem"},
-    "listItem": {"paragraph", "bulletList", "orderedList"},
-    "blockquote": {"paragraph", "bulletList", "orderedList"},
+    "listItem": BLOCKS,  # the editor lets any block go inside a list item or a quote
+    "blockquote": BLOCKS,
     "codeBlock": {"text"},
 }
 LEAVES = {"text", "hardBreak", "horizontalRule", "image"}

@@ -86,12 +86,16 @@ export function ArticlesManager() {
       {articles.isError && <Alert>بارگذاری فهرست ناموفق بود.</Alert>}
       <ResourceList
         label="مقاله‌ها"
-        rows={list.map((a) => ({
-          id: a.id,
-          title: a.title || `مقاله ${a.id}`,
-          detail: `${LANGUAGE_NAMES[a.language]} · ${a.status === "published" && !a.is_live ? "زمان‌بندی‌شده" : a.status === "published" ? "منتشرشده" : "پیش‌نویس"}`,
-          published: a.is_live,
-        }))}
+        rows={list.map((a) => {
+          const state = a.status === "draft" ? "پیش‌نویس" : a.is_live ? "منتشرشده" : "زمان‌بندی‌شده";
+          return {
+            id: a.id,
+            title: a.title || `مقاله ${a.id}`,
+            detail: LANGUAGE_NAMES[a.language],
+            published: a.is_live,
+            stateLabel: state,
+          };
+        })}
         onEdit={(id) => router.push(`/panel/articles/${id}`)}
         onDelete={(id) => {
           if (!window.confirm("این مقاله حذف شود؟")) return;

@@ -859,6 +859,26 @@ export interface components {
       /** Format: date-time */
       readonly updated_at: string;
     };
+    /** @description One row of the panel's list: no body, no embedded-media lookups, no translation queries. */
+    ArticleList: {
+      readonly id: number;
+      readonly language: components["schemas"]["LanguageEnum"];
+      /** Format: uuid */
+      readonly translation_group: string;
+      slug?: string;
+      readonly title: string;
+      readonly summary: string;
+      readonly category: number | null;
+      readonly status: components["schemas"]["ArticleStatusEnum"];
+      /** Format: date-time */
+      readonly published_at: string | null;
+      readonly reading_minutes: number;
+      readonly is_live: boolean;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
     ArticleMoved: {
       slug: string;
     };
@@ -1687,7 +1707,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Article"][];
+          "application/json": components["schemas"]["ArticleList"][];
         };
       };
     };

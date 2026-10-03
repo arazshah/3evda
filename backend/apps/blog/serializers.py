@@ -316,5 +316,16 @@ class ArticleSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
         return instance
 
 
+class ArticleListSerializer(ArticleSerializer):
+    """One row of the panel's list: no body, no embedded-media lookups, no translation queries."""
+
+    class Meta(ArticleSerializer.Meta):
+        fields = [
+            "id", "language", "translation_group", "slug", "title", "summary", "category", "status",
+            "published_at", "reading_minutes", "is_live", "created_at", "updated_at",
+        ]  # fmt: skip
+        read_only_fields = fields
+
+
 def other_language(language: str) -> str:
     return Language.EN if language == Language.FA else Language.FA

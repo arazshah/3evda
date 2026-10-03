@@ -90,6 +90,7 @@ describe("ArticlesManager", () => {
     const rows = within(list).getAllByRole("listitem");
     expect(rows[0]).toHaveTextContent("منتشرشده");
     expect(rows[1]).toHaveTextContent("زمان‌بندی‌شده");
+    expect(rows[1]).not.toHaveTextContent("پیش‌نویس"); // one state per row, never two
     expect(rows[2]).toHaveTextContent("پیش‌نویس");
 
     fireEvent.change(screen.getByLabelText("وضعیت"), { target: { value: "draft" } });
