@@ -50,7 +50,7 @@ export function ContentBlocks() {
       </div>
       <div className="flex flex-col gap-4">
         {shown.map((block) => (
-          <BlockEditor key={`${block.key}-${block.updated_at}`} block={block} />
+          <BlockEditor key={block.key} block={block} />
         ))}
       </div>
     </div>

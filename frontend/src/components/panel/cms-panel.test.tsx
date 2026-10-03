@@ -133,7 +133,12 @@ describe("ContentBlocks", () => {
     const api = fakeApi([
       { method: "GET", path: "/api/admin/cms/blocks/", body: blocks },
       { method: "PATCH", path: "/api/admin/cms/blocks/home.intro_title/", body: blocks[0] },
-      { method: "GET", path: "/api/admin/cms/blocks/", body: blocks },
+      // After the save the server reports a newer updated_at, as it does for real.
+      {
+        method: "GET",
+        path: "/api/admin/cms/blocks/",
+        body: blocks.map((b) => ({ ...b, updated_at: "t2" })),
+      },
     ]);
     vi.stubGlobal("fetch", api.fetchImpl);
     renderWithQuery(<ContentBlocks />);
@@ -145,6 +150,12 @@ describe("ContentBlocks", () => {
 
     await waitFor(() => expect(revalidatePublic).toHaveBeenCalledWith("site"));
     expect(api.calls.find((c) => c.method === "PATCH")?.body).toEqual({ text_fa: "طعم", text_en: "Hi" });
+    // The list refetches after a save; the form (and its confirmation) must survive that.
+    await waitFor(() =>
+      expect(api.calls.filter((c) => c.method === "GET" && c.path.endsWith("/blocks/"))).toHaveLength(2),
+    );
+    expect(within(form).getByText("ذخیره شد.")).toBeInTheDocument();
+    expect(within(form).getByLabelText("فارسی")).toHaveValue("طعم");
 
     fireEvent.click(screen.getByRole("button", { name: "درباره‌ی من" }));
     expect(await screen.findByRole("form", { name: "عنوان صفحه" })).toBeInTheDocument();
