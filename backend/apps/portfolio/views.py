@@ -24,11 +24,15 @@ from .serializers import (
 PUBLIC_CACHE = "public, max-age=30"
 
 
+def visible_projects() -> QuerySet[Project]:
+    """Published projects whose category (if any) is also published, in display order."""
+    return Project.objects.filter(is_published=True).filter(Q(category__isnull=True) | Q(category__is_published=True))
+
+
 def published_projects() -> QuerySet[Project]:
-    """Published projects whose category (if any) is also published, with everything the cards need."""
+    """`visible_projects` with everything the cards need (category, cover and gallery media)."""
     return (
-        Project.objects.filter(is_published=True)
-        .filter(Q(category__isnull=True) | Q(category__is_published=True))
+        visible_projects()
         .select_related("category", "cover")
         .prefetch_related("cover__variants", "images__media__variants")
     )
@@ -55,8 +59,11 @@ class PublicPortfolioView(APIView):
             projects = projects.filter(category__slug=slug)
         if style := params.get("style"):
             projects = projects.filter(style=style)
-        if params.get("featured") in ("1", "true"):
+        featured = params.get("featured", "").lower()
+        if featured in ("1", "true"):
             projects = projects.filter(is_featured=True)
+        elif featured in ("0", "false"):
+            projects = projects.filter(is_featured=False)
         categories = (
             Category.objects.filter(is_published=True)
             .select_related("cover")
@@ -79,13 +86,13 @@ class PublicProjectView(APIView):
 
     @extend_schema(responses=PublicProjectDetailSerializer, operation_id="public_project_retrieve", auth=[])
     def get(self, request: Request, slug: str) -> Response:
-        projects = list(published_projects())
-        index = next((i for i, p in enumerate(projects) if p.slug == slug), None)
-        if index is None:
+        slugs = list(visible_projects().values_list("slug", flat=True))  # light: only the order is needed
+        if slug not in slugs:
             raise NotFound
-        project = projects[index]
-        project.previous = projects[index - 1].slug if index > 0 else None  # type: ignore[attr-defined]
-        project.next = projects[index + 1].slug if index < len(projects) - 1 else None  # type: ignore[attr-defined]
+        index = slugs.index(slug)
+        project = published_projects().get(slug=slug)  # only this project's gallery is loaded
+        project.previous = slugs[index - 1] if index > 0 else None  # type: ignore[attr-defined]
+        project.next = slugs[index + 1] if index < len(slugs) - 1 else None  # type: ignore[attr-defined]
         response = Response(PublicProjectDetailSerializer(project).data)
         response["Cache-Control"] = PUBLIC_CACHE
         return response

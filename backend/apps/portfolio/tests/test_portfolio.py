@@ -163,3 +163,20 @@ def test_project_list_filters_and_audit(owner_client):
     assert [p["slug"] for p in owner_client.get(PROJECTS, {"q": "رستوران"}).json()] == ["b"]
     owner_client.patch(f"{PROJECTS}{Project.objects.get(slug='a').pk}/", {"year": 1404}, format="json")
     assert AuditLog.objects.filter(action="portfolio.project.update").exists()
+
+
+def test_featured_filter_honours_false(client):
+    make_project(slug="star", is_featured=True)
+    make_project(slug="plain", is_featured=False)
+    get = lambda v: sorted(p["slug"] for p in client.get("/api/public/portfolio", {"featured": v}).json()["projects"])  # noqa: E731
+    assert get("true") == ["star"] and get("1") == ["star"]
+    assert get("false") == ["plain"] and get("0") == ["plain"]
+    assert get("") == ["plain", "star"]
+
+
+def test_project_detail_loads_only_its_own_gallery(client, django_assert_max_num_queries):
+    for i in range(6):
+        project = make_project(slug=f"p{i}", position=i)
+        ProjectImage.objects.create(project=project, media=make_asset(f"img{i}"), position=0)
+    with django_assert_max_num_queries(7):  # constant, not proportional to the number of projects
+        assert client.get("/api/public/portfolio/p3").status_code == 200

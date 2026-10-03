@@ -83,3 +83,23 @@ def test_packages_filter_by_group_and_reorder(owner_client):
     assert [p["title_fa"] for p in owner_client.get(PACKAGES, {"group": g2.pk}).json()] == ["b"]
     assert owner_client.post(f"{PACKAGES}reorder/", {"ids": [b.pk, a.pk]}, format="json").status_code == 204
     assert [p["title_fa"] for p in owner_client.get(PACKAGES).json()] == ["b", "a"]
+
+
+def test_features_keep_their_included_state(client, owner_client):
+    group = PackageGroup.objects.create(title_fa="منو")
+    created = owner_client.post(
+        PACKAGES,
+        {
+            "group": group.pk,
+            "title_fa": "الف",
+            "features": [
+                {"text_fa": "ریتاچ", "included": True},
+                {"text_fa": "ویدیو", "included": False},
+                {"text_fa": "پیش‌فرض"},
+            ],
+        },
+        format="json",
+    ).json()
+    assert [f["included"] for f in created["features"]] == [True, False, True]
+    public = client.get("/api/public/packages").json()["groups"][0]["packages"][0]["features"]
+    assert [(f["text_fa"], f["included"]) for f in public] == [("ریتاچ", True), ("ویدیو", False), ("پیش‌فرض", True)]

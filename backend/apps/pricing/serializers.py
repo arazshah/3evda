@@ -11,7 +11,7 @@ from .models import Package, PackageFeature, PackageGroup
 class PublicFeatureSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = PackageFeature
-        fields = ["text_fa", "text_en"]
+        fields = ["text_fa", "text_en", "included"]
         read_only_fields = fields
 
 
@@ -58,7 +58,7 @@ class PackageGroupSerializer(serializers.ModelSerializer):  # type: ignore[type-
 class FeatureSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = PackageFeature
-        fields = ["text_fa", "text_en"]
+        fields = ["text_fa", "text_en", "included"]
 
 
 class PackageSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]

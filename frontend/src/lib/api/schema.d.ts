@@ -700,6 +700,8 @@ export interface components {
     Feature: {
       text_fa: string;
       text_en?: string;
+      /** @description False shows the line as not included */
+      included?: boolean;
     };
     /**
      * @description * `image` - تصویر
@@ -1045,6 +1047,8 @@ export interface components {
     PublicFeature: {
       readonly text_fa: string;
       readonly text_en: string;
+      /** @description False shows the line as not included */
+      readonly included: boolean;
     };
     PublicGroup: {
       readonly id: number;

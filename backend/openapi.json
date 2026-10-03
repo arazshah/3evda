@@ -2966,6 +2966,10 @@
                     "text_en": {
                         "type": "string",
                         "maxLength": 200
+                    },
+                    "included": {
+                        "type": "boolean",
+                        "description": "False shows the line as not included"
                     }
                 },
                 "required": [
@@ -4258,9 +4262,15 @@
                     "text_en": {
                         "type": "string",
                         "readOnly": true
+                    },
+                    "included": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "False shows the line as not included"
                     }
                 },
                 "required": [
+                    "included",
                     "text_en",
                     "text_fa"
                 ]

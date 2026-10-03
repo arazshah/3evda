@@ -50,6 +50,7 @@ class PackageFeature(models.Model):
     package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name="features")
     text_fa = models.CharField(max_length=200)
     text_en = models.CharField(max_length=200, blank=True)
+    included = models.BooleanField(default=True, help_text="False shows the line as not included")
     position = models.PositiveIntegerField(default=0)
 
     class Meta:
