@@ -485,3 +485,23 @@ def test_seed_demo_is_repeatable_and_public(client):
     assert slugs(client) == ["sample-article"]
     fa = client.get("/api/public/blog/articles/fa/sample-article/").json()
     assert fa["alternates"] == [{"language": "en", "slug": "sample-article"}]
+
+
+# ---- sitemap data ----------------------------------------------------------------------------------
+
+
+def test_sitemap_lists_only_what_visitors_can_open(client):
+    live = make_article("fa", slug="live")
+    make_article("en", slug="live-en", translation_group=live.translation_group)
+    make_article("fa", slug="draft", status=Article.Status.DRAFT, published_at=None)
+    make_article("fa", slug="scheduled", published_at=timezone.now() + timedelta(days=1))
+    Project.objects.create(slug="shown", title_fa="الف", is_published=True)
+    Project.objects.create(slug="hidden", title_fa="ب", is_published=False)
+
+    data = client.get("/api/public/sitemap").json()
+
+    assert [p["slug"] for p in data["projects"]] == ["shown"]
+    by_slug = {a["slug"]: a for a in data["articles"]}
+    assert set(by_slug) == {"live", "live-en"}
+    assert by_slug["live"]["alternates"] == [{"language": "en", "slug": "live-en"}]
+    assert by_slug["live-en"]["alternates"] == [{"language": "fa", "slug": "live"}]
