@@ -23,7 +23,16 @@ export const keys = {
   watermark: ["watermark"] as const,
   settings: ["cms", "settings"] as const,
   blocks: ["cms", "blocks"] as const,
+  items: ["cms", "items"] as const,
+  categories: ["portfolio", "categories"] as const,
+  projects: ["portfolio", "projects"] as const,
 };
+
+type Schemas = components["schemas"];
+export type ContentItem = Schemas["ContentItem"];
+export type Collection = Schemas["CollectionEnum"];
+export type Category = Schemas["Category"];
+export type Project = Schemas["Project"];
 
 export function useMe() {
   return useQuery({ queryKey: keys.me, queryFn: () => unwrap(api.GET("/api/auth/me")), staleTime: 30_000 });
@@ -131,6 +140,150 @@ export function useSaveBlock() {
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: keys.blocks });
       await revalidatePublic("site");
+    },
+  });
+}
+
+// ---- repeatable content items (hero slides, services, FAQ …) ---------------------------------------
+
+export function useItems(collection: Collection) {
+  return useQuery({
+    queryKey: [...keys.items, collection],
+    queryFn: () => unwrap(api.GET("/api/admin/cms/items/", { params: { query: { collection } } })),
+  });
+}
+
+type ItemBody = Schemas["PatchedContentItem"];
+
+export function useSaveItem() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: ItemBody & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/cms/items/", { body: body as Schemas["ContentItem"] }))
+        : unwrap(api.PATCH("/api/admin/cms/items/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.items });
+      await revalidatePublic("site");
+    },
+  });
+}
+
+export function useDeleteItem() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/cms/items/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.items });
+      await revalidatePublic("site");
+    },
+  });
+}
+
+export function useReorderItems() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { collection: Collection; ids: number[] }) =>
+      unwrap(api.POST("/api/admin/cms/items/reorder/", { body })),
+    onSettled: async () => {
+      await client.invalidateQueries({ queryKey: keys.items });
+      await revalidatePublic("site");
+    },
+  });
+}
+
+// ---- portfolio -------------------------------------------------------------------------------------
+
+export function useCategories() {
+  return useQuery({
+    queryKey: keys.categories,
+    queryFn: () => unwrap(api.GET("/api/admin/portfolio/categories/")),
+  });
+}
+
+export function useSaveCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedCategory"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/portfolio/categories/", { body: body as Category }))
+        : unwrap(api.PATCH("/api/admin/portfolio/categories/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.categories });
+      await revalidatePublic("portfolio");
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/portfolio/categories/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.categories });
+      await revalidatePublic("portfolio");
+    },
+  });
+}
+
+export function useReorderCategories() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      unwrap(api.POST("/api/admin/portfolio/categories/reorder/", { body: { ids } })),
+    onSettled: async () => {
+      await client.invalidateQueries({ queryKey: keys.categories });
+      await revalidatePublic("portfolio");
+    },
+  });
+}
+
+export function useProjects() {
+  return useQuery({
+    queryKey: keys.projects,
+    queryFn: () => unwrap(api.GET("/api/admin/portfolio/projects/")),
+  });
+}
+
+export function useSaveProject() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedProject"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/portfolio/projects/", { body: body as Project }))
+        : unwrap(api.PATCH("/api/admin/portfolio/projects/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.projects });
+      // Category project counts change with every project save.
+      await client.invalidateQueries({ queryKey: keys.categories });
+      await revalidatePublic("portfolio");
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/portfolio/projects/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.projects });
+      await client.invalidateQueries({ queryKey: keys.categories });
+      await revalidatePublic("portfolio");
+    },
+  });
+}
+
+export function useReorderProjects() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      unwrap(api.POST("/api/admin/portfolio/projects/reorder/", { body: { ids } })),
+    onSettled: async () => {
+      await client.invalidateQueries({ queryKey: keys.projects });
+      await revalidatePublic("portfolio");
     },
   });
 }
