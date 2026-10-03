@@ -1,11 +1,14 @@
 """In-memory test files. Nothing here is real personal data."""
 
+import hashlib
 import io
 import shutil
 import subprocess
 from pathlib import Path
 
 from PIL import Image, TiffImagePlugin
+
+from apps.media.models import MediaAsset, MediaVariant
 
 GPS_IFD = 0x8825
 ORIENTATION = 0x0112
@@ -73,3 +76,15 @@ def video_bytes(tmp_path: Path, container: str = "mp4", seconds: int = 2) -> byt
 
 
 __all__ = ["TiffImagePlugin"]
+
+
+def make_asset(name: str = "a", status: str = MediaAsset.Status.READY) -> MediaAsset:
+    asset = MediaAsset.objects.create(
+        kind="image", status=status, original_key=f"originals/{name}.jpg", original_filename=f"{name}.jpg",
+        mime="image/jpeg", size_bytes=10, sha256=hashlib.sha256(name.encode()).hexdigest(), width=1200, height=800,
+        alt_fa="متن", alt_en="text",
+    )  # fmt: skip
+    MediaVariant.objects.create(
+        asset=asset, name="w480", format="webp", key=f"v/{name}.webp", width=480, height=320, size_bytes=5
+    )
+    return asset

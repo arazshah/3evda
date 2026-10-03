@@ -1060,6 +1060,1068 @@
                 }
             }
         },
+        "/api/admin/portfolio/categories/": {
+            "get": {
+                "operationId": "admin_portfolio_categories_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_portfolio_categories_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/portfolio/categories/{id}/": {
+            "get": {
+                "operationId": "admin_portfolio_categories_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_portfolio_categories_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategory"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategory"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategory"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_portfolio_categories_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/portfolio/categories/reorder/": {
+            "post": {
+                "operationId": "admin_portfolio_categories_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/portfolio/projects/": {
+            "get": {
+                "operationId": "admin_portfolio_projects_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Project"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_portfolio_projects_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Project"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Project"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Project"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/portfolio/projects/{id}/": {
+            "get": {
+                "operationId": "admin_portfolio_projects_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این project را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_portfolio_projects_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این project را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProject"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProject"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedProject"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_portfolio_projects_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این project را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/portfolio/projects/reorder/": {
+            "post": {
+                "operationId": "admin_portfolio_projects_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/groups/": {
+            "get": {
+                "operationId": "admin_pricing_groups_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PackageGroup"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_pricing_groups_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PackageGroup"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PackageGroup"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PackageGroup"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PackageGroup"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/groups/{id}/": {
+            "get": {
+                "operationId": "admin_pricing_groups_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package group را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PackageGroup"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_pricing_groups_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package group را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackageGroup"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackageGroup"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackageGroup"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PackageGroup"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_pricing_groups_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package group را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/groups/reorder/": {
+            "post": {
+                "operationId": "admin_pricing_groups_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/packages/": {
+            "get": {
+                "operationId": "admin_pricing_packages_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Package"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_pricing_packages_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Package"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Package"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Package"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Package"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/packages/{id}/": {
+            "get": {
+                "operationId": "admin_pricing_packages_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Package"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_pricing_packages_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackage"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackage"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPackage"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Package"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_pricing_packages_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این package را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/packages/reorder/": {
+            "post": {
+                "operationId": "admin_pricing_packages_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/admin/settings/watermark": {
             "get": {
                 "operationId": "admin_settings_watermark_retrieve",
@@ -1492,6 +2554,106 @@
                 }
             }
         },
+        "/api/public/packages": {
+            "get": {
+                "operationId": "public_packages_retrieve",
+                "description": "Published groups with their published packages; groups without packages are left out.",
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicPackages"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/portfolio": {
+            "get": {
+                "operationId": "public_portfolio_list",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Category slug"
+                    },
+                    {
+                        "in": "query",
+                        "name": "featured",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "style",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "high_key",
+                                "low_key",
+                                "natural"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicPortfolio"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/portfolio/{slug}": {
+            "get": {
+                "operationId": "public_project_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProjectDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/site": {
             "get": {
                 "operationId": "public_site_retrieve",
@@ -1529,6 +2691,80 @@
                 "required": [
                     "display_name",
                     "username"
+                ]
+            },
+            "BlankEnum": {
+                "enum": [
+                    ""
+                ]
+            },
+            "Category": {
+                "type": "object",
+                "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-a-zA-Z0-9_]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "project_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "cover_detail",
+                    "id",
+                    "position",
+                    "project_count",
+                    "title_fa"
                 ]
             },
             "Code": {
@@ -1720,6 +2956,26 @@
                     "detail"
                 ]
             },
+            "Feature": {
+                "type": "object",
+                "properties": {
+                    "text_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "text_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "included": {
+                        "type": "boolean",
+                        "description": "False shows the line as not included"
+                    }
+                },
+                "required": [
+                    "text_fa"
+                ]
+            },
             "KindEnum": {
                 "enum": [
                     "image",
@@ -1900,6 +3156,123 @@
                     "width"
                 ]
             },
+            "Package": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "group": {
+                        "type": "integer"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "summary_fa": {
+                        "type": "string"
+                    },
+                    "summary_en": {
+                        "type": "string"
+                    },
+                    "price_mode": {
+                        "$ref": "#/components/schemas/PriceModeEnum"
+                    },
+                    "price_amount": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true,
+                        "description": "Toman"
+                    },
+                    "price_unit_fa": {
+                        "type": "string",
+                        "description": "e.g. «به ازای هر محصول»",
+                        "maxLength": 60
+                    },
+                    "price_unit_en": {
+                        "type": "string",
+                        "maxLength": 60
+                    },
+                    "badge_fa": {
+                        "type": "string",
+                        "description": "e.g. «محبوب»",
+                        "maxLength": 40
+                    },
+                    "badge_en": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        }
+                    }
+                },
+                "required": [
+                    "group",
+                    "id",
+                    "position",
+                    "title_fa"
+                ]
+            },
+            "PackageGroup": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "package_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "package_count",
+                    "position",
+                    "title_fa"
+                ]
+            },
             "PaginatedMediaAssetList": {
                 "type": "object",
                 "required": [
@@ -1959,6 +3332,68 @@
                     "current_password",
                     "new_password"
                 ]
+            },
+            "PatchedCategory": {
+                "type": "object",
+                "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-a-zA-Z0-9_]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "project_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
             },
             "PatchedContentBlock": {
                 "type": "object",
@@ -2176,6 +3611,223 @@
                     }
                 }
             },
+            "PatchedPackage": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "group": {
+                        "type": "integer"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "summary_fa": {
+                        "type": "string"
+                    },
+                    "summary_en": {
+                        "type": "string"
+                    },
+                    "price_mode": {
+                        "$ref": "#/components/schemas/PriceModeEnum"
+                    },
+                    "price_amount": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true,
+                        "description": "Toman"
+                    },
+                    "price_unit_fa": {
+                        "type": "string",
+                        "description": "e.g. «به ازای هر محصول»",
+                        "maxLength": 60
+                    },
+                    "price_unit_en": {
+                        "type": "string",
+                        "maxLength": 60
+                    },
+                    "badge_fa": {
+                        "type": "string",
+                        "description": "e.g. «محبوب»",
+                        "maxLength": 40
+                    },
+                    "badge_en": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        }
+                    }
+                }
+            },
+            "PatchedPackageGroup": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "package_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedProject": {
+                "type": "object",
+                "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-a-zA-Z0-9_]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "category": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "style": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/StyleEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "summary_fa": {
+                        "type": "string"
+                    },
+                    "summary_en": {
+                        "type": "string"
+                    },
+                    "body_fa": {
+                        "type": "string",
+                        "description": "Case study"
+                    },
+                    "body_en": {
+                        "type": "string"
+                    },
+                    "client_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "client_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "year": {
+                        "type": "integer",
+                        "maximum": 32767,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectImage"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PatchedSiteSettings": {
                 "type": "object",
                 "properties": {
@@ -2304,6 +3956,164 @@
                 "type": "string",
                 "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط"
             },
+            "PriceModeEnum": {
+                "enum": [
+                    "from",
+                    "fixed",
+                    "inquiry"
+                ],
+                "type": "string",
+                "description": "* `from` - از … شروع می‌شود\n* `fixed` - قیمت ثابت\n* `inquiry` - استعلام"
+            },
+            "Project": {
+                "type": "object",
+                "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-a-zA-Z0-9_]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "category": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "style": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/StyleEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "summary_fa": {
+                        "type": "string"
+                    },
+                    "summary_en": {
+                        "type": "string"
+                    },
+                    "body_fa": {
+                        "type": "string",
+                        "description": "Case study"
+                    },
+                    "body_en": {
+                        "type": "string"
+                    },
+                    "client_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "client_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "year": {
+                        "type": "integer",
+                        "maximum": 32767,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectImage"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "cover_detail",
+                    "created_at",
+                    "id",
+                    "position",
+                    "title_fa",
+                    "updated_at"
+                ]
+            },
+            "ProjectImage": {
+                "type": "object",
+                "properties": {
+                    "media": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "media_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "caption_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "caption_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    }
+                },
+                "required": [
+                    "media",
+                    "media_detail"
+                ]
+            },
             "PublicBlock": {
                 "type": "object",
                 "properties": {
@@ -2329,6 +4139,54 @@
                     "en",
                     "fa",
                     "media"
+                ]
+            },
+            "PublicCategory": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "cover": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "project_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "cover",
+                    "description_en",
+                    "description_fa",
+                    "project_count",
+                    "slug",
+                    "title_en",
+                    "title_fa"
                 ]
             },
             "PublicCollections": {
@@ -2392,6 +4250,95 @@
                     "process_step",
                     "service",
                     "testimonial"
+                ]
+            },
+            "PublicFeature": {
+                "type": "object",
+                "properties": {
+                    "text_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "text_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "included": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "False shows the line as not included"
+                    }
+                },
+                "required": [
+                    "included",
+                    "text_en",
+                    "text_fa"
+                ]
+            },
+            "PublicGroup": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "packages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicPackage"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "description_en",
+                    "description_fa",
+                    "id",
+                    "packages",
+                    "title_en",
+                    "title_fa"
+                ]
+            },
+            "PublicImage": {
+                "type": "object",
+                "properties": {
+                    "media": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "caption_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "caption_en": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "caption_en",
+                    "caption_fa",
+                    "media"
                 ]
             },
             "PublicItem": {
@@ -2516,6 +4463,311 @@
                     "lqip",
                     "variants",
                     "width"
+                ]
+            },
+            "PublicPackage": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "price_mode": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PriceModeEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "price_amount": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true,
+                        "description": "Toman"
+                    },
+                    "price_unit_fa": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "e.g. «به ازای هر محصول»"
+                    },
+                    "price_unit_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "badge_fa": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "e.g. «محبوب»"
+                    },
+                    "badge_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "is_featured": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicFeature"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "badge_en",
+                    "badge_fa",
+                    "features",
+                    "id",
+                    "is_featured",
+                    "price_amount",
+                    "price_mode",
+                    "price_unit_en",
+                    "price_unit_fa",
+                    "summary_en",
+                    "summary_fa",
+                    "title_en",
+                    "title_fa"
+                ]
+            },
+            "PublicPackages": {
+                "type": "object",
+                "properties": {
+                    "groups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicGroup"
+                        }
+                    }
+                },
+                "required": [
+                    "groups"
+                ]
+            },
+            "PublicPortfolio": {
+                "type": "object",
+                "properties": {
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicCategory"
+                        }
+                    },
+                    "projects": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicProject"
+                        }
+                    }
+                },
+                "required": [
+                    "categories",
+                    "projects"
+                ]
+            },
+            "PublicProject": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "category": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "style": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StyleEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "client_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "client_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "year": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "cover": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "nullable": true,
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "category",
+                    "client_en",
+                    "client_fa",
+                    "cover",
+                    "is_featured",
+                    "slug",
+                    "style",
+                    "summary_en",
+                    "summary_fa",
+                    "title_en",
+                    "title_fa",
+                    "year"
+                ]
+            },
+            "PublicProjectDetail": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "category": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "style": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StyleEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "client_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "client_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "year": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "cover": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "body_fa": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Case study"
+                    },
+                    "body_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicImage"
+                        },
+                        "readOnly": true
+                    },
+                    "previous": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "next": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "body_en",
+                    "body_fa",
+                    "category",
+                    "client_en",
+                    "client_fa",
+                    "cover",
+                    "images",
+                    "is_featured",
+                    "next",
+                    "previous",
+                    "slug",
+                    "style",
+                    "summary_en",
+                    "summary_fa",
+                    "title_en",
+                    "title_fa",
+                    "year"
                 ]
             },
             "PublicSettings": {
@@ -2682,6 +4934,20 @@
                     "ids"
                 ]
             },
+            "ReorderIds": {
+                "type": "object",
+                "properties": {
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "ids"
+                ]
+            },
             "SiteSettings": {
                 "type": "object",
                 "properties": {
@@ -2843,6 +5109,15 @@
                 ],
                 "type": "string",
                 "description": "* `pending` - در صف\n* `processing` - در حال پردازش\n* `ready` - آماده\n* `failed` - ناموفق"
+            },
+            "StyleEnum": {
+                "enum": [
+                    "low_key",
+                    "high_key",
+                    "natural"
+                ],
+                "type": "string",
+                "description": "* `low_key` - Low-key\n* `high_key` - High-key\n* `natural` - نور طبیعی"
             },
             "TotpSetup": {
                 "type": "object",

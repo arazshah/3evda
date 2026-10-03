@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.media",
     "apps.cms",
+    "apps.portfolio",
+    "apps.pricing",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
