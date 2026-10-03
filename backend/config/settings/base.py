@@ -187,6 +187,8 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "StatusEnum": "apps.media.models.MediaAsset.Status",
         "ArticleStatusEnum": "apps.blog.models.Article.Status",
+        "KindEnum": "apps.media.models.MediaAsset.Kind",
+        "QuoteRuleKindEnum": "apps.pricing.models.QuoteRule.Kind",
     },
 }
 

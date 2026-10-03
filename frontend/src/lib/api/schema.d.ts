@@ -526,6 +526,93 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/pricing/quote-settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_pricing_quote_settings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_pricing_quote_settings_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/pricing/rules/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_rules_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_rules_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/rules/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_rules_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_pricing_rules_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_pricing_rules_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/pricing/rules/preview/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Try the saved rules with some choices, and see how the number is built. */
+    post: operations["pricing_rules_preview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/rules/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_rules_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/settings/watermark": {
     parameters: {
       query?: never;
@@ -792,6 +879,40 @@ export interface paths {
       cookie?: never;
     };
     get: operations["public_project_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/quote/estimate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Choices in, an approximate price range out. Nothing is stored. */
+    post: operations["public_quote_estimate_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/quote/options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description What the calculator offers: labels and quantity limits only, no prices or factors. */
+    get: operations["public_quote_options_retrieve"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1313,6 +1434,32 @@ export interface components {
       /** Format: date-time */
       readonly updated_at?: string;
     };
+    PatchedQuoteRule: {
+      readonly id?: number;
+      /** @description Stable identifier used by the public form */
+      key?: string;
+      kind?: components["schemas"]["QuoteRuleKindEnum"];
+      label_fa?: string;
+      label_en?: string;
+      /**
+       * Format: int64
+       * @description Toman
+       */
+      amount?: number | null;
+      /** Format: decimal */
+      factor?: string | null;
+      min_quantity?: number | null;
+      is_active?: boolean;
+      readonly position?: number;
+    };
+    PatchedQuoteSettings: {
+      /** @description The estimate is shown as total ± this percent */
+      range_percent?: number;
+      /** @description Both ends of the range are rounded to this many toman */
+      rounding_step?: number;
+      min_quantity?: number;
+      max_quantity?: number;
+    };
     PatchedSiteSettings: {
       /** Format: uuid */
       logo?: string | null;
@@ -1610,6 +1757,79 @@ export interface components {
     PublicSitemap: {
       projects: components["schemas"]["SitemapProject"][];
       articles: components["schemas"]["SitemapArticle"][];
+    };
+    QuoteEstimate: {
+      low: number;
+      high: number;
+      currency: string;
+      approximate: boolean;
+    };
+    /** @description What a visitor (or the owner's preview) sends: choices only, never prices. */
+    QuoteInput: {
+      service: string;
+      quantity: number;
+      addons?: string[];
+      multipliers?: string[];
+    };
+    QuoteOption: {
+      /** @description Stable identifier used by the public form */
+      readonly key: string;
+      readonly label_fa: string;
+      readonly label_en: string;
+    };
+    QuoteOptions: {
+      services: components["schemas"]["QuoteOption"][];
+      addons: components["schemas"]["QuoteOption"][];
+      multipliers: components["schemas"]["QuoteOption"][];
+      min_quantity: number;
+      max_quantity: number;
+    };
+    /** @description The owner's preview also shows how the number was reached. */
+    QuotePreview: {
+      low: number;
+      high: number;
+      currency: string;
+      approximate: boolean;
+      total: number;
+      base: number;
+      tier_factor: string;
+      addons: string[][];
+      multipliers: string[][];
+    };
+    QuoteRule: {
+      readonly id: number;
+      /** @description Stable identifier used by the public form */
+      key: string;
+      kind: components["schemas"]["QuoteRuleKindEnum"];
+      label_fa: string;
+      label_en?: string;
+      /**
+       * Format: int64
+       * @description Toman
+       */
+      amount?: number | null;
+      /** Format: decimal */
+      factor?: string | null;
+      min_quantity?: number | null;
+      is_active?: boolean;
+      readonly position: number;
+    };
+    /**
+     * @description * `service` - قیمت پایه‌ی خدمت (هر محصول)
+     *     * `tier` - پله‌ی تعداد (ضریب از تعداد مشخص به بعد)
+     *     * `addon_fixed` - افزونه‌ی ثابت
+     *     * `addon_per_item` - افزونه به‌ازای هر محصول
+     *     * `multiplier` - ضریب (مثل فوریت)
+     * @enum {string}
+     */
+    QuoteRuleKindEnum: "service" | "tier" | "addon_fixed" | "addon_per_item" | "multiplier";
+    QuoteSettings: {
+      /** @description The estimate is shown as total ± this percent */
+      range_percent?: number;
+      /** @description Both ends of the range are rounded to this many toman */
+      rounding_step?: number;
+      min_quantity?: number;
+      max_quantity?: number;
     };
     RecoveryCodes: {
       recovery_codes: string[];
@@ -3272,6 +3492,214 @@ export interface operations {
       };
     };
   };
+  admin_pricing_quote_settings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteSettings"];
+        };
+      };
+    };
+  };
+  admin_pricing_quote_settings_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedQuoteSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedQuoteSettings"];
+        "multipart/form-data": components["schemas"]["PatchedQuoteSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteSettings"];
+        };
+      };
+    };
+  };
+  admin_pricing_rules_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteRule"][];
+        };
+      };
+    };
+  };
+  admin_pricing_rules_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["QuoteRule"];
+        "application/x-www-form-urlencoded": components["schemas"]["QuoteRule"];
+        "multipart/form-data": components["schemas"]["QuoteRule"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteRule"];
+        };
+      };
+    };
+  };
+  admin_pricing_rules_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این quote rule را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteRule"];
+        };
+      };
+    };
+  };
+  admin_pricing_rules_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این quote rule را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_pricing_rules_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این quote rule را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedQuoteRule"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedQuoteRule"];
+        "multipart/form-data": components["schemas"]["PatchedQuoteRule"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteRule"];
+        };
+      };
+    };
+  };
+  pricing_rules_preview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["QuoteInput"];
+        "application/x-www-form-urlencoded": components["schemas"]["QuoteInput"];
+        "multipart/form-data": components["schemas"]["QuoteInput"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuotePreview"];
+        };
+      };
+    };
+  };
+  admin_pricing_rules_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   admin_settings_watermark_retrieve: {
     parameters: {
       query?: never;
@@ -3720,6 +4148,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicProjectDetail"];
+        };
+      };
+    };
+  };
+  public_quote_estimate_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["QuoteInput"];
+        "application/x-www-form-urlencoded": components["schemas"]["QuoteInput"];
+        "multipart/form-data": components["schemas"]["QuoteInput"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteEstimate"];
+        };
+      };
+    };
+  };
+  public_quote_options_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuoteOptions"];
         };
       };
     };
