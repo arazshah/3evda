@@ -91,6 +91,15 @@ python manage.py bootstrap_admin --username sevda
 - دستور فقط وقتی کار می‌کند که هیچ کاربری وجود نداشته باشد. پایگاه داده هم اجازه‌ی ساخت کاربر دوم را نمی‌دهد.
 - اگر رمز را با متغیر `ADMIN_BOOTSTRAP_PASSWORD` داده‌اید، بلافاصله آن را از Coolify پاک کنید.
 
+**بدون ترمینال:** در Environment Variables همین Resource این دو متغیر را بگذارید و Redeploy بزنید؛ `api` هنگام بالا آمدن مالک را می‌سازد (اگر مالکی وجود داشته باشد هیچ کاری نمی‌کند):
+
+| متغیر | مقدار |
+|---|---|
+| `ADMIN_BOOTSTRAP_USERNAME` | `sevda` |
+| `ADMIN_BOOTSTRAP_PASSWORD` | رمز دلخواه، حداقل ۱۲ کاراکتر |
+
+بعد از اولین ورود و ثبت TOTP، `ADMIN_BOOTSTRAP_PASSWORD` را حتماً از Coolify پاک کنید.
+
 ### بازیابی دسترسی ادمین
 
 | مشکل | راه‌حل |
