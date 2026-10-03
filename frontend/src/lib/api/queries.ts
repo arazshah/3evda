@@ -26,6 +26,8 @@ export const keys = {
   items: ["cms", "items"] as const,
   categories: ["portfolio", "categories"] as const,
   projects: ["portfolio", "projects"] as const,
+  groups: ["pricing", "groups"] as const,
+  packages: ["pricing", "packages"] as const,
 };
 
 type Schemas = components["schemas"];
@@ -33,6 +35,8 @@ export type ContentItem = Schemas["ContentItem"];
 export type Collection = Schemas["CollectionEnum"];
 export type Category = Schemas["Category"];
 export type Project = Schemas["Project"];
+export type PackageGroup = Schemas["PackageGroup"];
+export type Package = Schemas["Package"];
 
 export function useMe() {
   return useQuery({ queryKey: keys.me, queryFn: () => unwrap(api.GET("/api/auth/me")), staleTime: 30_000 });
@@ -284,6 +288,101 @@ export function useReorderProjects() {
     onSettled: async () => {
       await revalidatePublic("portfolio");
       await client.invalidateQueries({ queryKey: keys.projects });
+    },
+  });
+}
+
+// ---- pricing ---------------------------------------------------------------------------------------
+
+export function usePackageGroups() {
+  return useQuery({
+    queryKey: keys.groups,
+    queryFn: () => unwrap(api.GET("/api/admin/pricing/groups/")),
+  });
+}
+
+export function useSaveGroup() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedPackageGroup"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/pricing/groups/", { body: body as PackageGroup }))
+        : unwrap(api.PATCH("/api/admin/pricing/groups/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.groups });
+    },
+  });
+}
+
+export function useDeleteGroup() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/pricing/groups/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.groups });
+      await client.invalidateQueries({ queryKey: keys.packages });
+    },
+  });
+}
+
+export function useReorderGroups() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) => unwrap(api.POST("/api/admin/pricing/groups/reorder/", { body: { ids } })),
+    onSettled: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.groups });
+    },
+  });
+}
+
+/** Every package of every group: the reorder endpoint needs the complete order, not one group's slice. */
+export function usePackages() {
+  return useQuery({
+    queryKey: keys.packages,
+    queryFn: () => unwrap(api.GET("/api/admin/pricing/packages/")),
+  });
+}
+
+export function useSavePackage() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedPackage"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/pricing/packages/", { body: body as Package }))
+        : unwrap(api.PATCH("/api/admin/pricing/packages/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.packages });
+      await client.invalidateQueries({ queryKey: keys.groups });
+    },
+  });
+}
+
+export function useDeletePackage() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/pricing/packages/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.packages });
+      await client.invalidateQueries({ queryKey: keys.groups });
+    },
+  });
+}
+
+export function useReorderPackages() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      unwrap(api.POST("/api/admin/pricing/packages/reorder/", { body: { ids } })),
+    onSettled: async () => {
+      await revalidatePublic("packages");
+      await client.invalidateQueries({ queryKey: keys.packages });
     },
   });
 }

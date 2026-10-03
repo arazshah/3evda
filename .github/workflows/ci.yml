@@ -204,6 +204,11 @@ jobs:
           E2E_EXPECTED_VERSION: ${{ github.sha }}
           E2E_ADMIN_USER: e2e-admin
         run: pnpm test
+      - name: Lighthouse (every public page scores at least 90)
+        working-directory: e2e
+        env:
+          E2E_BASE_URL: http://localhost:8080
+        run: pnpm lighthouse
       - name: Collect service logs
         if: failure()
         run: docker compose logs --no-color --timestamps > compose-logs.txt

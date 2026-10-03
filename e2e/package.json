@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "playwright test",
-    "install-browsers": "playwright install --with-deps chromium"
+    "install-browsers": "playwright install --with-deps chromium",
+    "lighthouse": "node scripts/lighthouse.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

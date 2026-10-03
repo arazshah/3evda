@@ -14,6 +14,7 @@ const NAV = [
   { href: "/panel/items", label: "بخش‌های تکرارشونده" },
   { href: "/panel/projects", label: "نمونه‌کارها" },
   { href: "/panel/categories", label: "دسته‌ها" },
+  { href: "/panel/packages", label: "پکیج‌ها و قیمت‌ها" },
   { href: "/panel/settings", label: "تنظیمات سایت" },
   { href: "/panel/media", label: "کتابخانه رسانه" },
   { href: "/panel/watermark", label: "واترمارک" },

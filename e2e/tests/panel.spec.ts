@@ -1,5 +1,7 @@
+import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import type { Page } from "@playwright/test";
 import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
 import { totp } from "./totp";
 
@@ -7,6 +9,12 @@ const USERNAME = process.env.E2E_ADMIN_USER ?? "e2e-admin";
 const PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? "";
 const PHOTO = new URL("../fixtures/photo-with-gps.jpg", import.meta.url).pathname;
 const sha256 = (data: Buffer) => createHash("sha256").update(data).digest("hex");
+
+async function expectNoSeriousViolations(page: Page, where: string) {
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+  const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+  expect(serious.map((v) => `${where} — ${v.id}: ${v.help}`)).toEqual([]);
+}
 
 // The owner account is enrolled once, so the whole journey runs serially in one project.
 test.describe.configure({ mode: "serial" });
@@ -144,6 +152,56 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expect(page.getByRole("list", { name: "دسته‌ها" })).toHaveCount(0);
   await page.goto("/portfolio");
   await expect(page.getByRole("link", { name: "پروژه‌ی ویرایش‌شده" })).toHaveCount(0);
+
+  // Packages journey: a group with a package in the panel, then on the public page, then removed.
+  await page.goto("/panel/packages");
+  await page.getByRole("button", { name: "افزودن گروه" }).click();
+  await page.getByLabel("نام گروه (فارسی)").fill("گروه آزمایشی");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.getByRole("list", { name: "گروه‌های پکیج" })).toContainText("گروه آزمایشی");
+
+  await page.getByRole("button", { name: "افزودن پکیج" }).click();
+  await page.getByLabel("نام پکیج (فارسی)").fill("پکیج آزمایشی");
+  await page.getByLabel("مبلغ (تومان)").fill("1500000");
+  await page.getByRole("button", { name: "افزودن ویژگی" }).click();
+  await page.getByLabel("ویژگی 1 (فارسی)").fill("پنج عکس");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.getByRole("list", { name: "پکیج‌ها" })).toContainText("پکیج آزمایشی");
+
+  await page.goto("/packages");
+  await expect(page.getByRole("heading", { level: 2, name: "گروه آزمایشی" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "پکیج آزمایشی" })).toBeVisible();
+  await expect(page.getByText(/^از .+ تومان$/)).toBeVisible();
+  await expect(page.getByText("پنج عکس")).toBeVisible();
+
+  // Switch it to quote-only: the amount disappears from the public page.
+  await page.goto("/panel/packages");
+  await page.getByRole("button", { name: "ویرایش پکیج آزمایشی" }).click();
+  await page.getByLabel("نوع قیمت").selectOption("inquiry");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await page.goto("/packages");
+  await expect(page.getByText(/^از .+ تومان$/)).toHaveCount(0);
+  await expect(page.getByText("استعلام بگیرید", { exact: true })).toBeVisible();
+
+  await page.goto("/panel/packages");
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف پکیج آزمایشی" }).click();
+  await expect(page.getByRole("list", { name: "پکیج‌ها" })).toHaveCount(0);
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف گروه آزمایشی" }).click();
+  await expect(page.getByRole("list", { name: "گروه‌های پکیج" })).toHaveCount(0);
+  await page.goto("/packages");
+  await expect(page.getByRole("heading", { level: 2, name: "گروه آزمایشی" })).toHaveCount(0);
+
+  // The panel itself meets the same accessibility bar as the public site.
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/settings", "/panel/media"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+    await expectNoSeriousViolations(page, path);
+  }
 
   // Sign out (the button lives in the panel, and the journey above ended on a public page).
   await page.goto("/panel");
