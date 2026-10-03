@@ -33,7 +33,7 @@ test("admin APIs refuse anonymous visitors", async ({ request }) => {
 });
 
 test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request, browser }) => {
-  test.setTimeout(120_000); // one long journey: sign-in, media, site content, portfolio
+  test.setTimeout(180_000); // one long journey: sign-in, media, site content, portfolio, enquiries, proformas
   await page.goto("/panel/login");
   await page.getByLabel("نام کاربری").fill(USERNAME);
   await page.getByLabel("رمز عبور").fill(PASSWORD);
@@ -360,6 +360,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expect(page.getByLabel("وضعیت", { exact: true })).toHaveValue("proforma_sent");
 
   // Deleting it removes the row and the stored file.
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
   await found.getByRole("link").click();
   acceptNextDialog();
   await page.getByRole("button", { name: "حذف استعلام" }).click();
