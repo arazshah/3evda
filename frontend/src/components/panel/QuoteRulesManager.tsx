@@ -261,7 +261,7 @@ function RuleForm({ rule, onDone }: { rule: QuoteRule | null; onDone: () => void
           label="شناسه (انگلیسی)"
           dir="ltr"
           required
-          pattern="[A-Za-z0-9_-]+"
+          pattern="[A-Za-z0-9_\-]+"
           hint="فقط حروف انگلیسی، عدد و خط تیره؛ یکتا است (مثلاً food یا urgent)."
           {...set("key")}
         />

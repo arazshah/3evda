@@ -223,4 +223,22 @@ describe("QuoteRulesManager", () => {
     expect(await screen.findByLabelText("نتیجه‌ی برآورد")).toBeInTheDocument();
     expect(api.calls.find((c) => c.path.endsWith("preview/"))?.body).toMatchObject({ addons: [] });
   });
+
+  it("uses a pattern browsers accept (they compile it with the `v` flag)", async () => {
+    const api = fakeApi([
+      { method: "GET", path: RULES, body: [] },
+      { method: "GET", path: SETTINGS, body: settings },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<QuoteRulesManager />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "افزودن قاعده" }));
+    const key = within(await screen.findByRole("dialog")).getByLabelText("شناسه (انگلیسی)");
+    const pattern = key.getAttribute("pattern") ?? "";
+    // jsdom does not validate `pattern`, but Chrome logs an error for one that is not a valid /v regex.
+    const compile = () => new RegExp(`^(?:${pattern})$`, "v");
+    expect(compile).not.toThrow();
+    expect(compile().test("e2e-service_1")).toBe(true);
+    expect(compile().test("bad key")).toBe(false);
+  });
 });
