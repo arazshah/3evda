@@ -322,7 +322,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   // Publishing puts the article in the sitemap and the feed; renaming it keeps the old address working.
   const text = async (path: string) => (await page.request.get(path)).text();
   expect(await text("/sitemap.xml")).not.toContain("mazmoon-azmayeshi");
-  await page.getByLabel("وضعیت", { exact: true }).selectOption("published");
+  await page.getByLabel("وضعیت").selectOption("published");
   await page.getByLabel("نشانی مقاله (اختیاری)").fill("mazmoon-azmayeshi");
   await page.getByRole("button", { name: "ذخیره", exact: true }).click();
   await expect(page.getByText("ذخیره شد.")).toBeVisible();
