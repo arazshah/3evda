@@ -28,6 +28,8 @@ export const keys = {
   projects: ["portfolio", "projects"] as const,
   groups: ["pricing", "groups"] as const,
   packages: ["pricing", "packages"] as const,
+  quoteRules: ["pricing", "rules"] as const,
+  quoteSettings: ["pricing", "quote-settings"] as const,
   articles: ["blog", "articles"] as const,
   blogCategories: ["blog", "categories"] as const,
   blogTags: ["blog", "tags"] as const,
@@ -40,6 +42,10 @@ export type Category = Schemas["Category"];
 export type Project = Schemas["Project"];
 export type PackageGroup = Schemas["PackageGroup"];
 export type Package = Schemas["Package"];
+export type QuoteRule = Schemas["QuoteRule"];
+export type QuoteSettings = Schemas["QuoteSettings"];
+export type QuotePreview = Schemas["QuotePreview"];
+export type QuoteInput = Schemas["QuoteInput"];
 export type Article = Schemas["Article"];
 export type BlogCategory = Schemas["BlogCategory"];
 export type BlogTag = Schemas["BlogTag"];
@@ -390,6 +396,67 @@ export function useReorderPackages() {
       await revalidatePublic("packages");
       await client.invalidateQueries({ queryKey: keys.packages });
     },
+  });
+}
+
+// ---- price calculator ------------------------------------------------------------------------------
+// The public calculator reads its options from the API on every visit, so saving needs no cache refresh.
+
+export function useQuoteRules() {
+  return useQuery({
+    queryKey: keys.quoteRules,
+    queryFn: () => unwrap(api.GET("/api/admin/pricing/rules/")),
+  });
+}
+
+export function useSaveQuoteRule() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedQuoteRule"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/pricing/rules/", { body: body as QuoteRule }))
+        : unwrap(api.PATCH("/api/admin/pricing/rules/{id}/", { params: { path: { id } }, body })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.quoteRules }),
+  });
+}
+
+export function useDeleteQuoteRule() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/pricing/rules/{id}/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.quoteRules }),
+  });
+}
+
+export function useReorderQuoteRules() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) => unwrap(api.POST("/api/admin/pricing/rules/reorder/", { body: { ids } })),
+    onSettled: () => client.invalidateQueries({ queryKey: keys.quoteRules }),
+  });
+}
+
+export function useQuoteSettings() {
+  return useQuery({
+    queryKey: keys.quoteSettings,
+    queryFn: () => unwrap(api.GET("/api/admin/pricing/quote-settings")),
+  });
+}
+
+export function useSaveQuoteSettings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas["PatchedQuoteSettings"]) =>
+      unwrap(api.PATCH("/api/admin/pricing/quote-settings", { body })),
+    onSuccess: (data) => client.setQueryData(keys.quoteSettings, data),
+  });
+}
+
+/** Try the saved rules with some choices (nothing is stored). */
+export function usePreviewQuote() {
+  return useMutation({
+    mutationFn: (body: QuoteInput) => unwrap(api.POST("/api/admin/pricing/rules/preview/", { body })),
   });
 }
 

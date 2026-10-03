@@ -196,6 +196,29 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.goto("/packages");
   await expect(page.getByRole("heading", { level: 2, name: "گروه آزمایشی" })).toHaveCount(0);
 
+  // Price calculator: a base-price rule drives the public estimate, which is a range and never shows the rule.
+  await page.goto("/panel/pricing");
+  await page.getByRole("button", { name: "افزودن قاعده" }).click();
+  const ruleDialog = page.getByRole("dialog");
+  await ruleDialog.getByLabel("عنوان در سایت (فارسی)").fill("خدمت آزمایشی");
+  await ruleDialog.getByLabel("شناسه (انگلیسی)").fill("e2e-service");
+  await ruleDialog.getByLabel("مبلغ (تومان)").fill("1000000");
+  await ruleDialog.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByRole("list", { name: "قواعد قیمت" })).toContainText("خدمت آزمایشی");
+  await page.getByLabel("تعداد محصول", { exact: true }).fill("2");
+  await page.getByRole("button", { name: "محاسبه" }).click();
+  await expect(page.getByLabel("نتیجه‌ی برآورد")).toContainText("مبلغ دقیق محاسبه‌شده");
+  const estimate = await page.request.post("/api/public/quote/estimate", {
+    data: { service: "e2e-service", quantity: 2 },
+  });
+  expect(await estimate.json()).toEqual({ low: 1_700_000, high: 2_300_000, currency: "toman", approximate: true });
+  const options = await (await page.request.get("/api/public/quote/options")).text();
+  expect(options).toContain("e2e-service");
+  expect(options).not.toContain("1000000");
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف خدمت آزمایشی" }).click();
+  await expect(page.getByRole("list", { name: "قواعد قیمت" })).toHaveCount(0);
+
   // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
   await page.goto("/panel/articles/new?language=fa");
   await page.getByLabel("عنوان", { exact: true }).fill("مقاله‌ی آزمایشی");
@@ -258,7 +281,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   }
 
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);
