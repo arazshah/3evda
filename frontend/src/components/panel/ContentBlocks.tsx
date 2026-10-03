@@ -18,6 +18,7 @@ const GROUP_LABELS: Record<string, string> = {
   packages: "پکیج‌ها",
   about: "درباره‌ی من",
   contact: "تماس",
+  blog: "مجله",
   footer: "پایین صفحه",
 };
 

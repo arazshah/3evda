@@ -18,7 +18,8 @@
       "contact": "Contact",
       "menu": "Main menu",
       "switchLanguage": "فارسی",
-      "quote": "Get a quote"
+      "quote": "Get a quote",
+      "blog": "Journal"
     },
     "footer": {
       "instagram": "Instagram",
@@ -72,6 +73,26 @@
       "map": "View on map",
       "channels": "Ways to reach me",
       "soon": "The online quote form is coming soon; until then, message me through any channel below."
+    },
+    "blog": {
+      "all": "All",
+      "categories": "Categories",
+      "tags": "Tags",
+      "readingTime": "{minutes} min read",
+      "empty": "No articles have been published yet.",
+      "previous": "Previous article",
+      "next": "Next article",
+      "relatedArticles": "Related articles",
+      "relatedProjects": "Related projects",
+      "pagination": "Pagination",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {page} of {pages}",
+      "preview": "Draft preview: this page is not public and is not indexed.",
+      "filters": "Filter articles",
+      "category": "Category",
+      "tag": "Tag",
+      "tagsHeading": "Tags"
     }
   }
 }

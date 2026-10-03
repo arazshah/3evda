@@ -229,11 +229,13 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expect(page.getByRole("link", { name: "ویرایش نسخه‌ی فارسی" })).toBeVisible();
 
   await page.goto("/panel/articles");
-  await expect(page.getByRole("list", { name: "مقاله‌ها" }).getByRole("listitem")).toHaveCount(2);
+  // Only this test's two articles: the sample articles seeded for CI stay.
+  const mine = page.getByRole("list", { name: "مقاله‌ها" }).getByRole("listitem").filter({ hasText: "مقاله‌ی آزمایشی" });
+  await expect(mine).toHaveCount(2);
   for (let remaining = 2; remaining > 0; remaining--) {
     acceptNextDialog();
     await page.getByRole("button", { name: "حذف مقاله‌ی آزمایشی" }).first().click();
-    await expect(page.getByRole("list", { name: "مقاله‌ها" }).getByRole("listitem")).toHaveCount(remaining - 1);
+    await expect(mine).toHaveCount(remaining - 1);
   }
 
   // The panel itself meets the same accessibility bar as the public site.

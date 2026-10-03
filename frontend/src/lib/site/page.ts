@@ -20,6 +20,13 @@ export async function pageMetadata(
   title: string,
   description?: string,
   image?: Parameters<typeof fallbackSrc>[0] | null,
+  extra: {
+    /** Where the same page lives in each language (only the ones that really exist). Default: both, same path. */
+    languages?: Partial<Record<Locale, string>>;
+    type?: "article";
+    publishedTime?: string | null;
+    noindex?: boolean;
+  } = {},
 ): Promise<Metadata> {
   const brand = pick(locale, site.settings.brand_name_fa, site.settings.brand_name_en);
   // Page text, else the owner's default description, else the built-in one: every page gets a meta description.
@@ -30,11 +37,20 @@ export async function pageMetadata(
   return {
     title: title ? `${title} | ${brand}` : brand,
     description: desc || undefined,
+    robots: extra.noindex ? { index: false, follow: false } : undefined,
     alternates: {
       canonical: href(locale, path),
-      languages: { fa: href("fa", path), en: href("en", path) },
+      languages: Object.fromEntries(
+        (Object.entries(extra.languages ?? { fa: path, en: path }) as [Locale, string][]).map(([l, p]) => [
+          l,
+          href(l, p),
+        ]),
+      ),
     },
     openGraph: {
+      ...(extra.type === "article"
+        ? { type: "article", publishedTime: extra.publishedTime ?? undefined }
+        : {}),
       title: title || brand,
       description: desc || undefined,
       locale: locale === "fa" ? "fa_IR" : "en_US",

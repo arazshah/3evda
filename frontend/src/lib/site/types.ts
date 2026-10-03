@@ -11,3 +11,7 @@ export type ProjectDetail = S["PublicProjectDetail"];
 export type Portfolio = S["PublicPortfolio"];
 export type PackageGroup = S["PublicGroup"];
 export type Package = S["PublicPackage"];
+export type BlogArticle = S["PublicBlogArticle"];
+export type BlogArticleDetail = S["PublicBlogArticleDetail"];
+export type BlogPage = S["PublicBlogArticlePage"];
+export type BlogTaxonomy = S["PublicBlogTaxonomy"];

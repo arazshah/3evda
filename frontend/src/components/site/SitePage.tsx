@@ -10,11 +10,13 @@ export async function SitePage({
   site,
   locale,
   path,
+  switchPath,
   children,
 }: {
   site: SiteData;
   locale: Locale;
   path: string;
+  switchPath?: string;
   children: ReactNode;
 }) {
   setRequestLocale(locale);
@@ -22,6 +24,7 @@ export async function SitePage({
   const nav = {
     home: t("nav.home"),
     portfolio: t("nav.portfolio"),
+    blog: t("nav.blog"),
     services: t("nav.services"),
     packages: t("nav.packages"),
     about: t("nav.about"),
@@ -38,7 +41,7 @@ export async function SitePage({
       >
         {t("common.skip")}
       </a>
-      <SiteHeader site={site} locale={locale} labels={nav} currentPath={path} />
+      <SiteHeader site={site} locale={locale} labels={nav} currentPath={path} switchPath={switchPath} />
       <main id="content">{children}</main>
       <SiteFooter
         site={site}

@@ -7,6 +7,7 @@ import type { SiteData } from "@/lib/site/types";
 export type NavLabels = {
   home: string;
   portfolio: string;
+  blog: string;
   services: string;
   packages: string;
   about: string;
@@ -21,11 +22,14 @@ export function SiteHeader({
   locale,
   labels,
   currentPath,
+  switchPath,
 }: {
   site: SiteData;
   locale: Locale;
   labels: NavLabels;
   currentPath: string;
+  /** The same page in the other language, when its address differs (e.g. a translated article). */
+  switchPath?: string;
 }) {
   const brand = pick(locale, site.settings.brand_name_fa, site.settings.brand_name_en);
   const custom = site.collections.nav_link;
@@ -35,6 +39,7 @@ export function SiteHeader({
         { label: labels.portfolio, to: "/portfolio" },
         { label: labels.services, to: "/services" },
         { label: labels.packages, to: "/packages" },
+        { label: labels.blog, to: "/blog" },
         { label: labels.about, to: "/about" },
         { label: labels.contact, to: "/contact" },
       ];
@@ -63,7 +68,9 @@ export function SiteHeader({
               <li key={l.to}>
                 <a
                   href={href(locale, l.to)}
-                  aria-current={currentPath === l.to ? "page" : undefined}
+                  aria-current={
+                    currentPath === l.to || currentPath.startsWith(`${l.to}/`) ? "page" : undefined
+                  }
                   className="inline-flex min-h-11 items-center text-muted hover:text-text aria-[current=page]:text-accent"
                 >
                   {l.label}
@@ -74,7 +81,7 @@ export function SiteHeader({
         </nav>
         <div className="flex items-center gap-2">
           <a
-            href={href(otherLocale, currentPath)}
+            href={href(otherLocale, switchPath ?? currentPath)}
             hrefLang={otherLocale}
             lang={otherLocale}
             className="inline-flex min-h-11 items-center px-2 text-muted hover:text-text"
