@@ -1,13 +1,24 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
 
+// Headings are the seeded defaults of the editable text blocks (apps/cms/blocks.py).
 const pages = [
-  { path: "/", lang: "fa", dir: "rtl", heading: "سودا رحیم‌پور" },
-  { path: "/en", lang: "en", dir: "ltr", heading: "Sevda Rahimpour" },
+  { path: "/", lang: "fa", dir: "rtl", heading: "طعم را دیدنی می‌کنیم" },
+  { path: "/en", lang: "en", dir: "ltr", heading: "We make flavour visible" },
+  { path: "/portfolio", lang: "fa", dir: "rtl", heading: "نمونه‌کارها" },
+  { path: "/en/portfolio", lang: "en", dir: "ltr", heading: "Portfolio" },
+  { path: "/services", lang: "fa", dir: "rtl", heading: "خدمات" },
+  { path: "/en/services", lang: "en", dir: "ltr", heading: "Services" },
+  { path: "/packages", lang: "fa", dir: "rtl", heading: "پکیج‌ها" },
+  { path: "/en/packages", lang: "en", dir: "ltr", heading: "Packages" },
+  { path: "/about", lang: "fa", dir: "rtl", heading: "درباره‌ی من" },
+  { path: "/en/about", lang: "en", dir: "ltr", heading: "About me" },
+  { path: "/contact", lang: "fa", dir: "rtl", heading: "تماس" },
+  { path: "/en/contact", lang: "en", dir: "ltr", heading: "Contact" },
 ] as const;
 
 for (const p of pages) {
-  test.describe(`home ${p.lang}`, () => {
+  test.describe(`${p.path} (${p.lang})`, () => {
     test("renders the localized document", async ({ page }) => {
       const response = await page.goto(p.path);
       expect(response?.status()).toBe(200);
@@ -28,9 +39,9 @@ for (const p of pages) {
 
 test("language switch links between Persian and English", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "English" }).click();
+  await page.getByRole("banner").getByRole("link", { name: "English" }).click();
   await expect(page).toHaveURL(/\/en$/);
-  await page.getByRole("link", { name: "فارسی" }).click();
+  await page.getByRole("banner").getByRole("link", { name: "فارسی" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "fa");
 });
 

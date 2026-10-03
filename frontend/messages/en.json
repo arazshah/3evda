@@ -3,16 +3,75 @@
     "title": "Sevda Rahimpour | Food & Product Photography",
     "description": "Advertising food and product photography in Urmia, Iran — Sevda Rahimpour"
   },
-  "comingSoon": {
-    "eyebrow": "Food & product photography · Urmia",
-    "name": "Sevda Rahimpour",
-    "message": "Our new website is coming soon",
-    "instagram": "See the portfolio on Instagram",
-    "switchLanguage": "فارسی"
-  },
   "notFound": {
     "title": "The page you were looking for was not found",
     "home": "Back to home",
     "homeHref": "/en"
+  },
+  "site": {
+    "nav": {
+      "home": "Home",
+      "portfolio": "Portfolio",
+      "services": "Services",
+      "packages": "Packages",
+      "about": "About",
+      "contact": "Contact",
+      "menu": "Main menu",
+      "switchLanguage": "فارسی",
+      "quote": "Get a quote"
+    },
+    "footer": {
+      "instagram": "Instagram",
+      "telegram": "Telegram",
+      "whatsapp": "WhatsApp"
+    },
+    "common": {
+      "skip": "Skip to content",
+      "viewAll": "View all",
+      "more": "More",
+      "empty": "Coming soon",
+      "back": "Back",
+      "slide": "Slide {n}",
+      "slides": "Home slides"
+    },
+    "portfolio": {
+      "filterLabel": "Filter portfolio",
+      "all": "All",
+      "style": "Style",
+      "styles": {
+        "low_key": "Low key",
+        "high_key": "High key",
+        "natural": "Natural"
+      },
+      "count": "{count} projects",
+      "noResults": "No projects match this filter",
+      "client": "Client",
+      "year": "Year",
+      "previous": "Previous project",
+      "next": "Next project",
+      "gallery": "Project images",
+      "lightbox": {
+        "dialog": "Image viewer",
+        "close": "Close",
+        "previous": "Previous image",
+        "next": "Next image"
+      }
+    },
+    "packages": {
+      "from": "From",
+      "toman": "Toman",
+      "inquiry": "Request a quote",
+      "included": "Included",
+      "excluded": "Not included",
+      "quote": "Quote this package"
+    },
+    "contact": {
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "map": "View on map",
+      "channels": "Ways to reach me",
+      "soon": "The online quote form is coming soon; until then, message me through any channel below."
+    }
   }
 }

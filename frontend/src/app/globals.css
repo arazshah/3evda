@@ -2,6 +2,10 @@
 @import "@fontsource/vazirmatn/400.css";
 @import "@fontsource/vazirmatn/600.css";
 @import "@fontsource/vazirmatn/800.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/800.css";
 
 /* Brand tokens — see docs/design/brand-preview.html */
 @theme {
@@ -15,7 +19,8 @@
   --color-accent-2: #b4473c;
   --color-success: #7e9a6c;
   --radius-brand: 6px;
-  --font-sans: "Vazirmatn", system-ui, sans-serif;
+  --font-sans: "Vazirmatn", "Inter", system-ui, sans-serif;
+  --font-display: "Fraunces", "Vazirmatn", Georgia, serif;
 }
 
 html {
@@ -44,4 +49,15 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* English pages use Inter for body text; Persian keeps Vazirmatn for both scripts. */
+html[lang="en"] body {
+  font-family: "Inter", "Vazirmatn", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/* Fraunces has no Persian glyphs: Persian headings stay in Vazirmatn. */
+html[lang="fa"] .font-display {
+  font-family: var(--font-sans);
 }
