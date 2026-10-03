@@ -12,6 +12,7 @@ import { Button } from "./ui";
 const NAV = [
   { href: "/panel", label: "داشبورد" },
   { href: "/panel/inquiries", label: "استعلام‌ها" },
+  { href: "/panel/proformas", label: "پیش‌فاکتورها" },
   { href: "/panel/content", label: "متن‌ها و تصاویر" },
   { href: "/panel/items", label: "بخش‌های تکرارشونده" },
   { href: "/panel/projects", label: "نمونه‌کارها" },

@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { errorMessage } from "@/lib/api/client";
 import {
   useDeleteInquiry,
+  useFromInquiry,
   useInquiry,
   useSaveInquiry,
   type Inquiry,
@@ -73,6 +74,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
   const router = useRouter();
   const save = useSaveInquiry();
   const remove = useDeleteInquiry();
+  const makeProforma = useFromInquiry();
   const [status, setStatus] = useState<InquiryStatus>(inquiry.status ?? "new");
   const [note, setNote] = useState(inquiry.internal_note ?? "");
   const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
@@ -93,6 +95,16 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
         ...(note !== (inquiry.internal_note ?? "") ? { internal_note: note } : {}),
       });
       setMessage({ tone: "success", text: "ذخیره شد." });
+    } catch (err) {
+      setMessage({ tone: "error", text: errorMessage(err) });
+    }
+  };
+
+  const proforma = async () => {
+    setMessage(null);
+    try {
+      const draft = await makeProforma.mutateAsync(inquiry.id);
+      router.push(`/panel/proformas/${draft.id}`);
     } catch (err) {
       setMessage({ tone: "error", text: errorMessage(err) });
     }
@@ -249,7 +261,10 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
         </Card>
       )}
 
-      <div>
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={proforma} disabled={makeProforma.isPending}>
+          {makeProforma.isPending ? "در حال ساخت…" : "ساخت پیش‌فاکتور"}
+        </Button>
         <Button variant="danger" onClick={destroy} disabled={remove.isPending}>
           حذف استعلام
         </Button>
