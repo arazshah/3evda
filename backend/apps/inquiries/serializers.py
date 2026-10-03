@@ -9,6 +9,7 @@ from rest_framework import serializers
 from apps.blog.models import Language
 
 from . import attachments
+from .messages import t
 from .models import Inquiry, InquiryAttachment, InquiryStatusChange
 
 # Persian and Arabic-Indic digits → ASCII, so a number typed on a Persian keyboard is stored one way.
@@ -42,13 +43,24 @@ class InquiryCreateSerializer(serializers.Serializer):  # type: ignore[type-arg]
         required=False,
         write_only=True,
         max_length=attachments.MAX_FILES,
-        error_messages={"max_length": attachments.MESSAGES["too_many"]},
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.lang = str(self.context.get("language", "fa"))
+        # DRF binds the max_length message when a field is built, so the field is rebuilt with this language's text.
+        self.fields["attachments"] = serializers.ListField(
+            child=serializers.FileField(),
+            required=False,
+            write_only=True,
+            max_length=attachments.MAX_FILES,
+            error_messages={"max_length": t("too_many", self.lang)},
+        )
 
     def validate_phone(self, value: str) -> str:
         value = value.translate(_DIGITS).strip()
         if value and not _PHONE.match(value):
-            raise serializers.ValidationError("شماره‌ی تلفن معتبر نیست.")
+            raise serializers.ValidationError(t("phone_invalid", self.lang))
         return value
 
     def validate_attachments(self, files: list[UploadedFile[bytes]]) -> list[tuple[UploadedFile[bytes], str, str]]:
@@ -57,17 +69,15 @@ class InquiryCreateSerializer(serializers.Serializer):  # type: ignore[type-arg]
             try:
                 mime, ext = attachments.inspect(upload)
             except attachments.AttachmentRejected as error:
-                raise serializers.ValidationError(error.message) from error
+                raise serializers.ValidationError(t(error.code, self.lang)) from error
             inspected.append((upload, mime, ext))
         return inspected
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if not any(attrs.get(f) for f in ("phone", "whatsapp", "telegram", "email")):
-            raise serializers.ValidationError(
-                {"phone": "دست‌کم یکی از راه‌های تماس (تلفن، واتس‌اپ، تلگرام یا ایمیل) را وارد کنید."}
-            )
+            raise serializers.ValidationError({"phone": t("contact_required", self.lang)})
         if attrs.get("service") and not attrs.get("quantity"):
-            raise serializers.ValidationError({"quantity": "تعداد محصول را وارد کنید."})
+            raise serializers.ValidationError({"quantity": t("quantity_required", self.lang)})
         return attrs
 
 

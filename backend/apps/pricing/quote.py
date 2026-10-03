@@ -19,10 +19,14 @@ MULTIPLIER = "multiplier"
 
 
 class QuoteError(ValueError):
-    def __init__(self, code: str, detail: str) -> None:
+    def __init__(self, code: str, detail: str, detail_en: str = "") -> None:
         super().__init__(detail)
         self.code = code
         self.detail = detail
+        self.detail_en = detail_en or detail
+
+    def detail_for(self, language: str) -> str:
+        return self.detail_en if language == "en" else self.detail
 
 
 @dataclass(frozen=True)
@@ -57,7 +61,7 @@ def _pick(rules: list[Rule], kind: str, key: str) -> Rule:
     for rule in rules:
         if rule.kind == kind and rule.key == key:
             return rule
-    raise QuoteError("unknown_option", "گزینه‌ی انتخاب‌شده معتبر نیست.")
+    raise QuoteError("unknown_option", "گزینه‌ی انتخاب‌شده معتبر نیست.", "The selected option is not valid.")
 
 
 def estimate(
@@ -70,7 +74,11 @@ def estimate(
     multipliers: list[str],
 ) -> Estimate:
     if not limits.min_quantity <= quantity <= limits.max_quantity:
-        raise QuoteError("bad_quantity", f"تعداد باید بین {limits.min_quantity} و {limits.max_quantity} باشد.")
+        raise QuoteError(
+            "bad_quantity",
+            f"تعداد باید بین {limits.min_quantity} و {limits.max_quantity} باشد.",
+            f"The number must be between {limits.min_quantity} and {limits.max_quantity}.",
+        )
 
     base_rule = _pick(rules, SERVICE, service)
     base = (base_rule.amount or 0) * quantity
@@ -85,7 +93,7 @@ def estimate(
     for key in dict.fromkeys(addons):  # de-duplicated, order kept
         rule = next((r for r in rules if r.key == key and r.kind in (ADDON_FIXED, ADDON_PER_ITEM)), None)
         if rule is None:
-            raise QuoteError("unknown_option", "گزینه‌ی انتخاب‌شده معتبر نیست.")
+            raise QuoteError("unknown_option", "گزینه‌ی انتخاب‌شده معتبر نیست.", "The selected option is not valid.")
         amount = (rule.amount or 0) * (quantity if rule.kind == ADDON_PER_ITEM else 1)
         chosen_addons.append((key, amount))
 

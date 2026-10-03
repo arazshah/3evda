@@ -27,8 +27,12 @@ def ip_digest(request: HttpRequest) -> str:
     return hmac.new(settings.SECRET_KEY.encode(), f"inquiry-ip:{ip}".encode(), hashlib.sha256).hexdigest()
 
 
-def _labels(keys: list[str]) -> list[dict[str, str]]:
-    found = {r.key: r.label_fa for r in QuoteRule.objects.filter(key__in=keys)}
+def _labels(keys: list[str], language: str) -> list[dict[str, str]]:
+    """The labels as the visitor saw them: their language, with the Persian text where English is empty."""
+    found = {
+        r.key: (r.label_en or r.label_fa) if language == "en" else r.label_fa
+        for r in QuoteRule.objects.filter(key__in=keys)
+    }
     return [{"key": key, "label": found.get(key, key)} for key in dict.fromkeys(keys)]
 
 
@@ -46,8 +50,12 @@ def create_inquiry(data: dict[str, Any], uploads: list[Upload], request: HttpReq
                 "multipliers": data.get("multipliers", []),
             }
         )
-        service_label = next(iter(_labels([data["service"]])))["label"]
-        options = {"addons": _labels(data.get("addons", [])), "multipliers": _labels(data.get("multipliers", []))}
+        language = data.get("language", "fa")
+        service_label = _labels([data["service"]], language)[0]["label"]
+        options = {
+            "addons": _labels(data.get("addons", []), language),
+            "multipliers": _labels(data.get("multipliers", []), language),
+        }
 
     stored: list[str] = []
     try:

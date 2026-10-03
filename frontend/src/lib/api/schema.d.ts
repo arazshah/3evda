@@ -322,7 +322,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description How many enquiries are still new (for the badge on the panel menu). */
+    /** @description How many enquiries the owner has not opened yet (for the badge on the panel menu). */
     get: operations["inquiries_summary"];
     put?: never;
     post?: never;

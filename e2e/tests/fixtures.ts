@@ -14,7 +14,15 @@ export const test = base.extend<{ page: Page }>({
       }
     });
     page.on("response", (res) => {
-      if (baseURL && res.url().startsWith(baseURL) && res.status() >= 400 && !res.request().isNavigationRequest()) {
+      // A test that provokes an error answer on purpose says so with an "expected-http-error" annotation.
+      const expected = base.info().annotations.some((a) => a.type === "expected-http-error");
+      if (
+        baseURL &&
+        res.url().startsWith(baseURL) &&
+        res.status() >= 400 &&
+        !res.request().isNavigationRequest() &&
+        !expected
+      ) {
         problems.push(`HTTP ${res.status()}: ${res.url()}`);
       }
     });

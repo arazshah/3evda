@@ -168,6 +168,20 @@ test.describe("quote form", () => {
     await expect(page.getByText("Required.").first()).toBeVisible();
   });
 
+  for (const [path, name, button, message] of [
+    ["/en/quote", "Full name", "Send request", /Enter at least one way to reach you/],
+    ["/quote", "نام و نام خانوادگی", "ارسال استعلام", /دست‌کم یکی از راه‌های تماس/],
+  ] as const) {
+    test(`a missing way to reach the visitor is explained in the page's language (${path})`, async ({ page }, info) => {
+      test.skip(info.project.name !== "desktop", "each submission counts against the rate limit");
+      info.annotations.push({ type: "expected-http-error", description: "the server answers 400 with the message" });
+      await page.goto(path);
+      await page.getByLabel(name).fill("E2E Visitor");
+      await page.getByRole("button", { name: button }).click(); // the server decides, in the visitor's language
+      await expect(page.getByText(message).first()).toBeVisible();
+    });
+  }
+
   test("the API refuses a disguised file and a body beyond the gateway limit", async ({ request }, info) => {
     test.skip(info.project.name !== "desktop", "each request counts against the rate limit");
     const fake = await request.post("/api/public/inquiries", {

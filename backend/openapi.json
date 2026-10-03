@@ -1972,7 +1972,7 @@
         "/api/admin/inquiries/summary/": {
             "get": {
                 "operationId": "inquiries_summary",
-                "description": "How many enquiries are still new (for the badge on the panel menu).",
+                "description": "How many enquiries the owner has not opened yet (for the badge on the panel menu).",
                 "parameters": [
                     {
                         "in": "query",

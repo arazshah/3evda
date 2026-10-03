@@ -16,20 +16,15 @@ MAX_BYTES = 10 * 1024 * 1024
 # A little more than three full files plus the form fields; a bigger request is refused before it is parsed.
 MAX_REQUEST_BYTES = MAX_FILES * MAX_BYTES + 1024 * 1024
 
-MESSAGES = {
-    "too_many": f"حداکثر {MAX_FILES} فایل می‌توانید پیوست کنید.",
-    "too_large": "حجم هر فایل باید کمتر از ۱۰ مگابایت باشد.",
-    "unsupported": "فقط تصویر (JPEG، PNG، WebP) و فایل PDF پذیرفته می‌شود.",
-    "empty": "فایل خالی است.",
-}
 _IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
 class AttachmentRejected(Exception):
+    """`code` is a key of `messages.MESSAGES` (empty, too_large, unsupported)."""
+
     def __init__(self, code: str) -> None:
         super().__init__(code)
         self.code = code
-        self.message = MESSAGES[code]
 
 
 def inspect(upload: UploadedFile[bytes]) -> tuple[str, str]:

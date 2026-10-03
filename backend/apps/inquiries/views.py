@@ -4,7 +4,7 @@ from urllib.parse import quote, urlsplit
 
 from django.db.models import Count, Q, QuerySet
 from django.http import HttpResponse
-from django.utils import timezone
+from django.utils import timezone, translation
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
@@ -22,6 +22,7 @@ from apps.pricing.quote import QuoteError
 
 from . import attachments
 from .exports import to_csv
+from .messages import t
 from .models import Inquiry, InquiryAttachment, InquiryStatusChange
 from .serializers import (
     InquiryCreateSerializer,
@@ -52,14 +53,17 @@ class PublicInquiryView(APIView):
         auth=[],
     )
     def post(self, request: Request) -> Response:
-        # A request far larger than three allowed files is refused before its body is parsed.
+        # A request far larger than three allowed files is refused before its body is parsed (so before
+        # the language can be read from it: the message is given in both languages).
         if int(request.META.get("CONTENT_LENGTH") or 0) > attachments.MAX_REQUEST_BYTES:
-            return Response(
-                {"code": "too_large", "detail": attachments.MESSAGES["too_large"]},
-                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            )
-        serializer = InquiryCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+            both = f"{t('request_too_large', 'fa')} / {t('request_too_large', 'en')}"
+            return Response({"code": "too_large", "detail": both}, status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        # The visitor's language decides the language of every message they get back.
+        raw = request.data.get("language") if hasattr(request.data, "get") else None
+        language = raw if raw in ("fa", "en") else "fa"
+        with translation.override(language):
+            serializer = InquiryCreateSerializer(data=request.data, context={"language": language})
+            serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         done = Response({"received": True}, status=status.HTTP_201_CREATED)
         done["Cache-Control"] = "no-store"
@@ -69,7 +73,9 @@ class PublicInquiryView(APIView):
         try:
             create_inquiry(data, uploads, request._request)
         except QuoteError as error:
-            return Response({"code": error.code, "detail": error.detail}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"code": error.code, "detail": error.detail_for(language)}, status=status.HTTP_400_BAD_REQUEST
+            )
         return done
 
 
@@ -153,6 +159,9 @@ class InquiryViewSet(
     def perform_update(self, serializer: Any) -> None:
         before = serializer.instance.status
         inquiry = serializer.save()
+        if inquiry.seen_at is None:  # changing it counts as having read it
+            inquiry.seen_at = timezone.now()
+            inquiry.save(update_fields=["seen_at"])
         fields = sorted(serializer.validated_data)
         if inquiry.status != before:
             user = self.request.user
@@ -168,8 +177,8 @@ class InquiryViewSet(
     @extend_schema(responses=InquirySummarySerializer, operation_id="inquiries_summary")
     @action(detail=False, methods=["get"])
     def summary(self, request: Request) -> Response:
-        """How many enquiries are still new (for the badge on the panel menu)."""
-        return Response({"new": Inquiry.objects.filter(status=Inquiry.Status.NEW).count()})
+        """How many enquiries the owner has not opened yet (for the badge on the panel menu)."""
+        return Response({"new": Inquiry.objects.filter(seen_at__isnull=True).count()})
 
     @extend_schema(responses={(200, "text/csv"): bytes}, operation_id="inquiries_export")
     @action(detail=False, methods=["get"])

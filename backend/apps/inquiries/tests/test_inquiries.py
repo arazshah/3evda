@@ -17,6 +17,16 @@ from apps.pricing.models import QuoteRule
 
 pytestmark = pytest.mark.django_db
 
+
+@pytest.fixture(autouse=True)
+def _roomy_rate_limit(monkeypatch):
+    """Most tests send many requests from one address; the rate-limit test sets its own small limit."""
+    from rest_framework.throttling import ScopedRateThrottle
+
+    rates = {**ScopedRateThrottle.THROTTLE_RATES, "inquiry": "1000/min"}
+    monkeypatch.setattr(ScopedRateThrottle, "THROTTLE_RATES", rates)
+
+
 PUBLIC = "/api/public/inquiries"
 ADMIN = "/api/admin/inquiries/"
 PDF = b"%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"
@@ -259,17 +269,25 @@ def test_the_list_is_paginated_newest_first_and_marks_unseen_ones(owner_client):
     assert len(owner_client.get(ADMIN, {"page": 2}).json()["results"]) == 3
 
 
-def test_opening_an_inquiry_marks_it_seen_and_updates_the_badge(owner_client):
-    inquiry = make()
-    assert owner_client.get(f"{ADMIN}summary/").json() == {"new": 1}
-    body = owner_client.get(f"{ADMIN}{inquiry.pk}/").json()
+def test_the_badge_counts_inquiries_the_owner_has_not_opened(owner_client):
+    first, second = make(name="الف"), make(name="ب")
+    assert owner_client.get(f"{ADMIN}summary/").json() == {"new": 2}
+    assert [r["is_new"] for r in owner_client.get(ADMIN).json()["results"]] == [
+        True,
+        True,
+    ]  # same definition as the list
+
+    body = owner_client.get(f"{ADMIN}{first.pk}/").json()
     assert body["seen_at"] is not None
-    first = Inquiry.objects.get().seen_at
-    owner_client.get(f"{ADMIN}{inquiry.pk}/")
-    assert Inquiry.objects.get().seen_at == first  # only the first opening counts
-    assert owner_client.get(ADMIN).json()["results"][0]["is_new"] is False
-    assert owner_client.get(f"{ADMIN}summary/").json() == {"new": 1}  # still «new» until its status changes
-    owner_client.patch(f"{ADMIN}{inquiry.pk}/", {"status": "reviewing"}, format="json")
+    opened_at = Inquiry.objects.get(pk=first.pk).seen_at
+    owner_client.get(f"{ADMIN}{first.pk}/")
+    assert Inquiry.objects.get(pk=first.pk).seen_at == opened_at  # only the first opening counts
+    assert owner_client.get(f"{ADMIN}summary/").json() == {"new": 1}
+    flags = {r["name"]: r["is_new"] for r in owner_client.get(ADMIN).json()["results"]}
+    assert flags == {"الف": False, "ب": True}
+    assert Inquiry.objects.get(pk=first.pk).status == "new"  # reading it does not triage it
+
+    owner_client.patch(f"{ADMIN}{second.pk}/", {"internal_note": "x"}, format="json")  # working on it counts as reading
     assert owner_client.get(f"{ADMIN}summary/").json() == {"new": 0}
 
 
@@ -386,3 +404,71 @@ def test_the_sample_rules_command_is_repeatable_and_gives_a_working_calculator(c
         format="json",
     ).json()
     assert body["low"] < body["high"] and body["approximate"] is True
+
+
+# ---- language ---------------------------------------------------------------------------------------
+
+
+def errors_for(client, language, **fields):
+    response = client.post(PUBLIC, {"name": "ع", "language": language} | fields, format="multipart")
+    assert response.status_code == 400
+    return response.json()
+
+
+def test_an_english_visitor_gets_english_messages_and_a_persian_visitor_persian_ones(client):
+    en = errors_for(client, "en")  # no way to reach them
+    assert en["fields"]["phone"][0].startswith("Enter at least one way")
+    fa = errors_for(client, "fa")
+    assert fa["fields"]["phone"][0].startswith("دست‌کم یکی")
+
+    assert errors_for(client, "en", phone="call me")["fields"]["phone"] == ["The phone number is not valid."]
+    assert errors_for(client, "fa", phone="call me")["fields"]["phone"] == ["شماره‌ی تلفن معتبر نیست."]
+    assert errors_for(client, "en", phone="09120000000", service="x")["fields"]["quantity"] == [
+        "Enter the number of products."
+    ]
+
+
+def test_built_in_field_errors_follow_the_visitors_language_too(client):
+    en = client.post(PUBLIC, {"language": "en", "phone": "09120000000"}, format="multipart").json()
+    assert en["fields"]["name"] == ["This field is required."]
+    fa = client.post(PUBLIC, {"language": "fa", "phone": "09120000000"}, format="multipart").json()
+    assert fa["fields"]["name"] != ["This field is required."]
+    assert errors_for(client, "en", phone="09120000000", email="nope")["fields"]["email"] == [
+        "Enter a valid email address."
+    ]
+
+
+def test_file_and_calculator_messages_are_in_the_visitors_language(client, s3_buckets):
+    seed_rules()
+    bad = file("notes.jpg", b"not an image")
+    en = errors_for(client, "en", phone="09120000000", attachments=[bad])
+    assert en["fields"]["attachments"] == ["Only images (JPEG, PNG, WebP) and PDF files are accepted."]
+    fa = errors_for(client, "fa", phone="09120000000", attachments=[file("notes.jpg", b"not an image")])
+    assert fa["fields"]["attachments"][0].startswith("فقط تصویر")
+
+    four = [file(f"{i}.pdf", PDF) for i in range(4)]
+    assert errors_for(client, "en", phone="09120000000", attachments=four)["fields"]["attachments"] == [
+        "You can attach at most 3 files."
+    ]
+
+    out_of_range = errors_for(client, "en", phone="09120000000", service="food", quantity=9999)
+    assert out_of_range["code"] == "bad_quantity" and out_of_range["detail"].startswith("The number must be between")
+    assert errors_for(client, "fa", phone="09120000000", service="food", quantity=9999)["detail"].startswith(
+        "تعداد باید"
+    )
+    unknown = errors_for(client, "en", phone="09120000000", service="nope", quantity=1)
+    assert unknown["detail"] == "The selected option is not valid."
+
+
+def test_an_unknown_language_is_treated_as_persian(client):
+    assert errors_for(client, "de")["fields"]["language"]  # not a valid choice, whatever language it is reported in
+
+
+def test_stored_labels_are_the_ones_the_visitor_saw(client):
+    seed_rules()  # food has an English label; video and urgent have none
+    send(client, language="en", service="food", quantity=1, addons=["video"], multipliers=["urgent"])
+    send(client, language="fa", service="food", quantity=1, addons=["video"])
+    english, persian = Inquiry.objects.order_by("id")
+    assert english.service_label == "Food"
+    assert english.options["addons"] == [{"key": "video", "label": "ویدیو"}]  # no English text: the form showed Persian
+    assert persian.service_label == "غذا"
