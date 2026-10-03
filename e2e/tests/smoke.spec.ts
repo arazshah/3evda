@@ -96,3 +96,47 @@ test.describe("journal", () => {
     }
   });
 });
+
+test.describe("search engines", () => {
+  test("robots.txt keeps the admin out and points at the sitemap", async ({ request }) => {
+    const text = await (await request.get("/robots.txt")).text();
+    expect(text).toContain("Disallow: /panel");
+    expect(text).toContain("Disallow: /api/");
+    expect(text).toMatch(/Sitemap: https?:\/\/.+\/sitemap\.xml/);
+  });
+
+  test("the sitemap lists pages and articles with language alternates, and nothing from /panel", async ({ request }) => {
+    const response = await request.get("/sitemap.xml");
+    expect(response.headers()["content-type"]).toContain("xml");
+    const xml = await response.text();
+    expect(xml).toMatch(/<loc>https?:\/\/[^<]+\/en\/portfolio<\/loc>/);
+    expect(xml).toMatch(/<loc>https?:\/\/[^<]+\/blog\/sample-article<\/loc>/);
+    expect(xml).toMatch(/hreflang="en" href="https?:\/\/[^"]+\/en\/blog\/sample-article"/);
+    expect(xml).not.toContain("/panel");
+  });
+
+  for (const [path, title, link] of [
+    ["/rss.xml", "مقاله‌ی نمونه", "/blog/sample-article"],
+    ["/en/rss.xml", "Sample article", "/en/blog/sample-article"],
+  ] as const) {
+    test(`${path} is a valid feed with the published articles`, async ({ request }) => {
+      const response = await request.get(path);
+      expect(response.headers()["content-type"]).toContain("application/rss+xml");
+      const xml = await response.text();
+      expect(xml).toContain("<rss version=\"2.0\"");
+      expect(xml).toContain(`<title>${title}</title>`);
+      expect(xml).toMatch(new RegExp(`<link>https?://[^<]+${link}</link>`));
+    });
+  }
+
+  test("pages carry structured data", async ({ page }) => {
+    const ld = async (path: string) => {
+      await page.goto(path);
+      return (await page.locator('script[type="application/ld+json"]').allTextContents()).join("\n");
+    };
+    expect(await ld("/")).toContain('"Photographer"');
+    const article = await ld("/blog/sample-article");
+    expect(article).toContain('"@type":"Article"');
+    expect(article).toContain('"BreadcrumbList"');
+  });
+});

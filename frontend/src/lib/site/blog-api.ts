@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { connection } from "next/server";
 import type { Locale } from "@/i18n/config";
 import { href } from "./text";
-import type { BlogArticleDetail, BlogPage, BlogTaxonomy } from "./types";
+import type { BlogArticleDetail, BlogPage, BlogTaxonomy, SitemapData } from "./types";
 
 const BASE = process.env.INTERNAL_API_URL ?? "http://localhost:8000";
 
@@ -55,4 +55,9 @@ export async function getArticle(lang: Locale, slug: string): Promise<BlogArticl
 
 export function getPreview(token: string): Promise<BlogArticleDetail> {
   return json<BlogArticleDetail>(`/api/public/blog/preview/${encodeURIComponent(token)}`);
+}
+
+/** Raw list of public addresses for sitemap.xml (the API never includes drafts or scheduled articles). */
+export function getSitemapData(): Promise<SitemapData> {
+  return json<SitemapData>("/api/public/sitemap");
 }

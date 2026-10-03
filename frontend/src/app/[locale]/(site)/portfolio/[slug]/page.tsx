@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGallery } from "@/components/site/ProjectGallery";
 import { PageTitle } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getProject, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
+import { breadcrumbLd, projectLd } from "@/lib/site/seo";
 import { href, localized } from "@/lib/site/text";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -36,6 +38,18 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <SitePage site={site} locale={locale} path={`/portfolio/${slug}`}>
+      <JsonLd
+        data={[
+          projectLd(locale, project, localized(locale, project, "title")),
+          breadcrumbLd(locale, [
+            { name: t("nav.portfolio"), path: "/portfolio" },
+            {
+              name: localized(locale, project, "title"),
+              path: `/portfolio/${encodeURIComponent(project.slug)}`,
+            },
+          ]),
+        ]}
+      />
       <PageTitle title={localized(locale, project, "title")} intro={localized(locale, project, "summary")} />
       <dl className="mx-auto mt-6 flex max-w-6xl flex-wrap gap-x-10 gap-y-2 px-4 text-muted">
         {client ? (

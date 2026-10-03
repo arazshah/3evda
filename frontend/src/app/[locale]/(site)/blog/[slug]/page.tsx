@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { JsonLd } from "@/components/site/JsonLd";
 import { ArticleView } from "@/components/site/ArticleView";
 import { journalLabels } from "@/components/site/Journal";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
 import { getArticle } from "@/lib/site/blog-api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
+import { articleLd, breadcrumbLd } from "@/lib/site/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -38,6 +40,7 @@ export default async function ArticlePage({ params }: Props) {
   ]);
   const translation = article.alternates.find((a) => a.language === other(locale));
   const t = await getTranslations({ locale, namespace: "site.blog" });
+  const nav = await getTranslations({ locale, namespace: "site.nav" });
   return (
     <SitePage
       site={site}
@@ -46,6 +49,15 @@ export default async function ArticlePage({ params }: Props) {
       // The language switch goes to the same article in the other language; without one, to that language's journal.
       switchPath={translation ? `/blog/${encodeURIComponent(translation.slug)}` : "/blog"}
     >
+      <JsonLd
+        data={[
+          articleLd(site, locale, article),
+          breadcrumbLd(locale, [
+            { name: nav("blog"), path: "/blog" },
+            { name: article.title, path: `/blog/${encodeURIComponent(article.slug)}` },
+          ]),
+        ]}
+      />
       <ArticleView article={article} locale={locale} labels={{ ...labels, tags: t("tagsHeading") }} />
     </SitePage>
   );

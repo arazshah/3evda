@@ -15,3 +15,4 @@ export type BlogArticle = S["PublicBlogArticle"];
 export type BlogArticleDetail = S["PublicBlogArticleDetail"];
 export type BlogPage = S["PublicBlogArticlePage"];
 export type BlogTaxonomy = S["PublicBlogTaxonomy"];
+export type SitemapData = S["PublicSitemap"];
