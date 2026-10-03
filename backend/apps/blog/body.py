@@ -30,7 +30,7 @@ CONTAINERS: dict[str, set[str]] = {
     "bulletList": {"listItem"},
     "orderedList": {"listItem"},
     "listItem": {"paragraph", "bulletList", "orderedList"},
-    "blockquote": {"paragraph"},
+    "blockquote": {"paragraph", "bulletList", "orderedList"},
     "codeBlock": {"text"},
 }
 LEAVES = {"text", "hardBreak", "horizontalRule", "image"}
@@ -222,7 +222,8 @@ def _block(node: Mapping[str, Any], media: Mapping[str, Mapping[str, Any]], lang
         case "paragraph" | "heading" | "codeBlock":
             inner = "".join(_inline(c) for c in children)  # only these hold text
             if kind == "paragraph":
-                return f"<p>{inner}</p>"
+                # The editor keeps an empty paragraph at the end (or between blocks); it is not content.
+                return f"<p>{inner}</p>" if inner else ""
             if kind == "heading":
                 return f"<h{node['attrs']['level']}>{inner}</h{node['attrs']['level']}>"
             return f"<pre><code>{inner}</code></pre>"

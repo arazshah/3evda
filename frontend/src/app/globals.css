@@ -61,3 +61,74 @@ html[lang="en"] body {
 html[lang="fa"] .font-display {
   font-family: var(--font-sans);
 }
+
+/* Article text: the editor in the panel and the public article page share it. */
+.rich > * + * {
+  margin-block-start: 1rem;
+}
+.rich h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-block-start: 2rem;
+}
+.rich h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-block-start: 1.6rem;
+}
+.rich h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.rich ul,
+.rich ol {
+  padding-inline-start: 1.5rem;
+}
+.rich ul {
+  list-style: disc;
+}
+.rich ol {
+  list-style: decimal;
+}
+.rich li > p {
+  margin: 0;
+}
+.rich blockquote {
+  border-inline-start: 3px solid var(--color-accent);
+  padding-inline-start: 1rem;
+  color: var(--color-muted);
+}
+.rich a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.rich code {
+  background: var(--color-elevated);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+}
+.rich pre {
+  background: var(--color-elevated);
+  border-radius: var(--radius-brand);
+  padding: 1rem;
+  overflow-x: auto;
+  direction: ltr;
+}
+.rich pre code {
+  background: none;
+  padding: 0;
+}
+.rich hr {
+  border-color: var(--color-line);
+}
+.rich img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-brand);
+}
+.rich img.ProseMirror-selectednode {
+  outline: 2px solid var(--color-accent);
+}

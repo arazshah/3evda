@@ -344,6 +344,15 @@ def test_embedded_images_are_protected_from_deletion_and_released_on_edit(owner_
     assert not MediaReference.objects.filter(asset=kept).exists()
 
 
+def test_the_editor_gets_library_data_for_embedded_images(owner_client):
+    asset = make_asset("inline")
+    article = create(owner_client, body=image_doc(asset)).json()
+    media = article["body_media"]
+    assert list(media) == [str(asset.pk)]
+    assert media[str(asset.pk)]["variants"][0]["name"] == "w480" and "original" not in str(media)
+    assert create(owner_client, title="none").json()["body_media"] == {}
+
+
 def test_cover_and_og_image_are_references_too(owner_client):
     cover = make_asset("cover")
     article = create(owner_client, cover=str(cover.pk)).json()

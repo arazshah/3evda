@@ -3804,6 +3804,13 @@
                         "type": "string"
                     },
                     "body": {},
+                    "body_media": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PublicMedia"
+                        },
+                        "readOnly": true
+                    },
                     "cover": {
                         "type": "string",
                         "format": "uuid",
@@ -3891,6 +3898,7 @@
                     }
                 },
                 "required": [
+                    "body_media",
                     "cover_detail",
                     "created_at",
                     "id",
@@ -4729,6 +4737,13 @@
                         "type": "string"
                     },
                     "body": {},
+                    "body_media": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PublicMedia"
+                        },
+                        "readOnly": true
+                    },
                     "cover": {
                         "type": "string",
                         "format": "uuid",

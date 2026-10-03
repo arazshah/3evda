@@ -834,6 +834,9 @@ export interface components {
       title: string;
       summary?: string;
       body?: unknown;
+      readonly body_media: {
+        [key: string]: components["schemas"]["PublicMedia"];
+      };
       /** Format: uuid */
       cover?: string | null;
       readonly cover_detail: components["schemas"]["PublicMedia"] | null;
@@ -1095,6 +1098,9 @@ export interface components {
       title?: string;
       summary?: string;
       body?: unknown;
+      readonly body_media?: {
+        [key: string]: components["schemas"]["PublicMedia"];
+      };
       /** Format: uuid */
       cover?: string | null;
       readonly cover_detail?: components["schemas"]["PublicMedia"] | null;

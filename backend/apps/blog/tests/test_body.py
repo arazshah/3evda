@@ -65,7 +65,9 @@ def test_a_normal_article_is_kept():
         doc({"type": "heading", "attrs": {"level": 9}, "content": [text("h9")]}),
         doc({"type": "image", "attrs": {"mediaId": "not-a-uuid"}}),
         doc(text("loose text outside a paragraph")),  # text is not allowed directly in the doc
-        doc({"type": "blockquote", "content": [{"type": "bulletList", "content": []}]}),  # wrong nesting
+        doc(
+            {"type": "blockquote", "content": [{"type": "heading", "attrs": {"level": 2}, "content": [text("h")]}]}
+        ),  # wrong nesting
         {"type": "paragraph", "content": []},  # not a doc
         "<p>raw html</p>",
         doc(para({"type": "text", "text": ""})),
@@ -158,6 +160,11 @@ def test_marks_and_structure_render():
     assert "<strong>a</strong><em>b</em><code>c</code>" in html
     assert "<ol><li><p>one</p></li></ol>" in html
     assert "<blockquote><p>q</p></blockquote>" in html and "<hr>" in html
+
+
+def test_empty_paragraphs_are_not_rendered():
+    html = render_html(doc(para(text("a")), {"type": "paragraph"}, para()), {}, "fa")
+    assert html == "<p>a</p>"
 
 
 def test_external_links_get_a_safe_rel():
