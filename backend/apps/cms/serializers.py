@@ -2,34 +2,10 @@ from typing import Any
 
 from rest_framework import serializers
 
-from apps.media.models import MediaAsset
-from apps.media.serializers import MediaVariantSerializer
+from apps.media.serializers import PublicMediaSerializer, ready_media_field
 
 from .blocks import BY_KEY
 from .models import ContentBlock, ContentItem, SiteSettings
-
-MEDIA_NOT_READY = "این فایل پیدا نشد یا هنوز پردازش نشده است."
-
-
-class PublicMediaSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
-    """What a visitor may know about a file: sizes, alt texts and the public variant URLs."""
-
-    variants = MediaVariantSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = MediaAsset
-        fields = ["id", "kind", "width", "height", "duration_seconds", "alt_fa", "alt_en", "lqip", "variants"]
-        read_only_fields = fields
-
-
-def ready_media_field() -> "serializers.PrimaryKeyRelatedField[MediaAsset]":
-    return serializers.PrimaryKeyRelatedField(
-        queryset=MediaAsset.objects.filter(status=MediaAsset.Status.READY),
-        allow_null=True,
-        required=False,
-        error_messages={"does_not_exist": MEDIA_NOT_READY},
-    )
-
 
 # ---- visitors (read-only) --------------------------------------------------------------------------
 

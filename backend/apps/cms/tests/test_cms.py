@@ -1,5 +1,3 @@
-import hashlib
-
 import pytest
 from django.core.management import call_command
 
@@ -7,23 +5,12 @@ from apps.audit.models import AuditLog
 from apps.cms.blocks import BLOCKS
 from apps.cms.models import ContentBlock, ContentItem, SiteSettings
 from apps.cms.service import ensure_blocks
-from apps.media.models import MediaAsset, MediaVariant
+from apps.media.models import MediaAsset
+from apps.media.tests.factories import make_asset
 
 pytestmark = pytest.mark.django_db
 
 ITEMS = "/api/admin/cms/items/"
-
-
-def make_asset(name: str = "a", status: str = MediaAsset.Status.READY) -> MediaAsset:
-    asset = MediaAsset.objects.create(
-        kind="image", status=status, original_key=f"originals/{name}.jpg", original_filename=f"{name}.jpg",
-        mime="image/jpeg", size_bytes=10, sha256=hashlib.sha256(name.encode()).hexdigest(), width=1200, height=800,
-        alt_fa="متن", alt_en="text",
-    )  # fmt: skip
-    MediaVariant.objects.create(
-        asset=asset, name="w480", format="webp", key=f"v/{name}.webp", width=480, height=320, size_bytes=5
-    )
-    return asset
 
 
 def make_item(collection: str = "service", **kwargs):  # type: ignore[no-untyped-def]

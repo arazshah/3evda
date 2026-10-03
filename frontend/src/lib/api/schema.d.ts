@@ -165,6 +165,222 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/portfolio/categories/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_portfolio_categories_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_portfolio_categories_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/portfolio/categories/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_portfolio_categories_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_portfolio_categories_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_portfolio_categories_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/portfolio/categories/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_portfolio_categories_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/portfolio/projects/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_portfolio_projects_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_portfolio_projects_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/portfolio/projects/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_portfolio_projects_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_portfolio_projects_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_portfolio_projects_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/portfolio/projects/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_portfolio_projects_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/groups/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_groups_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_groups_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/groups/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_groups_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_pricing_groups_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_pricing_groups_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/pricing/groups/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_groups_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/packages/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_packages_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_packages_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/pricing/packages/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_pricing_packages_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_pricing_packages_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_pricing_packages_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/pricing/packages/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_pricing_packages_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/settings/watermark": {
     parameters: {
       query?: never;
@@ -326,6 +542,55 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/packages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Published groups with their published packages; groups without packages are left out. */
+    get: operations["public_packages_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/portfolio": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_portfolio_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/portfolio/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_project_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/site": {
     parameters: {
       query?: never;
@@ -350,6 +615,23 @@ export interface components {
     AuthUser: {
       username: string;
       display_name: string;
+    };
+    /** @enum {unknown} */
+    BlankEnum: "";
+    /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
+    Category: {
+      readonly id: number;
+      slug?: string;
+      title_fa: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail: components["schemas"]["PublicMedia"] | null;
+      readonly position: number;
+      is_published?: boolean;
+      readonly project_count: number;
     };
     Code: {
       code: string;
@@ -415,6 +697,10 @@ export interface components {
       code: string;
       detail: string;
     };
+    Feature: {
+      text_fa: string;
+      text_en?: string;
+    };
     /**
      * @description * `image` - تصویر
      *     * `video` - ویدیو
@@ -461,6 +747,40 @@ export interface components {
       /** Format: int64 */
       size_bytes: number;
     };
+    Package: {
+      readonly id: number;
+      group: number;
+      title_fa: string;
+      title_en?: string;
+      summary_fa?: string;
+      summary_en?: string;
+      price_mode?: components["schemas"]["PriceModeEnum"];
+      /**
+       * Format: int64
+       * @description Toman
+       */
+      price_amount?: number | null;
+      /** @description e.g. «به ازای هر محصول» */
+      price_unit_fa?: string;
+      price_unit_en?: string;
+      /** @description e.g. «محبوب» */
+      badge_fa?: string;
+      badge_en?: string;
+      is_featured?: boolean;
+      is_published?: boolean;
+      readonly position: number;
+      features?: components["schemas"]["Feature"][];
+    };
+    PackageGroup: {
+      readonly id: number;
+      title_fa: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      readonly position: number;
+      is_published?: boolean;
+      readonly package_count: number;
+    };
     PaginatedMediaAssetList: {
       /** @example 123 */
       count: number;
@@ -482,6 +802,21 @@ export interface components {
     PasswordChange: {
       current_password: string;
       new_password: string;
+    };
+    /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
+    PatchedCategory: {
+      readonly id?: number;
+      slug?: string;
+      title_fa?: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail?: components["schemas"]["PublicMedia"] | null;
+      readonly position?: number;
+      is_published?: boolean;
+      readonly project_count?: number;
     };
     PatchedContentBlock: {
       readonly key?: string;
@@ -543,6 +878,68 @@ export interface components {
       /** Format: date-time */
       readonly updated_at?: string;
     };
+    PatchedPackage: {
+      readonly id?: number;
+      group?: number;
+      title_fa?: string;
+      title_en?: string;
+      summary_fa?: string;
+      summary_en?: string;
+      price_mode?: components["schemas"]["PriceModeEnum"];
+      /**
+       * Format: int64
+       * @description Toman
+       */
+      price_amount?: number | null;
+      /** @description e.g. «به ازای هر محصول» */
+      price_unit_fa?: string;
+      price_unit_en?: string;
+      /** @description e.g. «محبوب» */
+      badge_fa?: string;
+      badge_en?: string;
+      is_featured?: boolean;
+      is_published?: boolean;
+      readonly position?: number;
+      features?: components["schemas"]["Feature"][];
+    };
+    PatchedPackageGroup: {
+      readonly id?: number;
+      title_fa?: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      readonly position?: number;
+      is_published?: boolean;
+      readonly package_count?: number;
+    };
+    /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
+    PatchedProject: {
+      readonly id?: number;
+      slug?: string;
+      category?: number | null;
+      style?: components["schemas"]["StyleEnum"] | components["schemas"]["BlankEnum"];
+      title_fa?: string;
+      title_en?: string;
+      summary_fa?: string;
+      summary_en?: string;
+      /** @description Case study */
+      body_fa?: string;
+      body_en?: string;
+      client_fa?: string;
+      client_en?: string;
+      year?: number | null;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail?: components["schemas"]["PublicMedia"] | null;
+      is_featured?: boolean;
+      is_published?: boolean;
+      readonly position?: number;
+      images?: components["schemas"]["ProjectImage"][];
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     PatchedSiteSettings: {
       /** Format: uuid */
       logo?: string | null;
@@ -579,10 +976,61 @@ export interface components {
      * @enum {string}
      */
     PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    /**
+     * @description * `from` - از … شروع می‌شود
+     *     * `fixed` - قیمت ثابت
+     *     * `inquiry` - استعلام
+     * @enum {string}
+     */
+    PriceModeEnum: "from" | "fixed" | "inquiry";
+    /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
+    Project: {
+      readonly id: number;
+      slug?: string;
+      category?: number | null;
+      style?: components["schemas"]["StyleEnum"] | components["schemas"]["BlankEnum"];
+      title_fa: string;
+      title_en?: string;
+      summary_fa?: string;
+      summary_en?: string;
+      /** @description Case study */
+      body_fa?: string;
+      body_en?: string;
+      client_fa?: string;
+      client_en?: string;
+      year?: number | null;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail: components["schemas"]["PublicMedia"] | null;
+      is_featured?: boolean;
+      is_published?: boolean;
+      readonly position: number;
+      images?: components["schemas"]["ProjectImage"][];
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    ProjectImage: {
+      /** Format: uuid */
+      media: string;
+      readonly media_detail: components["schemas"]["PublicMedia"];
+      caption_fa?: string;
+      caption_en?: string;
+    };
     PublicBlock: {
       readonly fa: string;
       readonly en: string;
       readonly media: components["schemas"]["PublicMedia"] | null;
+    };
+    PublicCategory: {
+      readonly slug: string;
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly description_fa: string;
+      readonly description_en: string;
+      readonly cover: components["schemas"]["PublicMedia"] | null;
+      readonly project_count: number;
     };
     PublicCollections: {
       hero_slide: components["schemas"]["PublicItem"][];
@@ -593,6 +1041,23 @@ export interface components {
       behind_scenes: components["schemas"]["PublicItem"][];
       faq: components["schemas"]["PublicItem"][];
       nav_link: components["schemas"]["PublicItem"][];
+    };
+    PublicFeature: {
+      readonly text_fa: string;
+      readonly text_en: string;
+    };
+    PublicGroup: {
+      readonly id: number;
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly description_fa: string;
+      readonly description_en: string;
+      readonly packages: components["schemas"]["PublicPackage"][];
+    };
+    PublicImage: {
+      readonly media: components["schemas"]["PublicMedia"];
+      readonly caption_fa: string;
+      readonly caption_en: string;
     };
     PublicItem: {
       readonly id: number;
@@ -620,6 +1085,65 @@ export interface components {
       readonly alt_en: string;
       readonly lqip: string;
       readonly variants: components["schemas"]["MediaVariant"][];
+    };
+    PublicPackage: {
+      readonly id: number;
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly summary_fa: string;
+      readonly summary_en: string;
+      readonly price_mode: components["schemas"]["PriceModeEnum"];
+      /** @description Toman */
+      readonly price_amount: number | null;
+      /** @description e.g. «به ازای هر محصول» */
+      readonly price_unit_fa: string;
+      readonly price_unit_en: string;
+      /** @description e.g. «محبوب» */
+      readonly badge_fa: string;
+      readonly badge_en: string;
+      readonly is_featured: boolean;
+      readonly features: components["schemas"]["PublicFeature"][];
+    };
+    PublicPackages: {
+      groups: components["schemas"]["PublicGroup"][];
+    };
+    PublicPortfolio: {
+      categories: components["schemas"]["PublicCategory"][];
+      projects: components["schemas"]["PublicProject"][];
+    };
+    PublicProject: {
+      readonly slug: string;
+      readonly category: string;
+      readonly style: components["schemas"]["StyleEnum"];
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly summary_fa: string;
+      readonly summary_en: string;
+      readonly client_fa: string;
+      readonly client_en: string;
+      readonly year: number | null;
+      readonly is_featured: boolean;
+      readonly cover: components["schemas"]["PublicMedia"] | null;
+    };
+    PublicProjectDetail: {
+      readonly slug: string;
+      readonly category: string;
+      readonly style: components["schemas"]["StyleEnum"];
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly summary_fa: string;
+      readonly summary_en: string;
+      readonly client_fa: string;
+      readonly client_en: string;
+      readonly year: number | null;
+      readonly is_featured: boolean;
+      readonly cover: components["schemas"]["PublicMedia"] | null;
+      /** @description Case study */
+      readonly body_fa: string;
+      readonly body_en: string;
+      readonly images: components["schemas"]["PublicImage"][];
+      readonly previous: string | null;
+      readonly next: string | null;
     };
     PublicSettings: {
       readonly logo: components["schemas"]["PublicMedia"] | null;
@@ -656,6 +1180,9 @@ export interface components {
     };
     Reorder: {
       collection: components["schemas"]["CollectionEnum"];
+      ids: number[];
+    };
+    ReorderIds: {
       ids: number[];
     };
     SiteSettings: {
@@ -705,6 +1232,13 @@ export interface components {
      * @enum {string}
      */
     StatusEnum: "pending" | "processing" | "ready" | "failed";
+    /**
+     * @description * `low_key` - Low-key
+     *     * `high_key` - High-key
+     *     * `natural` - نور طبیعی
+     * @enum {string}
+     */
+    StyleEnum: "low_key" | "high_key" | "natural";
     TotpSetup: {
       otpauth_uri: string;
       secret: string;
@@ -1270,6 +1804,592 @@ export interface operations {
       };
     };
   };
+  admin_portfolio_categories_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Category"][];
+        };
+      };
+    };
+  };
+  admin_portfolio_categories_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Category"];
+        "application/x-www-form-urlencoded": components["schemas"]["Category"];
+        "multipart/form-data": components["schemas"]["Category"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Category"];
+        };
+      };
+    };
+  };
+  admin_portfolio_categories_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Category"];
+        };
+      };
+    };
+  };
+  admin_portfolio_categories_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_portfolio_categories_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedCategory"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedCategory"];
+        "multipart/form-data": components["schemas"]["PatchedCategory"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Category"];
+        };
+      };
+    };
+  };
+  admin_portfolio_categories_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_portfolio_projects_list: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Project"][];
+        };
+      };
+    };
+  };
+  admin_portfolio_projects_create: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Project"];
+        "application/x-www-form-urlencoded": components["schemas"]["Project"];
+        "multipart/form-data": components["schemas"]["Project"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+    };
+  };
+  admin_portfolio_projects_retrieve: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این project را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+    };
+  };
+  admin_portfolio_projects_destroy: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این project را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_portfolio_projects_partial_update: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این project را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedProject"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedProject"];
+        "multipart/form-data": components["schemas"]["PatchedProject"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+    };
+  };
+  admin_portfolio_projects_reorder_create: {
+    parameters: {
+      query?: {
+        category?: number;
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_pricing_groups_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PackageGroup"][];
+        };
+      };
+    };
+  };
+  admin_pricing_groups_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PackageGroup"];
+        "application/x-www-form-urlencoded": components["schemas"]["PackageGroup"];
+        "multipart/form-data": components["schemas"]["PackageGroup"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PackageGroup"];
+        };
+      };
+    };
+  };
+  admin_pricing_groups_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package group را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PackageGroup"];
+        };
+      };
+    };
+  };
+  admin_pricing_groups_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package group را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_pricing_groups_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package group را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedPackageGroup"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedPackageGroup"];
+        "multipart/form-data": components["schemas"]["PatchedPackageGroup"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PackageGroup"];
+        };
+      };
+    };
+  };
+  admin_pricing_groups_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_pricing_packages_list: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Package"][];
+        };
+      };
+    };
+  };
+  admin_pricing_packages_create: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Package"];
+        "application/x-www-form-urlencoded": components["schemas"]["Package"];
+        "multipart/form-data": components["schemas"]["Package"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Package"];
+        };
+      };
+    };
+  };
+  admin_pricing_packages_retrieve: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Package"];
+        };
+      };
+    };
+  };
+  admin_pricing_packages_destroy: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_pricing_packages_partial_update: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این package را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedPackage"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedPackage"];
+        "multipart/form-data": components["schemas"]["PatchedPackage"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Package"];
+        };
+      };
+    };
+  };
+  admin_pricing_packages_reorder_create: {
+    parameters: {
+      query?: {
+        group?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   admin_settings_watermark_retrieve: {
     parameters: {
       query?: never;
@@ -1556,6 +2676,70 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  public_packages_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicPackages"];
+        };
+      };
+    };
+  };
+  public_portfolio_list: {
+    parameters: {
+      query?: {
+        /** @description Category slug */
+        category?: string;
+        featured?: boolean;
+        style?: "high_key" | "low_key" | "natural";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicPortfolio"];
+        };
+      };
+    };
+  };
+  public_project_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicProjectDetail"];
         };
       };
     };
