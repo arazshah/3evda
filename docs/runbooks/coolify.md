@@ -123,7 +123,7 @@ curl -sI https://3evda.com/en | head -1       # 200
 - لاگ هر سرویس در Coolify، بخش **Logs** همان Resource، قابل مشاهده است.
 - اگر `ready` خطای ۵۰۳ برگرداند، نام سرویس خراب در پاسخ آمده است (`database`، `redis` یا `storage`).
 - اگر سرویس `api` بالا نمی‌آید، معمولاً migration شکست خورده است. پیام خطا در لاگ api آمده است.
-- volumeهای `pgdata_v2`، `redisdata` و `objects` بین دیپلوی‌ها حفظ می‌شوند. هرگز Resource را با گزینه‌ی حذف volumeها پاک نکنید.
+- volumeهای `pgdata_v2`، `redisdata` و `objects_v2` بین دیپلوی‌ها حفظ می‌شوند. هرگز Resource را با گزینه‌ی حذف volumeها پاک نکنید.
 
 **بازگشت به نسخه‌ی قبل (Rollback):**
 1. در GitHub، commit خراب را revert کنید و با PR به `main` merge کنید.
