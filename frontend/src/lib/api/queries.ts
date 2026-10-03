@@ -112,8 +112,8 @@ export function useSaveSettings() {
     mutationFn: (body: components["schemas"]["PatchedSiteSettings"]) =>
       unwrap(api.PATCH("/api/admin/cms/settings", { body })),
     onSuccess: async (data) => {
-      client.setQueryData(keys.settings, data);
       await revalidatePublic("site");
+      client.setQueryData(keys.settings, data);
     },
   });
 }
@@ -138,8 +138,8 @@ export function useSaveBlock() {
       media?: string | null;
     }) => unwrap(api.PATCH("/api/admin/cms/blocks/{key}/", { params: { path: { key } }, body })),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: keys.blocks });
       await revalidatePublic("site");
+      await client.invalidateQueries({ queryKey: keys.blocks });
     },
   });
 }
@@ -163,8 +163,8 @@ export function useSaveItem() {
         ? unwrap(api.POST("/api/admin/cms/items/", { body: body as Schemas["ContentItem"] }))
         : unwrap(api.PATCH("/api/admin/cms/items/{id}/", { params: { path: { id } }, body })),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: keys.items });
       await revalidatePublic("site");
+      await client.invalidateQueries({ queryKey: keys.items });
     },
   });
 }
@@ -175,8 +175,8 @@ export function useDeleteItem() {
     mutationFn: (id: number) =>
       unwrap(api.DELETE("/api/admin/cms/items/{id}/", { params: { path: { id } } })),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: keys.items });
       await revalidatePublic("site");
+      await client.invalidateQueries({ queryKey: keys.items });
     },
   });
 }
@@ -187,8 +187,8 @@ export function useReorderItems() {
     mutationFn: (body: { collection: Collection; ids: number[] }) =>
       unwrap(api.POST("/api/admin/cms/items/reorder/", { body })),
     onSettled: async () => {
-      await client.invalidateQueries({ queryKey: keys.items });
       await revalidatePublic("site");
+      await client.invalidateQueries({ queryKey: keys.items });
     },
   });
 }
@@ -210,8 +210,8 @@ export function useSaveCategory() {
         ? unwrap(api.POST("/api/admin/portfolio/categories/", { body: body as Category }))
         : unwrap(api.PATCH("/api/admin/portfolio/categories/{id}/", { params: { path: { id } }, body })),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: keys.categories });
       await revalidatePublic("portfolio");
+      await client.invalidateQueries({ queryKey: keys.categories });
     },
   });
 }
@@ -222,8 +222,8 @@ export function useDeleteCategory() {
     mutationFn: (id: number) =>
       unwrap(api.DELETE("/api/admin/portfolio/categories/{id}/", { params: { path: { id } } })),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: keys.categories });
       await revalidatePublic("portfolio");
+      await client.invalidateQueries({ queryKey: keys.categories });
     },
   });
 }
@@ -234,8 +234,8 @@ export function useReorderCategories() {
     mutationFn: (ids: number[]) =>
       unwrap(api.POST("/api/admin/portfolio/categories/reorder/", { body: { ids } })),
     onSettled: async () => {
-      await client.invalidateQueries({ queryKey: keys.categories });
       await revalidatePublic("portfolio");
+      await client.invalidateQueries({ queryKey: keys.categories });
     },
   });
 }
@@ -255,10 +255,10 @@ export function useSaveProject() {
         ? unwrap(api.POST("/api/admin/portfolio/projects/", { body: body as Project }))
         : unwrap(api.PATCH("/api/admin/portfolio/projects/{id}/", { params: { path: { id } }, body })),
     onSuccess: async () => {
+      await revalidatePublic("portfolio");
       await client.invalidateQueries({ queryKey: keys.projects });
       // Category project counts change with every project save.
       await client.invalidateQueries({ queryKey: keys.categories });
-      await revalidatePublic("portfolio");
     },
   });
 }
@@ -269,9 +269,9 @@ export function useDeleteProject() {
     mutationFn: (id: number) =>
       unwrap(api.DELETE("/api/admin/portfolio/projects/{id}/", { params: { path: { id } } })),
     onSuccess: async () => {
+      await revalidatePublic("portfolio");
       await client.invalidateQueries({ queryKey: keys.projects });
       await client.invalidateQueries({ queryKey: keys.categories });
-      await revalidatePublic("portfolio");
     },
   });
 }
@@ -282,8 +282,8 @@ export function useReorderProjects() {
     mutationFn: (ids: number[]) =>
       unwrap(api.POST("/api/admin/portfolio/projects/reorder/", { body: { ids } })),
     onSettled: async () => {
-      await client.invalidateQueries({ queryKey: keys.projects });
       await revalidatePublic("portfolio");
+      await client.invalidateQueries({ queryKey: keys.projects });
     },
   });
 }

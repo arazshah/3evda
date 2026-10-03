@@ -105,6 +105,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.getByLabel("نام دسته (فارسی)").fill("دسته‌ی آزمایشی");
   await page.getByLabel("نام دسته (English)").fill("E2E category");
   await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("list", { name: "دسته‌ها" })).toContainText("دسته‌ی آزمایشی");
 
   await page.goto("/panel/projects");
@@ -113,6 +115,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.getByLabel("عنوان (English)").fill("E2E project");
   await page.getByRole("combobox", { name: /^دسته/ }).selectOption({ label: "دسته‌ی آزمایشی" });
   await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("list", { name: "پروژه‌ها" })).toContainText("پروژه‌ی آزمایشی");
 
   await page.goto("/portfolio");
@@ -124,6 +128,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.getByRole("button", { name: "ویرایش پروژه‌ی آزمایشی" }).click();
   await page.getByLabel("عنوان (فارسی)").fill("پروژه‌ی ویرایش‌شده");
   await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  // The editor closes only after the save finished and the public cache was refreshed.
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("list", { name: "پروژه‌ها" })).toContainText("پروژه‌ی ویرایش‌شده");
   await page.goto("/portfolio");
   await expect(page.getByRole("link", { name: "پروژه‌ی ویرایش‌شده" })).toBeVisible();
