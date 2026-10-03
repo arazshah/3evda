@@ -220,6 +220,77 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   // The sample rules seeded for CI stay, so only this test's rule has to be gone.
   await expect(page.getByRole("list", { name: "قواعد قیمت" })).not.toContainText("خدمت آزمایشی");
 
+  // Inquiries: a visitor sends one with a PDF; the owner finds it, reads it, follows it up, exports it and removes it.
+  const visitor = `بازدیدکننده‌ی آزمایشی ${Date.now()}`;
+  const pdf = Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n");
+  const sent = await page.request.post("/api/public/inquiries", {
+    multipart: {
+      name: visitor,
+      phone: "09123334455",
+      message: "منوی جدید کافه را می‌خواهیم عکاسی کنیم.",
+      language: "fa",
+      service: "sample-food",
+      quantity: "4",
+      attachments: { name: "brief.pdf", mimeType: "application/pdf", buffer: pdf },
+    },
+  });
+  expect(sent.status()).toBe(201);
+
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  const found = page.getByRole("list", { name: "استعلام‌ها" }).getByRole("listitem");
+  await expect(found).toHaveCount(1);
+  await expect(found.getByText("خوانده‌نشده")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "منوی پنل" }).getByText(/استعلام خوانده‌نشده/)).toBeVisible();
+
+  await found.getByRole("link").click();
+  await expect(page.getByRole("heading", { level: 1, name: visitor })).toBeVisible();
+  await expect(page.getByRole("link", { name: "09123334455" })).toHaveAttribute("href", "tel:09123334455");
+  await expect(page.getByText("منوی جدید کافه را می‌خواهیم عکاسی کنیم.")).toBeVisible();
+  await expect(page.getByText(/از .+ تا .+ تومان/)).toBeVisible(); // the range the visitor was shown
+  await expectNoSeriousViolations(page, "inquiry detail");
+
+  // The attachment is private: the owner gets a short signed redirect and a download, not a page.
+  const attachment = await page.getByRole("link", { name: /brief\.pdf/ }).getAttribute("href");
+  const redirect = await page.request.get(attachment!, { maxRedirects: 0 });
+  expect(redirect.status()).toBe(302);
+  const signed = redirect.headers()["location"]!;
+  expect(signed).toMatch(/^\/storage-signed\//);
+  const file = await page.request.get(signed);
+  expect(file.status()).toBe(200);
+  expect((await file.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  expect(file.headers()["content-disposition"]).toContain("attachment");
+  expect((await request.get(attachment!, { maxRedirects: 0 })).status()).toBe(403); // not for anyone else
+
+  // Follow-up survives a reload.
+  await page.getByLabel("وضعیت", { exact: true }).selectOption("reviewing");
+  await page.getByLabel("یادداشت داخلی", { exact: true }).fill("تماس گرفتم؛ فردا پیش‌فاکتور می‌فرستم.");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("ذخیره شد.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel("وضعیت", { exact: true })).toHaveValue("reviewing");
+  await expect(page.getByLabel("یادداشت داخلی", { exact: true })).toHaveValue("تماس گرفتم؛ فردا پیش‌فاکتور می‌فرستم.");
+  await expect(page.getByRole("list", { name: "تاریخچه‌ی وضعیت" })).toContainText("در بررسی");
+
+  // It is no longer unread, and the CSV has it.
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await expect(found).toHaveCount(1);
+  await expect(found.getByText("خوانده‌نشده")).toHaveCount(0);
+  const csv = await page.request.get(`/api/admin/inquiries/export/?q=${encodeURIComponent(visitor)}`);
+  expect(csv.status()).toBe(200);
+  expect(csv.headers()["content-type"]).toContain("text/csv");
+  expect(await csv.text()).toContain(visitor);
+
+  // Deleting it removes the row and the stored file.
+  await found.getByRole("link").click();
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف استعلام" }).click();
+  await expect(page).toHaveURL(/\/panel\/inquiries$/);
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await expect(page.getByText("استعلامی با این فیلترها پیدا نشد.")).toBeVisible();
+  expect((await page.request.get(signed)).status()).toBeGreaterThanOrEqual(400);
+
   // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
   await page.goto("/panel/articles/new?language=fa");
   await page.getByLabel("عنوان", { exact: true }).fill("مقاله‌ی آزمایشی");
@@ -251,7 +322,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   // Publishing puts the article in the sitemap and the feed; renaming it keeps the old address working.
   const text = async (path: string) => (await page.request.get(path)).text();
   expect(await text("/sitemap.xml")).not.toContain("mazmoon-azmayeshi");
-  await page.getByLabel("وضعیت").selectOption("published");
+  await page.getByLabel("وضعیت", { exact: true }).selectOption("published");
   await page.getByLabel("نشانی مقاله (اختیاری)").fill("mazmoon-azmayeshi");
   await page.getByRole("button", { name: "ذخیره", exact: true }).click();
   await expect(page.getByText("ذخیره شد.")).toBeVisible();
@@ -282,7 +353,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   }
 
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);
