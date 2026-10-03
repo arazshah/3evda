@@ -88,7 +88,7 @@ export function SiteHeader({
           >
             {labels.switchLanguage}
           </a>
-          <ButtonLink href={href(locale, "/contact")} className="hidden sm:inline-flex">
+          <ButtonLink href={href(locale, "/quote")} className="hidden sm:inline-flex">
             {block(site, locale, "home.cta_primary") || labels.quote}
           </ButtonLink>
         </div>

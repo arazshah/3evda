@@ -217,7 +217,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   expect(options).not.toContain("1000000");
   acceptNextDialog();
   await page.getByRole("button", { name: "حذف خدمت آزمایشی" }).click();
-  await expect(page.getByRole("list", { name: "قواعد قیمت" })).toHaveCount(0);
+  // The sample rules seeded for CI stay, so only this test's rule has to be gone.
+  await expect(page.getByRole("list", { name: "قواعد قیمت" })).not.toContainText("خدمت آزمایشی");
 
   // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
   await page.goto("/panel/articles/new?language=fa");

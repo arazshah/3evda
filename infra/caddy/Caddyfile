@@ -29,6 +29,15 @@
 		respond "ok" 200
 	}
 
+	# The public enquiry form takes at most three 10 MB attachments. Cap its body at the edge so an
+	# anonymous visitor cannot stream the gateway-wide maximum into the API.
+	handle /api/public/inquiries {
+		request_body {
+			max_size 32MB
+		}
+		reverse_proxy api:8000
+	}
+
 	handle /api/* {
 		reverse_proxy api:8000
 	}

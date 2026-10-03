@@ -131,7 +131,7 @@ describe("PackageCard", () => {
     expect(screen.getByText("Popular")).toBeInTheDocument();
     expect(screen.getByText(/Included:/)).toBeInTheDocument();
     expect(screen.getByText(/Not included:/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Quote" })).toHaveAttribute("href", "/en/contact");
+    expect(screen.getByRole("link", { name: "Quote" })).toHaveAttribute("href", "/en/quote");
   });
 
   it("shows the inquiry label when there is no amount", () => {
@@ -214,7 +214,7 @@ describe("HeroSlides", () => {
   const props = {
     locale: "en" as const,
     eyebrow: "Tagline",
-    primary: { href: "/en/contact", label: "Quote" },
+    primary: { href: "/en/quote", label: "Quote" },
     secondary: { href: "/en/portfolio", label: "Portfolio" },
     slideLabelTemplate: "Slide {n}",
     groupLabel: "Slides",
