@@ -9,7 +9,9 @@ import { chromium } from "@playwright/test";
 const LIGHTHOUSE = "lighthouse@13.5.0";
 const MIN_SCORE = 0.9;
 const BASE = (process.env.E2E_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
-const PAGES = ["/", "/en", "/portfolio", "/en/portfolio", "/services", "/packages", "/about", "/contact"];
+const ROUTES = ["/", "/portfolio", "/services", "/packages", "/about", "/contact"];
+// Every public page in both languages (Persian is unprefixed, English lives under /en).
+const PAGES = ROUTES.flatMap((route) => [route, route === "/" ? "/en" : `/en${route}`]);
 const CATEGORIES = ["performance", "accessibility", "best-practices", "seo"];
 
 const outDir = mkdtempSync(join(tmpdir(), "lighthouse-"));

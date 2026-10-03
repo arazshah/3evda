@@ -15,7 +15,7 @@ import {
   type PackageGroup,
 } from "@/lib/api/queries";
 import { formatNumber } from "@/lib/format";
-import { moveId } from "@/lib/reorder";
+import { mergeGroupOrder, moveId } from "@/lib/reorder";
 import { EditorDialog } from "./EditorDialog";
 import { ResourceList } from "./ResourceList";
 import { Alert, Button, Field, TextArea } from "./ui";
@@ -118,13 +118,14 @@ export function PackagesManager() {
 }
 
 function GroupPackages({ group }: { group: PackageGroup }) {
-  const packages = usePackages(group.id);
+  const packages = usePackages();
   const reorder = useReorderPackages();
   const remove = useDeletePackage();
   const [editing, setEditing] = useState<Package | "new" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const list = packages.data ?? [];
+  const all = packages.data ?? [];
+  const list = all.filter((p) => p.group === group.id);
   const act = async (run: () => Promise<unknown>) => {
     setError(null);
     try {
@@ -150,7 +151,17 @@ function GroupPackages({ group }: { group: PackageGroup }) {
           published: p.is_published ?? true,
         }))}
         disabled={reorder.isPending}
-        onReorder={(ids) => act(() => reorder.mutateAsync(ids))}
+        // The API wants the order of every package, so this group's new order is merged into the full list.
+        onReorder={(ids) =>
+          act(() =>
+            reorder.mutateAsync(
+              mergeGroupOrder(
+                all.map((p) => p.id),
+                ids,
+              ),
+            ),
+          )
+        }
         onEdit={(id) => setEditing(list.find((p) => p.id === id) ?? null)}
         onDelete={(id) => {
           if (window.confirm("این پکیج حذف شود؟")) void act(() => remove.mutateAsync(id));

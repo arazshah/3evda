@@ -339,11 +339,11 @@ export function useReorderGroups() {
   });
 }
 
-export function usePackages(group: number | undefined) {
+/** Every package of every group: the reorder endpoint needs the complete order, not one group's slice. */
+export function usePackages() {
   return useQuery({
-    queryKey: [...keys.packages, group],
-    queryFn: () => unwrap(api.GET("/api/admin/pricing/packages/", { params: { query: { group } } })),
-    enabled: group !== undefined,
+    queryKey: keys.packages,
+    queryFn: () => unwrap(api.GET("/api/admin/pricing/packages/")),
   });
 }
 

@@ -126,3 +126,34 @@ describe("PackagesManager", () => {
     expect(api.calls.find((c) => c.path.endsWith("/reorder/"))?.body).toEqual({ ids: [8, 7] });
   });
 });
+
+describe("PackagesManager with several groups", () => {
+  it("sends the order of every package when one group is reordered", async () => {
+    const api = fakeApi([
+      { method: "GET", path: "/api/admin/pricing/groups/", body: [group(1, "غذا", 2), group(2, "محصول", 2)] },
+      {
+        method: "GET",
+        path: "/api/admin/pricing/packages/",
+        body: [
+          pkg(10, "الف", { group: 1 }),
+          pkg(11, "ب", { group: 1 }),
+          pkg(20, "ج", { group: 2 }),
+          pkg(21, "د", { group: 2 }),
+        ],
+      },
+      { method: "POST", path: "/api/admin/pricing/packages/reorder/", body: {} },
+      { method: "GET", path: "/api/admin/pricing/packages/", body: [] },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<PackagesManager />);
+
+    // Only the selected group's packages are listed.
+    const list = await screen.findByRole("list", { name: "پکیج‌ها" });
+    expect(within(list).queryByText("ج")).not.toBeInTheDocument();
+    fireEvent.click(within(list).getByRole("button", { name: "پایین بردن الف" }));
+
+    await waitFor(() => expect(api.calls.some((c) => c.path.endsWith("/reorder/"))).toBe(true));
+    // The other group's packages are part of the order too, or the API answers 400.
+    expect(api.calls.find((c) => c.path.endsWith("/reorder/"))?.body).toEqual({ ids: [11, 10, 20, 21] });
+  });
+});

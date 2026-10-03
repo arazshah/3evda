@@ -6,3 +6,13 @@ export function moveId<T>(ids: T[], index: number, delta: -1 | 1): T[] {
   [next[index], next[target]] = [next[target]!, next[index]!];
   return next;
 }
+
+/**
+ * The complete order after reordering one group: `all` is every id in display order, `groupOrder`
+ * the new order of the ids that belong to the group. The group's entries keep the slots they had.
+ */
+export function mergeGroupOrder(all: number[], groupOrder: number[]): number[] {
+  const members = new Set(groupOrder);
+  let next = 0;
+  return all.map((id) => (members.has(id) ? groupOrder[next++]! : id));
+}
