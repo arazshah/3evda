@@ -7,8 +7,6 @@ import { getPortfolio, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
 import { block } from "@/lib/site/text";
 
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({
   params,
 }: {

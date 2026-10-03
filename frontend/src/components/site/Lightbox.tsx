@@ -3,7 +3,14 @@
 import { useCallback, useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 
-export type LightboxImage = { src: string; width: number | null; height: number | null; alt: string };
+export type LightboxImage = {
+  src: string;
+  width: number | null;
+  height: number | null;
+  alt: string;
+  /** Set for videos: `src` is then the poster frame. */
+  video?: string;
+};
 
 /** A grid of thumbnails that open a full-screen viewer with previous/next and arrow-key navigation. */
 export function LightboxGallery({
@@ -26,17 +33,21 @@ export function LightboxGallery({
   return (
     <>
       {children(setIndex)}
-      <Dialog open={current !== null} onClose={close} label={labels.dialog} closeLabel={labels.close}>
+      <Dialog
+        open={current !== null}
+        onClose={close}
+        label={labels.dialog}
+        closeLabel={labels.close}
+        // On the dialog itself so arrows work from the initial focus (the close button).
+        onKeyDown={(e) => {
+          // Arrow keys follow the visual direction, which flips with the document direction.
+          const rtl = document.documentElement.dir === "rtl";
+          if (e.key === "ArrowRight") move(rtl ? -1 : 1);
+          if (e.key === "ArrowLeft") move(rtl ? 1 : -1);
+        }}
+      >
         {current ? (
-          <div
-            onKeyDown={(e) => {
-              // Arrow keys follow the visual direction, which flips with the document direction.
-              const rtl = document.documentElement.dir === "rtl";
-              if (e.key === "ArrowRight") move(rtl ? -1 : 1);
-              if (e.key === "ArrowLeft") move(rtl ? 1 : -1);
-            }}
-            className="flex h-dvh w-dvw items-center justify-center p-4"
-          >
+          <div className="flex h-dvh w-dvw items-center justify-center p-4">
             {images.length > 1 ? (
               <button
                 type="button"
@@ -47,8 +58,20 @@ export function LightboxGallery({
                 ‹
               </button>
             ) : null}
-            {/* eslint-disable-next-line @next/next/no-img-element -- pipeline rendition */}
-            <img src={current.src} alt={current.alt} className="max-h-full max-w-full object-contain" />
+            {current.video ? (
+              <video
+                key={current.video}
+                src={current.video}
+                poster={current.src}
+                controls
+                playsInline
+                aria-label={current.alt}
+                className="max-h-full max-w-full"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element -- pipeline rendition
+              <img src={current.src} alt={current.alt} className="max-h-full max-w-full object-contain" />
+            )}
             {images.length > 1 ? (
               <button
                 type="button"

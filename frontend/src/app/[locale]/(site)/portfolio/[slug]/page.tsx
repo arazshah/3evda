@@ -7,8 +7,6 @@ import { getProject, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
 import { href, localized } from "@/lib/site/text";
 
-export const dynamic = "force-dynamic";
-
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

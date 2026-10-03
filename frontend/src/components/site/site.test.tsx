@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { HeroSlides } from "./HeroSlides";
 import { LightboxGallery } from "./Lightbox";
 import { PackageCard } from "./PackageCard";
 import { PortfolioGrid } from "./PortfolioGrid";
@@ -69,6 +70,16 @@ describe("PortfolioGrid", () => {
     fireEvent.click(screen.getByRole("button", { name: "Product" }));
     fireEvent.click(screen.getByRole("button", { name: "High key" }));
     expect(screen.getByText("Nothing")).toBeInTheDocument();
+  });
+
+  it("does not render a control for a project without a style", () => {
+    const unstyled = [
+      project("a", "food", "low_key"),
+      project("b", "food", "high_key"),
+      project("z", "food", "" as never),
+    ];
+    render(<PortfolioGrid projects={unstyled} categories={categories} locale="en" labels={gridLabels} />);
+    for (const button of screen.getAllByRole("button")) expect(button).toHaveAccessibleName();
   });
 
   it("starts with the category from the URL", () => {
@@ -159,5 +170,70 @@ describe("LightboxGallery", () => {
     expect(screen.getByAltText("First")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByAltText("First")).not.toBeInTheDocument();
+  });
+});
+
+describe("LightboxGallery keyboard and video", () => {
+  const polyfill = () => {
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.setAttribute("open", "");
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      this.removeAttribute("open");
+    };
+  };
+
+  it("navigates with the arrow keys from the close button and plays videos", () => {
+    polyfill();
+    const items = [
+      { src: "/a.webp", width: 1, height: 1, alt: "First" },
+      { src: "/poster.webp", width: 1, height: 1, alt: "Clip", video: "/clip.mp4" },
+    ];
+    document.documentElement.dir = "ltr";
+    render(
+      <LightboxGallery images={items} labels={labels}>
+        {(open) => (
+          <button type="button" onClick={() => open(0)}>
+            open
+          </button>
+        )}
+      </LightboxGallery>,
+    );
+    fireEvent.click(screen.getByText("open"));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Close" }), { key: "ArrowRight" });
+    const video = screen.getByLabelText("Clip");
+    expect(video.tagName).toBe("VIDEO");
+    expect(video).toHaveAttribute("src", "/clip.mp4");
+    expect(video).toHaveAttribute("poster", "/poster.webp");
+    fireEvent.keyDown(screen.getByRole("button", { name: "Close" }), { key: "ArrowLeft" });
+    expect(screen.getByAltText("First")).toBeInTheDocument();
+  });
+});
+
+describe("HeroSlides", () => {
+  const props = {
+    locale: "en" as const,
+    eyebrow: "Tagline",
+    primary: { href: "/en/contact", label: "Quote" },
+    secondary: { href: "/en/portfolio", label: "Portfolio" },
+    slideLabelTemplate: "Slide {n}",
+    groupLabel: "Slides",
+  };
+
+  it("shows the first slide and lets the visitor reach the others", () => {
+    const slides = [
+      { title: "One", subtitle: "first", media: null },
+      { title: "Two", subtitle: "second", media: null },
+    ];
+    render(<HeroSlides {...props} slides={slides} />);
+    expect(screen.getByRole("heading", { level: 1, name: "One" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Slide 2" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Two" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("hides the slide buttons when there is only one slide", () => {
+    render(<HeroSlides {...props} slides={[{ title: "Solo", subtitle: "", media: null }]} />);
+    expect(screen.queryByRole("group", { name: "Slides" })).not.toBeInTheDocument();
   });
 });

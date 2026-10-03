@@ -28,7 +28,7 @@ export function PortfolioGrid({
 }) {
   const [category, setCategory] = useState(initialCategory);
   const [style, setStyle] = useState("");
-  const styles = useMemo(() => [...new Set(projects.map((p) => p.style))], [projects]);
+  const styles = useMemo(() => [...new Set(projects.map((p) => p.style).filter(Boolean))], [projects]);
   const shown = projects.filter(
     (p) => (!category || p.category === category) && (!style || p.style === style),
   );

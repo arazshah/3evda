@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import type { Package, PackageGroup, Portfolio, ProjectDetail, SiteData } from "./types";
 
 const BASE = process.env.INTERNAL_API_URL ?? "http://localhost:8000";
@@ -6,7 +7,12 @@ const REVALIDATE_SECONDS = 30;
 
 export const TAGS = { site: "site", portfolio: "portfolio", packages: "packages" } as const;
 
+/**
+ * Pages render at request time (the API is not reachable while the image is built) but keep the
+ * data cache: `connection()` opts out of prerendering without turning every fetch into no-store.
+ */
 async function getJson<T>(path: string, tag: string): Promise<T | null> {
+  await connection();
   try {
     const res = await fetch(`${BASE}${path}`, { next: { revalidate: REVALIDATE_SECONDS, tags: [tag] } });
     if (res.status === 404) return null;

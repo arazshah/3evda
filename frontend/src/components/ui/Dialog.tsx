@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type KeyboardEventHandler, type ReactNode } from "react";
 
 /** Modal built on the native <dialog>: focus trap, Esc to close and inert background come from the browser. */
 export function Dialog({
@@ -10,6 +10,7 @@ export function Dialog({
   closeLabel,
   children,
   className = "",
+  onKeyDown,
 }: {
   open: boolean;
   onClose: () => void;
@@ -17,6 +18,7 @@ export function Dialog({
   closeLabel: string;
   children: ReactNode;
   className?: string;
+  onKeyDown?: KeyboardEventHandler<HTMLDialogElement>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -32,6 +34,7 @@ export function Dialog({
       ref={ref}
       aria-label={label}
       onClose={onClose}
+      onKeyDown={onKeyDown}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}

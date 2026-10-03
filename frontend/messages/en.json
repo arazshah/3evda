@@ -30,7 +30,9 @@
       "viewAll": "View all",
       "more": "More",
       "empty": "Coming soon",
-      "back": "Back"
+      "back": "Back",
+      "slide": "Slide {n}",
+      "slides": "Home slides"
     },
     "portfolio": {
       "filterLabel": "Filter portfolio",
