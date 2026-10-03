@@ -3028,6 +3028,350 @@
                 }
             }
         },
+        "/api/admin/pricing/quote-settings": {
+            "get": {
+                "operationId": "admin_pricing_quote_settings_retrieve",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_pricing_quote_settings_partial_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/rules/": {
+            "get": {
+                "operationId": "admin_pricing_rules_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/QuoteRule"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_pricing_rules_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteRule"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteRule"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteRule"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteRule"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/rules/{id}/": {
+            "get": {
+                "operationId": "admin_pricing_rules_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این quote rule را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteRule"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_pricing_rules_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این quote rule را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteRule"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteRule"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedQuoteRule"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteRule"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_pricing_rules_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این quote rule را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/rules/preview/": {
+            "post": {
+                "operationId": "pricing_rules_preview",
+                "description": "Try the saved rules with some choices, and see how the number is built.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuotePreview"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/pricing/rules/reorder/": {
+            "post": {
+                "operationId": "admin_pricing_rules_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/admin/settings/watermark": {
             "get": {
                 "operationId": "admin_settings_watermark_retrieve",
@@ -3721,6 +4065,68 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PublicProjectDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/quote/estimate": {
+            "post": {
+                "operationId": "public_quote_estimate_create",
+                "description": "Choices in, an approximate price range out. Nothing is stored.",
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteEstimate"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/quote/options": {
+            "get": {
+                "operationId": "public_quote_options_retrieve",
+                "description": "What the calculator offers: labels and quantity limits only, no prices or factors.",
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteOptions"
                                 }
                             }
                         },
@@ -5516,6 +5922,86 @@
                     }
                 }
             },
+            "PatchedQuoteRule": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "Stable identifier used by the public form",
+                        "maxLength": 40,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/QuoteRuleKindEnum"
+                    },
+                    "label_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "label_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true,
+                        "description": "Toman"
+                    },
+                    "factor": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "min_quantity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedQuoteSettings": {
+                "type": "object",
+                "properties": {
+                    "range_percent": {
+                        "type": "integer",
+                        "maximum": 50,
+                        "minimum": 0,
+                        "description": "The estimate is shown as total ± this percent"
+                    },
+                    "rounding_step": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 1,
+                        "description": "Both ends of the range are rounded to this many toman"
+                    },
+                    "min_quantity": {
+                        "type": "integer",
+                        "maximum": 100000,
+                        "minimum": 1
+                    },
+                    "max_quantity": {
+                        "type": "integer",
+                        "maximum": 100000,
+                        "minimum": 1
+                    }
+                }
+            },
             "PatchedSiteSettings": {
                 "type": "object",
                 "properties": {
@@ -6923,6 +7409,280 @@
                     "articles",
                     "projects"
                 ]
+            },
+            "QuoteEstimate": {
+                "type": "object",
+                "properties": {
+                    "low": {
+                        "type": "integer"
+                    },
+                    "high": {
+                        "type": "integer"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "approximate": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "approximate",
+                    "currency",
+                    "high",
+                    "low"
+                ]
+            },
+            "QuoteInput": {
+                "type": "object",
+                "description": "What a visitor (or the owner's preview) sends: choices only, never prices.",
+                "properties": {
+                    "service": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "addons": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40,
+                            "pattern": "^[-a-zA-Z0-9_]+$"
+                        },
+                        "maxItems": 20
+                    },
+                    "multipliers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40,
+                            "pattern": "^[-a-zA-Z0-9_]+$"
+                        },
+                        "maxItems": 20
+                    }
+                },
+                "required": [
+                    "quantity",
+                    "service"
+                ]
+            },
+            "QuoteOption": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Stable identifier used by the public form",
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "label_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "label_en": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "key",
+                    "label_en",
+                    "label_fa"
+                ]
+            },
+            "QuoteOptions": {
+                "type": "object",
+                "properties": {
+                    "services": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuoteOption"
+                        }
+                    },
+                    "addons": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuoteOption"
+                        }
+                    },
+                    "multipliers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuoteOption"
+                        }
+                    },
+                    "min_quantity": {
+                        "type": "integer"
+                    },
+                    "max_quantity": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "addons",
+                    "max_quantity",
+                    "min_quantity",
+                    "multipliers",
+                    "services"
+                ]
+            },
+            "QuotePreview": {
+                "type": "object",
+                "description": "The owner's preview also shows how the number was reached.",
+                "properties": {
+                    "low": {
+                        "type": "integer"
+                    },
+                    "high": {
+                        "type": "integer"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "approximate": {
+                        "type": "boolean"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "base": {
+                        "type": "integer"
+                    },
+                    "tier_factor": {
+                        "type": "string"
+                    },
+                    "addons": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "multipliers": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "addons",
+                    "approximate",
+                    "base",
+                    "currency",
+                    "high",
+                    "low",
+                    "multipliers",
+                    "tier_factor",
+                    "total"
+                ]
+            },
+            "QuoteRule": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "Stable identifier used by the public form",
+                        "maxLength": 40,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/QuoteRuleKindEnum"
+                    },
+                    "label_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "label_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true,
+                        "description": "Toman"
+                    },
+                    "factor": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,3}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "min_quantity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "key",
+                    "kind",
+                    "label_fa",
+                    "position"
+                ]
+            },
+            "QuoteRuleKindEnum": {
+                "enum": [
+                    "service",
+                    "tier",
+                    "addon_fixed",
+                    "addon_per_item",
+                    "multiplier"
+                ],
+                "type": "string",
+                "description": "* `service` - قیمت پایه‌ی خدمت (هر محصول)\n* `tier` - پله‌ی تعداد (ضریب از تعداد مشخص به بعد)\n* `addon_fixed` - افزونه‌ی ثابت\n* `addon_per_item` - افزونه به‌ازای هر محصول\n* `multiplier` - ضریب (مثل فوریت)"
+            },
+            "QuoteSettings": {
+                "type": "object",
+                "properties": {
+                    "range_percent": {
+                        "type": "integer",
+                        "maximum": 50,
+                        "minimum": 0,
+                        "description": "The estimate is shown as total ± this percent"
+                    },
+                    "rounding_step": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 1,
+                        "description": "Both ends of the range are rounded to this many toman"
+                    },
+                    "min_quantity": {
+                        "type": "integer",
+                        "maximum": 100000,
+                        "minimum": 1
+                    },
+                    "max_quantity": {
+                        "type": "integer",
+                        "maximum": 100000,
+                        "minimum": 1
+                    }
+                }
             },
             "RecoveryCodes": {
                 "type": "object",

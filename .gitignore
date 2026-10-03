@@ -33,3 +33,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+
+# Local Redis snapshots
+*.rdb
