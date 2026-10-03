@@ -144,7 +144,10 @@ class ContentItemSerializer(serializers.ModelSerializer):  # type: ignore[type-a
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         merged = {**{f: getattr(self.instance, f, "") for f in ("title_fa", "title_en", "body_fa", "body_en")}, **attrs}
         has_text = any(merged.get(f) for f in ("title_fa", "title_en", "body_fa", "body_en"))
-        has_media = attrs.get("media") or (self.instance is not None and self.instance.media_id)
+        if "media" in attrs:  # an explicit null replaces the stored image
+            has_media = attrs["media"] is not None
+        else:
+            has_media = self.instance is not None and self.instance.media_id is not None
         if not (has_text or has_media):
             raise serializers.ValidationError("حداقل یک عنوان، متن یا تصویر لازم است.")
         return attrs

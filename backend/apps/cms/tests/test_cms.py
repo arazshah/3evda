@@ -209,3 +209,14 @@ def test_deleting_an_item_releases_its_media(owner_client):
     assert asset.references.count() == 1
     owner_client.delete(f"{ITEMS}{item.pk}/")
     assert asset.references.count() == 0
+
+
+def test_clearing_the_only_content_of_an_item_is_rejected(owner_client):
+    item = make_item("hero_slide", title_fa="", media=make_asset())
+    assert owner_client.patch(f"{ITEMS}{item.pk}/", {"media": None}, format="json").status_code == 400
+    item.refresh_from_db()
+    assert item.media_id is not None
+    # still fine when some text remains
+    assert (
+        owner_client.patch(f"{ITEMS}{item.pk}/", {"media": None, "title_fa": "متن"}, format="json").status_code == 200
+    )
