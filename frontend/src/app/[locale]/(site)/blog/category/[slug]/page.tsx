@@ -4,6 +4,7 @@ import { Journal } from "@/components/site/Journal";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
 import { getTaxonomy } from "@/lib/site/blog-api";
+import { switchPathFor } from "@/lib/site/blog";
 import { localeOf, pageMetadata } from "@/lib/site/page";
 import { localized } from "@/lib/site/text";
 
@@ -40,10 +41,16 @@ export default async function Page({ params, searchParams }: Props) {
   const locale = await localeOf(params);
   const { slug } = await params;
   const page = pageNumber((await searchParams).page);
-  const [site, item] = await Promise.all([getSite(), find(locale, slug)]);
+  const otherLocale = locale === "fa" ? "en" : "fa";
+  const [site, item, other] = await Promise.all([getSite(), find(locale, slug), getTaxonomy(otherLocale)]);
   const base = `/blog/category/${encodeURIComponent(slug)}`;
   return (
-    <SitePage site={site} locale={locale} path="/blog" switchPath={base}>
+    <SitePage
+      site={site}
+      locale={locale}
+      path="/blog"
+      switchPath={switchPathFor(base, other.categories, slug)}
+    >
       <Journal
         locale={locale}
         title={localized(locale, item, "title")}
