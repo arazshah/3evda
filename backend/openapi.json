@@ -5,6 +5,565 @@
         "version": "0.1.0"
     },
     "paths": {
+        "/api/admin/cms/blocks/": {
+            "get": {
+                "operationId": "admin_cms_blocks_list",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ContentBlock"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/cms/blocks/{key}/": {
+            "get": {
+                "operationId": "admin_cms_blocks_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "key",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[\\w.]+$"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentBlock"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_cms_blocks_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "key",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[\\w.]+$"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentBlock"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentBlock"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentBlock"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentBlock"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/cms/items/": {
+            "get": {
+                "operationId": "admin_cms_items_list",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ContentItem"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_cms_items_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContentItem"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContentItem"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContentItem"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentItem"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/cms/items/{id}/": {
+            "get": {
+                "operationId": "admin_cms_items_retrieve",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این content item را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentItem"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_cms_items_partial_update",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این content item را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentItem"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentItem"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedContentItem"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentItem"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_cms_items_destroy",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این content item را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/cms/items/reorder/": {
+            "post": {
+                "operationId": "admin_cms_items_reorder_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "collection",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "behind_scenes",
+                                "client",
+                                "faq",
+                                "hero_slide",
+                                "nav_link",
+                                "process_step",
+                                "service",
+                                "testimonial"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reorder"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reorder"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reorder"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/cms/settings": {
+            "get": {
+                "operationId": "admin_cms_settings_retrieve",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SiteSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "admin_cms_settings_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SiteSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SiteSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SiteSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SiteSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_cms_settings_partial_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSiteSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSiteSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSiteSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SiteSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/media/": {
             "get": {
                 "operationId": "admin_media_list",
@@ -932,6 +1491,27 @@
                     }
                 }
             }
+        },
+        "/api/public/site": {
+            "get": {
+                "operationId": "public_site_retrieve",
+                "description": "Everything the public pages need in one cacheable response. Only published items are included.",
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicSite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -961,6 +1541,151 @@
                 },
                 "required": [
                     "code"
+                ]
+            },
+            "CollectionEnum": {
+                "enum": [
+                    "hero_slide",
+                    "service",
+                    "process_step",
+                    "client",
+                    "testimonial",
+                    "behind_scenes",
+                    "faq",
+                    "nav_link"
+                ],
+                "type": "string",
+                "description": "* `hero_slide` - اسلاید هیرو\n* `service` - خدمت\n* `process_step` - مرحله‌ی همکاری\n* `client` - مشتری\n* `testimonial` - نظر مشتری\n* `behind_scenes` - پشت صحنه\n* `faq` - پرسش پرتکرار\n* `nav_link` - پیوند منو"
+            },
+            "ContentBlock": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "display_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "group": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "kind": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "text_fa": {
+                        "type": "string"
+                    },
+                    "text_en": {
+                        "type": "string"
+                    },
+                    "media": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "media_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "display_name",
+                    "group",
+                    "key",
+                    "kind",
+                    "media_detail",
+                    "updated_at"
+                ]
+            },
+            "ContentItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "collection": {
+                        "$ref": "#/components/schemas/CollectionEnum"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "subtitle_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "subtitle_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "body_fa": {
+                        "type": "string"
+                    },
+                    "body_en": {
+                        "type": "string"
+                    },
+                    "link_url": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "media": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "media_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "collection",
+                    "created_at",
+                    "id",
+                    "media_detail",
+                    "position",
+                    "updated_at"
                 ]
             },
             "Credentials": {
@@ -1235,6 +1960,121 @@
                     "new_password"
                 ]
             },
+            "PatchedContentBlock": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "display_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "group": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "kind": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "text_fa": {
+                        "type": "string"
+                    },
+                    "text_en": {
+                        "type": "string"
+                    },
+                    "media": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "media_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedContentItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "collection": {
+                        "$ref": "#/components/schemas/CollectionEnum"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "subtitle_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "subtitle_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "body_fa": {
+                        "type": "string"
+                    },
+                    "body_en": {
+                        "type": "string"
+                    },
+                    "link_url": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "media": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "media_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PatchedMediaAsset": {
                 "type": "object",
                 "properties": {
@@ -1336,6 +2176,123 @@
                     }
                 }
             },
+            "PatchedSiteSettings": {
+                "type": "object",
+                "properties": {
+                    "logo": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "og_image": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "logo_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "og_image_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "brand_name_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "brand_name_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "tagline_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "tagline_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "description_fa": {
+                        "type": "string",
+                        "description": "Default meta description"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "email": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "email",
+                                "maxLength": 254
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "instagram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "address_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "address_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "map_url": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri",
+                                "maxLength": 200
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "footer_text_fa": {
+                        "type": "string"
+                    },
+                    "footer_text_en": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PositionEnum": {
                 "enum": [
                     "bottom_right",
@@ -1346,6 +2303,352 @@
                 ],
                 "type": "string",
                 "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط"
+            },
+            "PublicBlock": {
+                "type": "object",
+                "properties": {
+                    "fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "media": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "en",
+                    "fa",
+                    "media"
+                ]
+            },
+            "PublicCollections": {
+                "type": "object",
+                "properties": {
+                    "hero_slide": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "service": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "process_step": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "client": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "testimonial": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "behind_scenes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "faq": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    },
+                    "nav_link": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicItem"
+                        }
+                    }
+                },
+                "required": [
+                    "behind_scenes",
+                    "client",
+                    "faq",
+                    "hero_slide",
+                    "nav_link",
+                    "process_step",
+                    "service",
+                    "testimonial"
+                ]
+            },
+            "PublicItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "subtitle_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "subtitle_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "body_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "body_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "link_url": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "media": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "body_en",
+                    "body_fa",
+                    "id",
+                    "link_url",
+                    "media",
+                    "subtitle_en",
+                    "subtitle_fa",
+                    "title_en",
+                    "title_fa"
+                ]
+            },
+            "PublicMedia": {
+                "type": "object",
+                "description": "What a visitor may know about a file: sizes, alt texts and the public variant URLs.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "kind": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/KindEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "width": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "height": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "duration_seconds": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "alt_fa": {
+                        "type": "string",
+                        "readOnly": true,
+                        "title": "متن جایگزین (فارسی)"
+                    },
+                    "alt_en": {
+                        "type": "string",
+                        "readOnly": true,
+                        "title": "متن جایگزین (انگلیسی)"
+                    },
+                    "lqip": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "variants": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaVariant"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "alt_en",
+                    "alt_fa",
+                    "duration_seconds",
+                    "height",
+                    "id",
+                    "kind",
+                    "lqip",
+                    "variants",
+                    "width"
+                ]
+            },
+            "PublicSettings": {
+                "type": "object",
+                "properties": {
+                    "logo": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "og_image": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "brand_name_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand_name_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "tagline_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "tagline_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description_fa": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Default meta description"
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "instagram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "address_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "address_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "map_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "footer_text_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "footer_text_en": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "address_en",
+                    "address_fa",
+                    "brand_name_en",
+                    "brand_name_fa",
+                    "description_en",
+                    "description_fa",
+                    "email",
+                    "footer_text_en",
+                    "footer_text_fa",
+                    "instagram",
+                    "logo",
+                    "map_url",
+                    "og_image",
+                    "phone",
+                    "tagline_en",
+                    "tagline_fa",
+                    "telegram",
+                    "whatsapp"
+                ]
+            },
+            "PublicSite": {
+                "type": "object",
+                "properties": {
+                    "settings": {
+                        "$ref": "#/components/schemas/PublicSettings"
+                    },
+                    "blocks": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PublicBlock"
+                        }
+                    },
+                    "collections": {
+                        "$ref": "#/components/schemas/PublicCollections"
+                    }
+                },
+                "required": [
+                    "blocks",
+                    "collections",
+                    "settings"
+                ]
             },
             "RecoveryCodes": {
                 "type": "object",
@@ -1359,6 +2662,146 @@
                 },
                 "required": [
                     "recovery_codes"
+                ]
+            },
+            "Reorder": {
+                "type": "object",
+                "properties": {
+                    "collection": {
+                        "$ref": "#/components/schemas/CollectionEnum"
+                    },
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "collection",
+                    "ids"
+                ]
+            },
+            "SiteSettings": {
+                "type": "object",
+                "properties": {
+                    "logo": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "og_image": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "logo_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "og_image_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "brand_name_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "brand_name_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "tagline_fa": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "tagline_en": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "description_fa": {
+                        "type": "string",
+                        "description": "Default meta description"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "email": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "email",
+                                "maxLength": 254
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "instagram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "address_fa": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "address_en": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "map_url": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri",
+                                "maxLength": 200
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "footer_text_fa": {
+                        "type": "string"
+                    },
+                    "footer_text_en": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "logo_detail",
+                    "og_image_detail",
+                    "updated_at"
                 ]
             },
             "State": {

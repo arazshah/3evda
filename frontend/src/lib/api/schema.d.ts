@@ -4,6 +4,102 @@
  */
 
 export interface paths {
+  "/api/admin/cms/blocks/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_cms_blocks_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/cms/blocks/{key}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_cms_blocks_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_cms_blocks_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/cms/items/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_cms_items_list"];
+    put?: never;
+    post: operations["admin_cms_items_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/cms/items/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_cms_items_retrieve"];
+    put?: never;
+    post?: never;
+    delete: operations["admin_cms_items_destroy"];
+    options?: never;
+    head?: never;
+    patch: operations["admin_cms_items_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/cms/items/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_cms_items_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/cms/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_cms_settings_retrieve"];
+    put: operations["admin_cms_settings_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_cms_settings_partial_update"];
+    trace?: never;
+  };
   "/api/admin/media/": {
     parameters: {
       query?: never;
@@ -230,6 +326,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/site": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Everything the public pages need in one cacheable response. Only published items are included. */
+    get: operations["public_site_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -240,6 +353,59 @@ export interface components {
     };
     Code: {
       code: string;
+    };
+    /**
+     * @description * `hero_slide` - اسلاید هیرو
+     *     * `service` - خدمت
+     *     * `process_step` - مرحله‌ی همکاری
+     *     * `client` - مشتری
+     *     * `testimonial` - نظر مشتری
+     *     * `behind_scenes` - پشت صحنه
+     *     * `faq` - پرسش پرتکرار
+     *     * `nav_link` - پیوند منو
+     * @enum {string}
+     */
+    CollectionEnum:
+      | "hero_slide"
+      | "service"
+      | "process_step"
+      | "client"
+      | "testimonial"
+      | "behind_scenes"
+      | "faq"
+      | "nav_link";
+    ContentBlock: {
+      readonly key: string;
+      readonly display_name: string;
+      readonly group: string;
+      readonly kind: string;
+      text_fa?: string;
+      text_en?: string;
+      /** Format: uuid */
+      media?: string | null;
+      readonly media_detail: components["schemas"]["PublicMedia"] | null;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    ContentItem: {
+      readonly id: number;
+      collection: components["schemas"]["CollectionEnum"];
+      readonly position: number;
+      is_published?: boolean;
+      title_fa?: string;
+      title_en?: string;
+      subtitle_fa?: string;
+      subtitle_en?: string;
+      body_fa?: string;
+      body_en?: string;
+      link_url?: string;
+      /** Format: uuid */
+      media?: string | null;
+      readonly media_detail: components["schemas"]["PublicMedia"] | null;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
     };
     Credentials: {
       username: string;
@@ -317,6 +483,39 @@ export interface components {
       current_password: string;
       new_password: string;
     };
+    PatchedContentBlock: {
+      readonly key?: string;
+      readonly display_name?: string;
+      readonly group?: string;
+      readonly kind?: string;
+      text_fa?: string;
+      text_en?: string;
+      /** Format: uuid */
+      media?: string | null;
+      readonly media_detail?: components["schemas"]["PublicMedia"] | null;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
+    PatchedContentItem: {
+      readonly id?: number;
+      collection?: components["schemas"]["CollectionEnum"];
+      readonly position?: number;
+      is_published?: boolean;
+      title_fa?: string;
+      title_en?: string;
+      subtitle_fa?: string;
+      subtitle_en?: string;
+      body_fa?: string;
+      body_en?: string;
+      link_url?: string;
+      /** Format: uuid */
+      media?: string | null;
+      readonly media_detail?: components["schemas"]["PublicMedia"] | null;
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     PatchedMediaAsset: {
       /** Format: uuid */
       readonly id?: string;
@@ -344,6 +543,33 @@ export interface components {
       /** Format: date-time */
       readonly updated_at?: string;
     };
+    PatchedSiteSettings: {
+      /** Format: uuid */
+      logo?: string | null;
+      /** Format: uuid */
+      og_image?: string | null;
+      readonly logo_detail?: components["schemas"]["PublicMedia"] | null;
+      readonly og_image_detail?: components["schemas"]["PublicMedia"] | null;
+      brand_name_fa?: string;
+      brand_name_en?: string;
+      tagline_fa?: string;
+      tagline_en?: string;
+      /** @description Default meta description */
+      description_fa?: string;
+      description_en?: string;
+      phone?: string;
+      email?: string;
+      whatsapp?: string;
+      telegram?: string;
+      instagram?: string;
+      address_fa?: string;
+      address_en?: string;
+      map_url?: string;
+      footer_text_fa?: string;
+      footer_text_en?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     /**
      * @description * `bottom_right` - پایین راست
      *     * `bottom_left` - پایین چپ
@@ -353,8 +579,111 @@ export interface components {
      * @enum {string}
      */
     PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    PublicBlock: {
+      readonly fa: string;
+      readonly en: string;
+      readonly media: components["schemas"]["PublicMedia"] | null;
+    };
+    PublicCollections: {
+      hero_slide: components["schemas"]["PublicItem"][];
+      service: components["schemas"]["PublicItem"][];
+      process_step: components["schemas"]["PublicItem"][];
+      client: components["schemas"]["PublicItem"][];
+      testimonial: components["schemas"]["PublicItem"][];
+      behind_scenes: components["schemas"]["PublicItem"][];
+      faq: components["schemas"]["PublicItem"][];
+      nav_link: components["schemas"]["PublicItem"][];
+    };
+    PublicItem: {
+      readonly id: number;
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly subtitle_fa: string;
+      readonly subtitle_en: string;
+      readonly body_fa: string;
+      readonly body_en: string;
+      readonly link_url: string;
+      readonly media: components["schemas"]["PublicMedia"] | null;
+    };
+    /** @description What a visitor may know about a file: sizes, alt texts and the public variant URLs. */
+    PublicMedia: {
+      /** Format: uuid */
+      readonly id: string;
+      readonly kind: components["schemas"]["KindEnum"];
+      readonly width: number | null;
+      readonly height: number | null;
+      /** Format: double */
+      readonly duration_seconds: number | null;
+      /** متن جایگزین (فارسی) */
+      readonly alt_fa: string;
+      /** متن جایگزین (انگلیسی) */
+      readonly alt_en: string;
+      readonly lqip: string;
+      readonly variants: components["schemas"]["MediaVariant"][];
+    };
+    PublicSettings: {
+      readonly logo: components["schemas"]["PublicMedia"] | null;
+      readonly og_image: components["schemas"]["PublicMedia"] | null;
+      readonly brand_name_fa: string;
+      readonly brand_name_en: string;
+      readonly tagline_fa: string;
+      readonly tagline_en: string;
+      /** @description Default meta description */
+      readonly description_fa: string;
+      readonly description_en: string;
+      readonly phone: string;
+      /** Format: email */
+      readonly email: string;
+      readonly whatsapp: string;
+      readonly telegram: string;
+      readonly instagram: string;
+      readonly address_fa: string;
+      readonly address_en: string;
+      /** Format: uri */
+      readonly map_url: string;
+      readonly footer_text_fa: string;
+      readonly footer_text_en: string;
+    };
+    PublicSite: {
+      settings: components["schemas"]["PublicSettings"];
+      blocks: {
+        [key: string]: components["schemas"]["PublicBlock"];
+      };
+      collections: components["schemas"]["PublicCollections"];
+    };
     RecoveryCodes: {
       recovery_codes: string[];
+    };
+    Reorder: {
+      collection: components["schemas"]["CollectionEnum"];
+      ids: number[];
+    };
+    SiteSettings: {
+      /** Format: uuid */
+      logo?: string | null;
+      /** Format: uuid */
+      og_image?: string | null;
+      readonly logo_detail: components["schemas"]["PublicMedia"] | null;
+      readonly og_image_detail: components["schemas"]["PublicMedia"] | null;
+      brand_name_fa?: string;
+      brand_name_en?: string;
+      tagline_fa?: string;
+      tagline_en?: string;
+      /** @description Default meta description */
+      description_fa?: string;
+      description_en?: string;
+      phone?: string;
+      email?: string;
+      whatsapp?: string;
+      telegram?: string;
+      instagram?: string;
+      address_fa?: string;
+      address_en?: string;
+      map_url?: string;
+      footer_text_fa?: string;
+      footer_text_en?: string;
+      /** Format: date-time */
+      readonly updated_at: string;
     };
     State: {
       state: components["schemas"]["StateEnum"];
@@ -404,6 +733,341 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  admin_cms_blocks_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentBlock"][];
+        };
+      };
+    };
+  };
+  admin_cms_blocks_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentBlock"];
+        };
+      };
+    };
+  };
+  admin_cms_blocks_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedContentBlock"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedContentBlock"];
+        "multipart/form-data": components["schemas"]["PatchedContentBlock"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentBlock"];
+        };
+      };
+    };
+  };
+  admin_cms_items_list: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentItem"][];
+        };
+      };
+    };
+  };
+  admin_cms_items_create: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContentItem"];
+        "application/x-www-form-urlencoded": components["schemas"]["ContentItem"];
+        "multipart/form-data": components["schemas"]["ContentItem"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentItem"];
+        };
+      };
+    };
+  };
+  admin_cms_items_retrieve: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این content item را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentItem"];
+        };
+      };
+    };
+  };
+  admin_cms_items_destroy: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این content item را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_cms_items_partial_update: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این content item را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedContentItem"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedContentItem"];
+        "multipart/form-data": components["schemas"]["PatchedContentItem"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentItem"];
+        };
+      };
+    };
+  };
+  admin_cms_items_reorder_create: {
+    parameters: {
+      query?: {
+        collection?:
+          | "behind_scenes"
+          | "client"
+          | "faq"
+          | "hero_slide"
+          | "nav_link"
+          | "process_step"
+          | "service"
+          | "testimonial";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Reorder"];
+        "application/x-www-form-urlencoded": components["schemas"]["Reorder"];
+        "multipart/form-data": components["schemas"]["Reorder"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_cms_settings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SiteSettings"];
+        };
+      };
+    };
+  };
+  admin_cms_settings_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["SiteSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["SiteSettings"];
+        "multipart/form-data": components["schemas"]["SiteSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SiteSettings"];
+        };
+      };
+    };
+  };
+  admin_cms_settings_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedSiteSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedSiteSettings"];
+        "multipart/form-data": components["schemas"]["PatchedSiteSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SiteSettings"];
+        };
+      };
+    };
+  };
   admin_media_list: {
     parameters: {
       query?: {
@@ -892,6 +1556,25 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  public_site_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicSite"];
         };
       };
     };
