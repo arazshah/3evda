@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.cms",
     "apps.portfolio",
     "apps.pricing",
+    "apps.blog",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -182,6 +183,11 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     # The schema documents admin endpoints, so it is only served to staff.
     "SERVE_PERMISSIONS": ["apps.accounts.permissions.IsVerifiedOwner"],
+    # Two models have a `status`; pin the names so the generated types (and the panel code) stay stable.
+    "ENUM_NAME_OVERRIDES": {
+        "StatusEnum": "apps.media.models.MediaAsset.Status",
+        "ArticleStatusEnum": "apps.blog.models.Article.Status",
+    },
 }
 
 SECURE_CONTENT_TYPE_NOSNIFF = True

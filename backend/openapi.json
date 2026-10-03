@@ -5,6 +5,912 @@
         "version": "0.1.0"
     },
     "paths": {
+        "/api/admin/blog/articles/": {
+            "get": {
+                "operationId": "admin_blog_articles_list",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Article"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_blog_articles_create",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Article"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Article"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Article"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Article"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/articles/{id}/": {
+            "get": {
+                "operationId": "admin_blog_articles_retrieve",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این article را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Article"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_blog_articles_partial_update",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این article را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedArticle"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedArticle"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedArticle"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Article"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_blog_articles_destroy",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این article را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/articles/{id}/preview-link/": {
+            "post": {
+                "operationId": "admin_blog_articles_preview_link_create",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این article را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreviewLink"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/articles/{id}/translate/": {
+            "post": {
+                "operationId": "admin_blog_articles_translate_create",
+                "description": "A draft copy in the other language, in the same translation group.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این article را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Article"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/categories/": {
+            "get": {
+                "operationId": "admin_blog_categories_list",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BlogCategory"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_blog_categories_create",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogCategory"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogCategory"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogCategory"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogCategory"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/categories/{id}/": {
+            "get": {
+                "operationId": "admin_blog_categories_retrieve",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogCategory"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_blog_categories_partial_update",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogCategory"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogCategory"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogCategory"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogCategory"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_blog_categories_destroy",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این category را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/tags/": {
+            "get": {
+                "operationId": "admin_blog_tags_list",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BlogTag"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_blog_tags_create",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogTag"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogTag"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogTag"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogTag"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/blog/tags/{id}/": {
+            "get": {
+                "operationId": "admin_blog_tags_retrieve",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این tag را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogTag"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_blog_tags_partial_update",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این tag را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogTag"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogTag"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBlogTag"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogTag"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_blog_tags_destroy",
+                "description": "DELETE answers 409 (not 500) when other rows still reference the object.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این tag را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/admin/cms/blocks/": {
             "get": {
                 "operationId": "admin_cms_blocks_list",
@@ -2554,6 +3460,175 @@
                 }
             }
         },
+        "/api/public/blog/articles": {
+            "get": {
+                "operationId": "public_blog_articles_list",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Category slug"
+                    },
+                    {
+                        "in": "query",
+                        "name": "lang",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "tag",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Tag slug"
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBlogArticlePage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/blog/articles/{lang}/{slug}/": {
+            "get": {
+                "operationId": "public_blog_article_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "lang",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBlogArticleDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "301": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArticleMoved"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/blog/preview/{token}": {
+            "get": {
+                "operationId": "public_blog_preview_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBlogArticleDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/blog/taxonomy": {
+            "get": {
+                "operationId": "public_blog_taxonomy_retrieve",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "lang",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en",
+                                "fa"
+                            ]
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBlogTaxonomy"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/packages": {
             "get": {
                 "operationId": "public_packages_retrieve",
@@ -2678,6 +3753,176 @@
     },
     "components": {
         "schemas": {
+            "Alternate": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "language",
+                    "slug"
+                ]
+            },
+            "Article": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "translation_group": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 120,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "summary": {
+                        "type": "string"
+                    },
+                    "body": {},
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "category": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ArticleStatusEnum"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "seo_title": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "seo_description": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "og_image": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "og_image_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "related_projects": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "reading_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_live": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "translations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Translation"
+                        },
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "cover_detail",
+                    "created_at",
+                    "id",
+                    "is_live",
+                    "language",
+                    "og_image_detail",
+                    "reading_minutes",
+                    "title",
+                    "translation_group",
+                    "translations",
+                    "updated_at"
+                ]
+            },
+            "ArticleMoved": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "slug"
+                ]
+            },
+            "ArticleStatusEnum": {
+                "enum": [
+                    "draft",
+                    "published"
+                ],
+                "type": "string",
+                "description": "* `draft` - پیش‌نویس\n* `published` - منتشرشده"
+            },
             "AuthUser": {
                 "type": "object",
                 "properties": {
@@ -2696,6 +3941,113 @@
             "BlankEnum": {
                 "enum": [
                     ""
+                ]
+            },
+            "BlogCategory": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "article_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "article_count",
+                    "id",
+                    "title_fa"
+                ]
+            },
+            "BlogTag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "article_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "article_count",
+                    "id",
+                    "title_fa"
+                ]
+            },
+            "BlogTaxonomyItem": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title_fa": {
+                        "type": "string"
+                    },
+                    "title_en": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "count",
+                    "slug",
+                    "title_en",
+                    "title_fa"
                 ]
             },
             "Category": {
@@ -2983,6 +4335,14 @@
                 ],
                 "type": "string",
                 "description": "* `image` - تصویر\n* `video` - ویدیو"
+            },
+            "LanguageEnum": {
+                "enum": [
+                    "fa",
+                    "en"
+                ],
+                "type": "string",
+                "description": "* `fa` - فارسی\n* `en` - English"
             },
             "MediaAsset": {
                 "type": "object",
@@ -3332,6 +4692,203 @@
                     "current_password",
                     "new_password"
                 ]
+            },
+            "PatchedArticle": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "translation_group": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 120,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "summary": {
+                        "type": "string"
+                    },
+                    "body": {},
+                    "cover": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "cover_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "category": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ArticleStatusEnum"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "seo_title": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "seo_description": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "og_image": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "og_image_detail": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "related_projects": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "reading_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_live": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "translations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Translation"
+                        },
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedBlogCategory": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "description_fa": {
+                        "type": "string"
+                    },
+                    "description_en": {
+                        "type": "string"
+                    },
+                    "article_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedBlogTag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 80,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "article_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
             },
             "PatchedCategory": {
                 "type": "object",
@@ -3956,6 +5513,21 @@
                 "type": "string",
                 "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط"
             },
+            "PreviewLink": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "expires_in",
+                    "token"
+                ]
+            },
             "PriceModeEnum": {
                 "enum": [
                     "from",
@@ -4139,6 +5711,304 @@
                     "en",
                     "fa",
                     "media"
+                ]
+            },
+            "PublicBlogArticle": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-\\w]+$"
+                    },
+                    "title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "cover": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "category": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicBlogCategory"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicBlogTag"
+                        },
+                        "readOnly": true
+                    },
+                    "reading_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "category",
+                    "cover",
+                    "language",
+                    "published_at",
+                    "reading_minutes",
+                    "slug",
+                    "summary",
+                    "tags",
+                    "title"
+                ]
+            },
+            "PublicBlogArticleDetail": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-\\w]+$"
+                    },
+                    "title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "cover": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "category": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicBlogCategory"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicBlogTag"
+                        },
+                        "readOnly": true
+                    },
+                    "reading_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "body_html": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "seo_title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "seo_description": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "og_image": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicMedia"
+                            }
+                        ],
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "alternates": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Alternate"
+                        },
+                        "readOnly": true
+                    },
+                    "related_articles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicBlogArticle"
+                        },
+                        "readOnly": true
+                    },
+                    "related_projects": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicProject"
+                        },
+                        "readOnly": true
+                    },
+                    "previous": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "next": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "alternates",
+                    "body_html",
+                    "category",
+                    "cover",
+                    "language",
+                    "next",
+                    "og_image",
+                    "previous",
+                    "published_at",
+                    "reading_minutes",
+                    "related_articles",
+                    "related_projects",
+                    "seo_description",
+                    "seo_title",
+                    "slug",
+                    "summary",
+                    "tags",
+                    "title"
+                ]
+            },
+            "PublicBlogArticlePage": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "pages": {
+                        "type": "integer"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicBlogArticle"
+                        }
+                    }
+                },
+                "required": [
+                    "count",
+                    "page",
+                    "pages",
+                    "results"
+                ]
+            },
+            "PublicBlogCategory": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-\\w]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "slug",
+                    "title_en",
+                    "title_fa"
+                ]
+            },
+            "PublicBlogTag": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-\\w]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "slug",
+                    "title_en",
+                    "title_fa"
+                ]
+            },
+            "PublicBlogTaxonomy": {
+                "type": "object",
+                "properties": {
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BlogTaxonomyItem"
+                        }
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BlogTaxonomyItem"
+                        }
+                    }
+                },
+                "required": [
+                    "categories",
+                    "tags"
                 ]
             },
             "PublicCategory": {
@@ -5136,6 +7006,29 @@
                     "otpauth_uri",
                     "qr_data_uri",
                     "secret"
+                ]
+            },
+            "Translation": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "language",
+                    "slug",
+                    "status"
                 ]
             },
             "WatermarkSetting": {

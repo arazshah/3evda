@@ -4,6 +4,151 @@
  */
 
 export interface paths {
+  "/api/admin/blog/articles/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_articles_list"];
+    put?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    post: operations["admin_blog_articles_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/blog/articles/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_articles_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    delete: operations["admin_blog_articles_destroy"];
+    options?: never;
+    head?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    patch: operations["admin_blog_articles_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/blog/articles/{id}/preview-link/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    post: operations["admin_blog_articles_preview_link_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/blog/articles/{id}/translate/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A draft copy in the other language, in the same translation group. */
+    post: operations["admin_blog_articles_translate_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/blog/categories/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_categories_list"];
+    put?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    post: operations["admin_blog_categories_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/blog/categories/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_categories_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    delete: operations["admin_blog_categories_destroy"];
+    options?: never;
+    head?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    patch: operations["admin_blog_categories_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/blog/tags/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_tags_list"];
+    put?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    post: operations["admin_blog_tags_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/blog/tags/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    get: operations["admin_blog_tags_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    delete: operations["admin_blog_tags_destroy"];
+    options?: never;
+    head?: never;
+    /** @description DELETE answers 409 (not 500) when other rows still reference the object. */
+    patch: operations["admin_blog_tags_partial_update"];
+    trace?: never;
+  };
   "/api/admin/cms/blocks/": {
     parameters: {
       query?: never;
@@ -542,6 +687,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/blog/articles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_blog_articles_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/blog/articles/{lang}/{slug}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_blog_article_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/blog/preview/{token}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_blog_preview_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/blog/taxonomy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_blog_taxonomy_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/packages": {
     parameters: {
       query?: never;
@@ -612,12 +821,78 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    Alternate: {
+      language: string;
+      slug: string;
+    };
+    Article: {
+      readonly id: number;
+      language: components["schemas"]["LanguageEnum"];
+      /** Format: uuid */
+      readonly translation_group: string;
+      slug?: string;
+      title: string;
+      summary?: string;
+      body?: unknown;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail: components["schemas"]["PublicMedia"] | null;
+      category?: number | null;
+      tags?: number[];
+      status?: components["schemas"]["ArticleStatusEnum"];
+      /** Format: date-time */
+      published_at?: string | null;
+      seo_title?: string;
+      seo_description?: string;
+      /** Format: uuid */
+      og_image?: string | null;
+      readonly og_image_detail: components["schemas"]["PublicMedia"] | null;
+      related_projects?: number[];
+      readonly reading_minutes: number;
+      readonly is_live: boolean;
+      readonly translations: components["schemas"]["Translation"][];
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    ArticleMoved: {
+      slug: string;
+    };
+    /**
+     * @description * `draft` - پیش‌نویس
+     *     * `published` - منتشرشده
+     * @enum {string}
+     */
+    ArticleStatusEnum: "draft" | "published";
     AuthUser: {
       username: string;
       display_name: string;
     };
     /** @enum {unknown} */
     BlankEnum: "";
+    BlogCategory: {
+      readonly id: number;
+      slug?: string;
+      title_fa: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      readonly article_count: number;
+    };
+    BlogTag: {
+      readonly id: number;
+      slug?: string;
+      title_fa: string;
+      title_en?: string;
+      readonly article_count: number;
+    };
+    BlogTaxonomyItem: {
+      slug: string;
+      title_fa: string;
+      title_en: string;
+      count: number;
+    };
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     Category: {
       readonly id: number;
@@ -709,6 +984,12 @@ export interface components {
      * @enum {string}
      */
     KindEnum: "image" | "video";
+    /**
+     * @description * `fa` - فارسی
+     *     * `en` - English
+     * @enum {string}
+     */
+    LanguageEnum: "fa" | "en";
     MediaAsset: {
       /** Format: uuid */
       readonly id: string;
@@ -804,6 +1085,53 @@ export interface components {
     PasswordChange: {
       current_password: string;
       new_password: string;
+    };
+    PatchedArticle: {
+      readonly id?: number;
+      language?: components["schemas"]["LanguageEnum"];
+      /** Format: uuid */
+      readonly translation_group?: string;
+      slug?: string;
+      title?: string;
+      summary?: string;
+      body?: unknown;
+      /** Format: uuid */
+      cover?: string | null;
+      readonly cover_detail?: components["schemas"]["PublicMedia"] | null;
+      category?: number | null;
+      tags?: number[];
+      status?: components["schemas"]["ArticleStatusEnum"];
+      /** Format: date-time */
+      published_at?: string | null;
+      seo_title?: string;
+      seo_description?: string;
+      /** Format: uuid */
+      og_image?: string | null;
+      readonly og_image_detail?: components["schemas"]["PublicMedia"] | null;
+      related_projects?: number[];
+      readonly reading_minutes?: number;
+      readonly is_live?: boolean;
+      readonly translations?: components["schemas"]["Translation"][];
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
+    PatchedBlogCategory: {
+      readonly id?: number;
+      slug?: string;
+      title_fa?: string;
+      title_en?: string;
+      description_fa?: string;
+      description_en?: string;
+      readonly article_count?: number;
+    };
+    PatchedBlogTag: {
+      readonly id?: number;
+      slug?: string;
+      title_fa?: string;
+      title_en?: string;
+      readonly article_count?: number;
     };
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     PatchedCategory: {
@@ -978,6 +1306,10 @@ export interface components {
      * @enum {string}
      */
     PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    PreviewLink: {
+      token: string;
+      expires_in: number;
+    };
     /**
      * @description * `from` - از … شروع می‌شود
      *     * `fixed` - قیمت ثابت
@@ -1024,6 +1356,59 @@ export interface components {
       readonly fa: string;
       readonly en: string;
       readonly media: components["schemas"]["PublicMedia"] | null;
+    };
+    PublicBlogArticle: {
+      readonly language: components["schemas"]["LanguageEnum"];
+      readonly slug: string;
+      readonly title: string;
+      readonly summary: string;
+      readonly cover: components["schemas"]["PublicMedia"] | null;
+      readonly category: components["schemas"]["PublicBlogCategory"] | null;
+      readonly tags: components["schemas"]["PublicBlogTag"][];
+      readonly reading_minutes: number;
+      /** Format: date-time */
+      readonly published_at: string | null;
+    };
+    PublicBlogArticleDetail: {
+      readonly language: components["schemas"]["LanguageEnum"];
+      readonly slug: string;
+      readonly title: string;
+      readonly summary: string;
+      readonly cover: components["schemas"]["PublicMedia"] | null;
+      readonly category: components["schemas"]["PublicBlogCategory"] | null;
+      readonly tags: components["schemas"]["PublicBlogTag"][];
+      readonly reading_minutes: number;
+      /** Format: date-time */
+      readonly published_at: string | null;
+      readonly body_html: string;
+      readonly seo_title: string;
+      readonly seo_description: string;
+      readonly og_image: components["schemas"]["PublicMedia"] | null;
+      readonly alternates: components["schemas"]["Alternate"][];
+      readonly related_articles: components["schemas"]["PublicBlogArticle"][];
+      readonly related_projects: components["schemas"]["PublicProject"][];
+      readonly previous: string | null;
+      readonly next: string | null;
+    };
+    PublicBlogArticlePage: {
+      count: number;
+      page: number;
+      pages: number;
+      results: components["schemas"]["PublicBlogArticle"][];
+    };
+    PublicBlogCategory: {
+      readonly slug: string;
+      readonly title_fa: string;
+      readonly title_en: string;
+    };
+    PublicBlogTag: {
+      readonly slug: string;
+      readonly title_fa: string;
+      readonly title_en: string;
+    };
+    PublicBlogTaxonomy: {
+      categories: components["schemas"]["BlogTaxonomyItem"][];
+      tags: components["schemas"]["BlogTaxonomyItem"][];
     };
     PublicCategory: {
       readonly slug: string;
@@ -1248,6 +1633,12 @@ export interface components {
       secret: string;
       qr_data_uri: string;
     };
+    Translation: {
+      id: number;
+      language: string;
+      slug: string;
+      status: string;
+    };
     WatermarkSetting: {
       enabled?: boolean;
       text?: string;
@@ -1271,6 +1662,430 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  admin_blog_articles_list: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Article"][];
+        };
+      };
+    };
+  };
+  admin_blog_articles_create: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Article"];
+        "application/x-www-form-urlencoded": components["schemas"]["Article"];
+        "multipart/form-data": components["schemas"]["Article"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Article"];
+        };
+      };
+    };
+  };
+  admin_blog_articles_retrieve: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این article را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Article"];
+        };
+      };
+    };
+  };
+  admin_blog_articles_destroy: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این article را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_blog_articles_partial_update: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این article را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedArticle"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedArticle"];
+        "multipart/form-data": components["schemas"]["PatchedArticle"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Article"];
+        };
+      };
+    };
+  };
+  admin_blog_articles_preview_link_create: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این article را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PreviewLink"];
+        };
+      };
+    };
+  };
+  admin_blog_articles_translate_create: {
+    parameters: {
+      query?: {
+        category?: number;
+        language?: "en" | "fa";
+        q?: string;
+        status?: "draft" | "published";
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این article را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Article"];
+        };
+      };
+    };
+  };
+  admin_blog_categories_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogCategory"][];
+        };
+      };
+    };
+  };
+  admin_blog_categories_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BlogCategory"];
+        "application/x-www-form-urlencoded": components["schemas"]["BlogCategory"];
+        "multipart/form-data": components["schemas"]["BlogCategory"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogCategory"];
+        };
+      };
+    };
+  };
+  admin_blog_categories_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogCategory"];
+        };
+      };
+    };
+  };
+  admin_blog_categories_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_blog_categories_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این category را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedBlogCategory"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedBlogCategory"];
+        "multipart/form-data": components["schemas"]["PatchedBlogCategory"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogCategory"];
+        };
+      };
+    };
+  };
+  admin_blog_tags_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogTag"][];
+        };
+      };
+    };
+  };
+  admin_blog_tags_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BlogTag"];
+        "application/x-www-form-urlencoded": components["schemas"]["BlogTag"];
+        "multipart/form-data": components["schemas"]["BlogTag"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogTag"];
+        };
+      };
+    };
+  };
+  admin_blog_tags_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این tag را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogTag"];
+        };
+      };
+    };
+  };
+  admin_blog_tags_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این tag را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_blog_tags_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این tag را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedBlogTag"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedBlogTag"];
+        "multipart/form-data": components["schemas"]["PatchedBlogTag"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BlogTag"];
+        };
+      };
+    };
+  };
   admin_cms_blocks_list: {
     parameters: {
       query?: never;
@@ -2680,6 +3495,104 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  public_blog_articles_list: {
+    parameters: {
+      query: {
+        /** @description Category slug */
+        category?: string;
+        lang: "en" | "fa";
+        page?: number;
+        /** @description Tag slug */
+        tag?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBlogArticlePage"];
+        };
+      };
+    };
+  };
+  public_blog_article_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        lang: string;
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBlogArticleDetail"];
+        };
+      };
+      301: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ArticleMoved"];
+        };
+      };
+    };
+  };
+  public_blog_preview_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBlogArticleDetail"];
+        };
+      };
+    };
+  };
+  public_blog_taxonomy_retrieve: {
+    parameters: {
+      query: {
+        lang: "en" | "fa";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBlogTaxonomy"];
         };
       };
     };

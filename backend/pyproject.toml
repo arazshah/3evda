@@ -14,6 +14,7 @@ dependencies = [
     "djangorestframework>=3.18.1",
     "drf-spectacular>=0.30.0",
     "gunicorn>=26.2.0",
+    "nh3>=0.3",
     "pillow>=12.3.0",
     "psycopg[binary]>=3.3.6",
     "redis>=8.1.0",
