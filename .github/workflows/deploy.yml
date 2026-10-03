@@ -1,0 +1,65 @@
+name: Deploy
+
+# Runs after CI succeeds on main. Coolify builds docker-compose.yml on the server;
+# this workflow triggers it, waits for the new version to report healthy, and smoke-tests it.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: ${{ vars.PUBLIC_URL || 'https://3evda.com' }}
+    env:
+      PUBLIC_URL: ${{ vars.PUBLIC_URL || 'https://3evda.com' }}
+      EXPECTED_VERSION: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Trigger Coolify deployment
+        env:
+          COOLIFY_DEPLOY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          if [ -z "$COOLIFY_DEPLOY_URL" ] || [ -z "$COOLIFY_TOKEN" ]; then
+            echo "::notice::COOLIFY_DEPLOY_URL/COOLIFY_TOKEN are not set; relying on Coolify auto-deploy (see docs/runbooks/coolify.md)."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 30 \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" "${COOLIFY_DEPLOY_URL}" > /dev/null
+          echo "Deployment requested."
+
+      - name: Wait for the new version to go live
+        run: |
+          deadline=$(( $(date +%s) + 1200 ))
+          until [ "$(date +%s)" -ge "$deadline" ]; do
+            version=$(curl --silent --max-time 10 "${PUBLIC_URL}/api/health/live" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null || true)
+            if [ "$version" = "$EXPECTED_VERSION" ]; then
+              echo "Live version is ${version}"
+              exit 0
+            fi
+            echo "Live version: ${version:-unreachable}; waiting for ${EXPECTED_VERSION}…"
+            sleep 20
+          done
+          echo "::error::${PUBLIC_URL} did not report version ${EXPECTED_VERSION} within 20 minutes. Check the Coolify deployment log, and that 'Include Source Commit in Build' is enabled."
+          exit 1
+
+      - name: Smoke test
+        run: |
+          set -e
+          check() { code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 15 "${PUBLIC_URL}$1"); echo "$1 -> $code"; test "$code" = "$2"; }
+          check / 200
+          check /en 200
+          check /api/health/ready 200
+          check /healthz 200

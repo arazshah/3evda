@@ -1,5 +1,7 @@
 # Phase 0 Repository and Engineering Foundation Implementation Plan
 
+> **Superseded (2026-10-02):** replaced by `2026-10-02-phase-0-foundation.md` and `2026-10-02-roadmap.md` after the stack changed to Django + Next.js. Kept for history only.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Establish a private GitHub repository and a reproducible, tested, Docker-buildable Next.js foundation without shipping unsafe legacy code.

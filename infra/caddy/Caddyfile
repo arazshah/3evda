@@ -1,0 +1,93 @@
+# Internal gateway. TLS and the public domain are handled by Coolify's proxy in front of it.
+{
+	admin off
+	auto_https off
+	servers {
+		# Trust X-Forwarded-* only from the Docker/Coolify network.
+		trusted_proxies static private_ranges
+		client_ip_headers X-Forwarded-For
+	}
+}
+
+:80 {
+	encode zstd gzip
+
+	request_body {
+		max_size {$GATEWAY_MAX_BODY:110MB}
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	@no_request_id not header X-Request-ID *
+	request_header @no_request_id X-Request-ID {http.request.uuid}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Short-lived signed downloads of private originals. Django authorises the request and redirects
+	# here; the storage service validates the signature. Only GET/HEAD of the private bucket with a
+	# signature is forwarded, and the request reaches storage exactly as signed.
+	handle_path /storage-signed/* {
+		@signed {
+			method GET HEAD
+			path /{$S3_PRIVATE_BUCKET:private}/*
+			query X-Amz-Signature=*
+		}
+		handle @signed {
+			reverse_proxy storage:8333 {
+				# The signature covers the host; SeaweedFS also honours X-Forwarded-Host, so drop it.
+				header_up Host storage:8333
+				header_up -X-Forwarded-Host
+				header_up -X-Forwarded-Proto
+				header_up -X-Forwarded-For
+				header_up -Cookie
+				header_up -Authorization
+				header_down -Server
+			}
+			header Cache-Control "no-store"
+			header Referrer-Policy "no-referrer"
+		}
+		respond 404
+	}
+
+	handle /django-admin* {
+		reverse_proxy api:8000
+	}
+
+	handle /static/* {
+		reverse_proxy api:8000
+	}
+
+	# Public, derived media only. The private bucket is never routed.
+	handle_path /media/* {
+		@not_read not method GET HEAD
+		respond @not_read 405
+
+		rewrite * /{$S3_PUBLIC_BUCKET:public}{path}
+		reverse_proxy storage:8333 {
+			header_up -Authorization
+			header_up -Cookie
+			header_down -Server
+
+			# Variants have content-addressed names, so successful responses are immutable.
+			@found status 2xx
+			handle_response @found {
+				header Cache-Control "public, max-age=31536000, immutable"
+				copy_response
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}

@@ -1,0 +1,154 @@
+# Production stack for Coolify (Build Pack: Docker Compose).
+# Coolify assigns the public domain to the `gateway` service (port 80) only.
+# Every variable is documented in .env.example; `:?` marks the ones that must be set.
+
+x-build-args: &build-args
+  APP_VERSION: ${SOURCE_COMMIT:-dev}
+  BASE_REGISTRY: ${BASE_REGISTRY:-docker.io/library}
+  DEBIAN_MIRROR: ${DEBIAN_MIRROR:-}
+
+x-backend-env: &backend-env
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set a random string of at least 50 characters}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-3evda.com,www.3evda.com}
+  PUBLIC_URL: ${PUBLIC_URL:-https://3evda.com}
+  DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.prod}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  COOKIE_SECURE: ${COOKIE_SECURE:-true}
+  TRUSTED_PROXY_COUNT: ${TRUSTED_PROXY_COUNT:-2}
+  MEDIA_MAX_IMAGE_BYTES: ${MEDIA_MAX_IMAGE_BYTES:-52428800}
+  MEDIA_MAX_VIDEO_BYTES: ${MEDIA_MAX_VIDEO_BYTES:-104857600}
+  POSTGRES_HOST: postgres
+  POSTGRES_DB: ${POSTGRES_DB:-threevda}
+  POSTGRES_USER: ${POSTGRES_USER:-threevda}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a database password}
+  REDIS_URL: redis://redis:6379/0
+  S3_ENDPOINT_URL: http://storage:8333
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:?set an object storage access key}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:?set an object storage secret key}
+  S3_PRIVATE_BUCKET: ${S3_PRIVATE_BUCKET:-private}
+  S3_PUBLIC_BUCKET: ${S3_PUBLIC_BUCKET:-public}
+
+services:
+  gateway:
+    build:
+      context: ./infra/caddy
+      args:
+        BASE_REGISTRY: ${BASE_REGISTRY:-docker.io/library}
+    restart: unless-stopped
+    environment:
+      S3_PUBLIC_BUCKET: ${S3_PUBLIC_BUCKET:-public}
+      S3_PRIVATE_BUCKET: ${S3_PRIVATE_BUCKET:-private}
+      GATEWAY_MAX_BODY: ${GATEWAY_MAX_BODY:-110MB}
+    expose:
+      - "80"
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        <<: *build-args
+        NPM_CONFIG_REGISTRY: ${NPM_CONFIG_REGISTRY:-https://registry.npmjs.org/}
+    restart: unless-stopped
+    environment:
+      INTERNAL_API_URL: http://api:8000
+
+  api:
+    build:
+      context: ./backend
+      args:
+        <<: *build-args
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      args:
+        <<: *build-args
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    restart: unless-stopped
+    command: ["worker"]
+    environment:
+      <<: *backend-env
+      CELERY_CONCURRENCY: ${CELERY_CONCURRENCY:-2}
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping --destination celery@$$HOSTNAME --timeout 5 >/dev/null"]
+      interval: 30s
+      timeout: 15s
+      start_period: 30s
+      retries: 3
+    depends_on:
+      api:
+        condition: service_healthy
+
+  postgres:
+    image: ${BASE_REGISTRY:-docker.io/library}/postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-threevda}
+      POSTGRES_USER: ${POSTGRES_USER:-threevda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a database password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: ${BASE_REGISTRY:-docker.io/library}/redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "300", "10"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SeaweedFS in single-node S3 mode — see docs/adr/0001-object-storage.md.
+  # The credentials file is generated at start-up from the environment, so no key is stored in the repo.
+  storage:
+    image: ${SEAWEEDFS_IMAGE:-chrislusf/seaweedfs:4.48}
+    restart: unless-stopped
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?set an object storage access key}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?set an object storage secret key}
+      S3_PUBLIC_BUCKET: ${S3_PUBLIC_BUCKET:-public}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        umask 077
+        printf '{"identities":[{"name":"app","credentials":[{"accessKey":"%s","secretKey":"%s"}],"actions":["Admin","Read","Write","List","Tagging"]},{"name":"anonymous","actions":["Read:%s"]}]}' \
+          "$$S3_ACCESS_KEY" "$$S3_SECRET_KEY" "$$S3_PUBLIC_BUCKET" > /tmp/s3.json
+        exec weed server -dir=/data -s3 -s3.config=/tmp/s3.json -volume.max=0 -master.volumeSizeLimitMB=1024
+    volumes:
+      - objects:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8333/healthz"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:
+  objects:

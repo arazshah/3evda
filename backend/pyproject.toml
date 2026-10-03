@@ -1,0 +1,78 @@
+[project]
+name = "threevda-backend"
+version = "0.1.0"
+description = "3evda.com backend (Django)"
+requires-python = ">=3.13"
+dependencies = [
+    "boto3>=1.43.108",
+    "celery>=5.6.3",
+    "django>=5.2,<5.3",
+    "django-axes>=8.3.1",
+    "django-environ>=0.14.0",
+    "django-otp>=1.7.3",
+    "django-storages>=1.14.6",
+    "djangorestframework>=3.18.1",
+    "drf-spectacular>=0.30.0",
+    "gunicorn>=26.2.0",
+    "pillow>=12.3.0",
+    "psycopg[binary]>=3.3.6",
+    "redis>=8.1.0",
+    "segno>=1.6.6",
+    "whitenoise>=6.12.0",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs>=6.1.1",
+    "djangorestframework-stubs>=3.18.1",
+    "moto[s3]>=5.2.3",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.14.0",
+    "ruff>=0.16.10",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+addopts = "-q --strict-markers --cov=apps --cov=config --cov-report=term-missing --cov-fail-under=85"
+testpaths = ["apps"]
+
+[tool.coverage.run]
+branch = true
+omit = ["*/tests/*", "*/migrations/*", "config/wsgi.py", "manage.py"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "DJ", "SIM", "RUF"]
+# RUF001-003: Persian text legitimately uses Arabic-script digits and letters.
+ignore = ["RUF001", "RUF002", "RUF003", "RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "S603", "B017"]
+"conftest.py" = ["S106"]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+strict = true
+ignore_missing_imports = true
+exclude = ["/tests/", "/migrations/", "conftest\\.py$"]
+
+[[tool.mypy.overrides]]
+module = ["config.settings.*"]
+disable_error_code = ["misc"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
+
+[[tool.mypy.overrides]]
+module = ["apps.*.tasks"]
+disable_error_code = ["untyped-decorator"]

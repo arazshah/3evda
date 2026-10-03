@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3evda Brand Preview</title>
+<!-- Preview only. Production self-hosts every font (Iran server). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F0D0B; --surface: #1A1612; --elevated: #262019; --line: #3A3128;
+    --text: #F2EADF; --muted: #B3A594; --accent: #E3A33B; --accent-2: #B4473C; --success: #7E9A6C;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 16px/1.9 "Vazirmatn", system-ui, sans-serif;
+    background-image: radial-gradient(ellipse 80% 50% at 70% 0%, rgba(227,163,59,.10), transparent 70%);
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .logo { font-weight: 800; letter-spacing: .5px; }
+  .logo span { color: var(--accent); }
+  nav { display: flex; gap: 20px; color: var(--muted); font-size: 14px; flex-wrap: wrap; }
+  nav a { color: inherit; text-decoration: none; }
+  nav a:hover { color: var(--accent); }
+  .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; padding: 64px 0; }
+  .eyebrow { color: var(--accent); font-size: 13px; letter-spacing: 2px; }
+  h1 { font-weight: 800; font-size: clamp(32px, 5vw, 54px); line-height: 1.35; margin: 8px 0 16px; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lead { color: var(--muted); max-width: 46ch; }
+  .btns { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .btn { padding: 12px 22px; border-radius: var(--radius); font-weight: 600; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); }
+  .photo { aspect-ratio: 4/5; border-radius: var(--radius); position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 55% 55%, #c9822c 0 14%, transparent 15%),
+      radial-gradient(circle at 55% 58%, #6b3a17 0 24%, transparent 25%),
+      radial-gradient(circle at 30% 30%, #3f5a2f 0 10%, transparent 11%),
+      radial-gradient(ellipse 70% 40% at 50% 100%, #3b2615, transparent 70%),
+      linear-gradient(160deg, #1c1611, #080706);
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,.8); }
+  .photo figcaption { position: absolute; bottom: 12px; inset-inline-start: 12px; font-size: 12px; color: var(--muted); background: rgba(15,13,11,.7); padding: 4px 10px; border-radius: var(--radius); }
+  h2 { font-weight: 800; font-size: 26px; margin: 0 0 20px; }
+  section { padding: 48px 0; border-top: 1px solid var(--line); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .sw { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .sw i { display: block; height: 72px; }
+  .sw div { padding: 8px 12px; font-size: 13px; }
+  .sw code { color: var(--muted); font-family: "Inter", monospace; direction: ltr; display: inline-block; }
+  .type { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .en { direction: ltr; text-align: left; font-family: "Inter", sans-serif; }
+  .en h3 { font-family: "Fraunces", serif; font-weight: 600; font-size: 34px; line-height: 1.2; margin: 0 0 8px; }
+  .fa h3 { font-weight: 800; font-size: 32px; line-height: 1.5; margin: 0 0 8px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .pkgs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .pkg.featured { border-color: var(--accent); position: relative; }
+  .badge { position: absolute; top: -11px; inset-inline-start: 16px; background: var(--accent-2); color: var(--text); font-size: 12px; padding: 2px 10px; border-radius: 99px; }
+  .price { font-size: 28px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .pkg ul { list-style: none; padding: 0; color: var(--muted); font-size: 14px; }
+  .ok { color: var(--success); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); border-radius: 99px; padding: 6px 14px; font-size: 14px; color: var(--muted); }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
+  footer { padding: 32px 0; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+  @media (max-width: 760px) {
+    .hero, .type, .pkgs { grid-template-columns: 1fr; }
+    .hero { padding: 40px 0; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">3EVDA<span>.</span> <span style="color:var(--muted);font-weight:400">| سودا رحیم‌پور</span></div>
+    <nav><a href="#">نمونه‌کارها</a><a href="#">خدمات</a><a href="#">پکیج‌ها</a><a href="#">رزرو</a><a href="#">درباره من</a><a href="#">EN</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">عکاسی غذا و محصول · ارومیه</div>
+      <h1>طعم را <em>دیدنی</em> می‌کنیم</h1>
+      <p class="lead">عکاسی تبلیغاتی برای رستوران‌ها، کافه‌ها و برندهای خوراکی؛ از منوی رستوران تا کمپین محصول. محصولتان را بفرستید، عکس‌ها را آنلاین تحویل بگیرید.</p>
+      <div class="btns"><a class="btn btn-primary" href="#">استعلام قیمت</a><a class="btn btn-ghost" href="#">مشاهده نمونه‌کارها</a></div>
+    </div>
+    <figure class="photo" style="margin:0"><figcaption>جای عکس هیرو — سبک low-key</figcaption></figure>
+  </div>
+
+  <section>
+    <h2>پالت رنگ — «استودیوی تاریک، نور گرم»</h2>
+    <div class="swatches">
+      <div class="sw"><i style="background:#0F0D0B;border-bottom:1px solid var(--line)"></i><div>Espresso — پس‌زمینه<br><code>#0F0D0B</code></div></div>
+      <div class="sw"><i style="background:#1A1612"></i><div>Roast — سطح<br><code>#1A1612</code></div></div>
+      <div class="sw"><i style="background:#262019"></i><div>Walnut — برجسته<br><code>#262019</code></div></div>
+      <div class="sw"><i style="background:#F2EADF"></i><div>Cream — متن<br><code>#F2EADF</code></div></div>
+      <div class="sw"><i style="background:#B3A594"></i><div>Oat — متن ثانویه<br><code>#B3A594</code></div></div>
+      <div class="sw"><i style="background:#E3A33B"></i><div>Saffron — تأکید<br><code>#E3A33B</code></div></div>
+      <div class="sw"><i style="background:#B4473C"></i><div>Pomegranate — تزئینی<br><code>#B4473C</code></div></div>
+      <div class="sw"><i style="background:#7E9A6C"></i><div>Sage — موفقیت<br><code>#7E9A6C</code></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>تایپوگرافی</h2>
+    <div class="type">
+      <div class="card fa"><div class="meta">Vazirmatn · 800 / 400</div><h3>هر بشقاب یک داستان</h3><p class="meta" style="font-size:15px">نور گرم، پراپ‌های اصیل ایرانی و ترکیب‌بندی دقیق؛ عکس‌هایی که فروش را بالا می‌برند. ۱۲۳۴۵۶۷۸۹۰</p></div>
+      <div class="card en"><div class="meta">Fraunces 600 · Inter 400</div><h3>Every plate tells a story</h3><p class="meta" style="font-size:15px">Warm light, authentic Persian props and precise composition — food &amp; product photography that sells. 1234567890</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>پکیج‌ها (نمونه)</h2>
+    <div class="chips" style="margin-bottom:20px"><span class="chip on">همه</span><span class="chip">منوی رستوران</span><span class="chip">فروشگاهی</span><span class="chip">تبلیغاتی</span><span class="chip">محتوای ماهانه</span></div>
+    <div class="pkgs">
+      <div class="card pkg"><div class="meta">فروشگاهی</div><h3 style="margin:4px 0">پس‌زمینه سفید</h3><div class="price">از ۲۵۰ <small class="meta">هزار تومان / محصول</small></div><ul><li><span class="ok">✓</span> ۳ زاویه برای هر محصول</li><li><span class="ok">✓</span> ریتاچ پایه</li></ul></div>
+      <div class="card pkg featured"><span class="badge">محبوب</span><div class="meta">رستوران و کافه</div><h3 style="margin:4px 0">عکاسی منو</h3><div class="price">از ۴۰۰ <small class="meta">هزار تومان / آیتم</small></div><ul><li><span class="ok">✓</span> استایلینگ غذا</li><li><span class="ok">✓</span> گالری انتخاب آنلاین</li></ul></div>
+      <div class="card pkg"><div class="meta">برند</div><h3 style="margin:4px 0">کمپین تبلیغاتی</h3><div class="price">استعلام</div><ul><li><span class="ok">✓</span> مودبورد و ایده‌پردازی</li><li><span class="ok">✓</span> عکس + ریلز</li></ul></div>
+    </div>
+    <p class="meta">قیمت‌ها فقط نمایشی‌اند و از پنل تعریف می‌شوند.</p>
+  </section>
+
+  <footer>پیش‌نمایش هویت بصری 3evda.com — فقط برای تأیید رنگ و فونت؛ طراحی نهایی صفحات در فاز ۲.</footer>
+</div>
+</body>
+</html>
