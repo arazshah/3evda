@@ -148,7 +148,7 @@ Internet ──► Coolify Traefik (TLS, 3evda.com, www → apex)
 | `web` | `frontend/Dockerfile` (multi-stage، کاربر غیر root) | — | `/api/health` در Next |
 | `api` | `backend/Dockerfile` (multi-stage، کاربر غیر root) | — | `/api/health/live` و `/api/health/ready` |
 | `worker` | همان ایمیج api، با فرمان `celery worker -B` | — | `celery inspect ping` |
-| `postgres` | `postgres:17-alpine` | `pgdata` | `pg_isready` |
+| `postgres` | `postgres:17-alpine` | `pgdata_v2` | `pg_isready` |
 | `redis` | `redis:7-alpine` | `redisdata` | `redis-cli ping` |
 | `storage` | سرویس S3-سازگار (بخش ۶.۲) | `objects` | endpoint سلامت |
 

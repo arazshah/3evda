@@ -26,7 +26,8 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.prod \
-    APP_VERSION=${APP_VERSION}
+    APP_VERSION=${APP_VERSION} \
+    HOME=/tmp
 # ffmpeg: video metadata stripping and posters. libfribidi0: Persian text shaping for watermarks
 # (Pillow's bundled raqm loads it at runtime).
 RUN if [ -n "$DEBIAN_MIRROR" ]; then \
