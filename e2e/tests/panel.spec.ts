@@ -196,8 +196,48 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.goto("/packages");
   await expect(page.getByRole("heading", { level: 2, name: "گروه آزمایشی" })).toHaveCount(0);
 
+  // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
+  await page.goto("/panel/articles/new?language=fa");
+  await page.getByLabel("عنوان", { exact: true }).fill("مقاله‌ی آزمایشی");
+  const editor = page.getByRole("textbox", { name: "متن مقاله" });
+  await editor.click();
+  await page.getByRole("button", { name: "تیتر 2" }).click();
+  await page.keyboard.type("تیتر آزمایشی");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "پررنگ" }).click();
+  await page.keyboard.type("متن پررنگ");
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  await expect(page.getByText("مقاله ساخته شد.")).toBeVisible();
+  await page.reload();
+  await expect(editor.locator("h2")).toHaveText("تیتر آزمایشی");
+  await expect(editor.locator("strong")).toHaveText("متن پررنگ");
+
+  // A draft is only visible through its preview link.
+  const publicTitles = async () =>
+    ((await (await page.request.get("/api/public/blog/articles?lang=fa")).json()).results as { title: string }[]).map(
+      (a) => a.title,
+    );
+  expect(await publicTitles()).not.toContain("مقاله‌ی آزمایشی");
+  await page.getByRole("button", { name: "لینک پیش‌نمایش" }).click();
+  const previewUrl = await page.getByLabel("لینک پیش‌نمایش", { exact: true }).inputValue();
+  const preview = await page.request.get(`/api/public/blog/preview/${previewUrl.split("/").pop()}`);
+  expect(preview.status()).toBe(200);
+  expect((await preview.json()).body_html).toContain("<h2>تیتر آزمایشی</h2>");
+
+  await page.getByRole("button", { name: "ساخت نسخه‌ی English" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("English");
+  await expect(page.getByRole("link", { name: "ویرایش نسخه‌ی فارسی" })).toBeVisible();
+
+  await page.goto("/panel/articles");
+  await expect(page.getByRole("list", { name: "مقاله‌ها" }).getByRole("listitem")).toHaveCount(2);
+  for (let remaining = 2; remaining > 0; remaining--) {
+    acceptNextDialog();
+    await page.getByRole("button", { name: "حذف مقاله‌ی آزمایشی" }).first().click();
+    await expect(page.getByRole("list", { name: "مقاله‌ها" }).getByRole("listitem")).toHaveCount(remaining - 1);
+  }
+
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);

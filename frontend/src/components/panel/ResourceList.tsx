@@ -3,7 +3,14 @@
 import { moveId } from "@/lib/reorder";
 import { Button } from "./ui";
 
-export type Row = { id: number; title: string; detail?: string; published: boolean };
+export type Row = {
+  id: number;
+  title: string;
+  detail?: string;
+  published: boolean;
+  /** Overrides the default «منتشر شده» / «پیش‌نویس» text when a row has more states than that. */
+  stateLabel?: string;
+};
 
 /**
  * An ordered list of rows with move up/down, edit and delete. The order is changed with buttons
@@ -19,7 +26,8 @@ export function ResourceList({
 }: {
   label: string;
   rows: Row[];
-  onReorder: (ids: number[]) => void;
+  /** Leave out for lists that have no manual order. */
+  onReorder?: (ids: number[]) => void;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   disabled?: boolean;
@@ -44,27 +52,31 @@ export function ResourceList({
             )}
           </div>
           <span className={`text-xs ${row.published ? "text-success" : "text-muted"}`}>
-            {row.published ? "منتشر شده" : "پیش‌نویس"}
+            {row.stateLabel ?? (row.published ? "منتشر شده" : "پیش‌نویس")}
           </span>
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="ghost"
-              className="min-w-11 px-3"
-              disabled={disabled || index === 0}
-              aria-label={`بالا بردن ${row.title}`}
-              onClick={() => onReorder(moveId(ids, index, -1))}
-            >
-              ↑
-            </Button>
-            <Button
-              variant="ghost"
-              className="min-w-11 px-3"
-              disabled={disabled || index === rows.length - 1}
-              aria-label={`پایین بردن ${row.title}`}
-              onClick={() => onReorder(moveId(ids, index, 1))}
-            >
-              ↓
-            </Button>
+            {onReorder && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="min-w-11 px-3"
+                  disabled={disabled || index === 0}
+                  aria-label={`بالا بردن ${row.title}`}
+                  onClick={() => onReorder(moveId(ids, index, -1))}
+                >
+                  ↑
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="min-w-11 px-3"
+                  disabled={disabled || index === rows.length - 1}
+                  aria-label={`پایین بردن ${row.title}`}
+                  onClick={() => onReorder(moveId(ids, index, 1))}
+                >
+                  ↓
+                </Button>
+              </>
+            )}
             <Button variant="ghost" aria-label={`ویرایش ${row.title}`} onClick={() => onEdit(row.id)}>
               ویرایش
             </Button>

@@ -211,12 +211,13 @@ class ArticleSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     related_projects = serializers.PrimaryKeyRelatedField(many=True, queryset=Project.objects.all(), required=False)
     is_live = serializers.SerializerMethodField()
     translations = serializers.SerializerMethodField()
+    body_media = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = [
-            "id", "language", "translation_group", "slug", "title", "summary", "body", "cover", "cover_detail",
-            "category", "tags", "status", "published_at", "seo_title", "seo_description", "og_image",
+            "id", "language", "translation_group", "slug", "title", "summary", "body", "body_media", "cover",
+            "cover_detail", "category", "tags", "status", "published_at", "seo_title", "seo_description", "og_image",
             "og_image_detail", "related_projects", "reading_minutes", "is_live", "translations", "created_at",
             "updated_at",
         ]  # fmt: skip
@@ -226,6 +227,13 @@ class ArticleSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
 
     def get_is_live(self, obj: Article) -> bool:
         return obj.is_live
+
+    @extend_schema_field(serializers.DictField(child=PublicMediaSerializer()))
+    def get_body_media(self, obj: Article) -> Any:
+        """Library data (previews, alt texts) for the images in the body, so the editor can show them."""
+        ids = media_ids(obj.body) if isinstance(obj.body, dict) else []
+        assets = MediaAsset.objects.filter(pk__in=ids, status=MediaAsset.Status.READY).prefetch_related("variants")
+        return {str(a.pk): PublicMediaSerializer(a).data for a in assets}
 
     @extend_schema_field(TranslationSerializer(many=True))
     def get_translations(self, obj: Article) -> Any:
@@ -306,6 +314,17 @@ class ArticleSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
         if projects is not None:
             instance.related_projects.set(projects)
         return instance
+
+
+class ArticleListSerializer(ArticleSerializer):
+    """One row of the panel's list: no body, no embedded-media lookups, no translation queries."""
+
+    class Meta(ArticleSerializer.Meta):
+        fields = [
+            "id", "language", "translation_group", "slug", "title", "summary", "category", "status",
+            "published_at", "reading_minutes", "is_live", "created_at", "updated_at",
+        ]  # fmt: skip
+        read_only_fields = fields
 
 
 def other_language(language: str) -> str:

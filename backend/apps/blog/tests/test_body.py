@@ -65,7 +65,9 @@ def test_a_normal_article_is_kept():
         doc({"type": "heading", "attrs": {"level": 9}, "content": [text("h9")]}),
         doc({"type": "image", "attrs": {"mediaId": "not-a-uuid"}}),
         doc(text("loose text outside a paragraph")),  # text is not allowed directly in the doc
-        doc({"type": "blockquote", "content": [{"type": "bulletList", "content": []}]}),  # wrong nesting
+        doc({"type": "paragraph", "content": [{"type": "paragraph", "content": []}]}),  # a paragraph holds only text
+        doc({"type": "bulletList", "content": [{"type": "paragraph", "content": []}]}),  # a list holds list items
+        doc({"type": "listItem", "content": []}),  # a list item outside a list
         {"type": "paragraph", "content": []},  # not a doc
         "<p>raw html</p>",
         doc(para({"type": "text", "text": ""})),
@@ -75,6 +77,29 @@ def test_a_normal_article_is_kept():
 def test_documents_outside_the_vocabulary_are_rejected(bad):
     with pytest.raises(BodyError):
         clean_doc(bad)
+
+
+def test_everything_the_editor_can_nest_is_accepted():
+    """The toolbar can wrap a heading in a quote or put a heading/quote/image inside a list item."""
+    source = doc(
+        {"type": "blockquote", "content": [{"type": "heading", "attrs": {"level": 2}, "content": [text("h")]}]},
+        {
+            "type": "blockquote",
+            "content": [{"type": "bulletList", "content": [{"type": "listItem", "content": [para(text("x"))]}]}],
+        },
+        {
+            "type": "bulletList",
+            "content": [
+                {"type": "listItem", "content": [para(text("a")), {"type": "blockquote", "content": [para(text("q"))]}]}
+            ],
+        },
+        {"type": "blockquote", "content": [{"type": "image", "attrs": {"mediaId": MEDIA_ID}}]},
+    )
+    assert clean_doc(source) == source
+    html = render_html(source, media(), "fa")
+    assert (
+        "<blockquote><h2>h</h2></blockquote>" in html and "<li><p>a</p><blockquote><p>q</p></blockquote></li>" in html
+    )
 
 
 @pytest.mark.parametrize("attrs", [[], "x", 7, True])
@@ -158,6 +183,11 @@ def test_marks_and_structure_render():
     assert "<strong>a</strong><em>b</em><code>c</code>" in html
     assert "<ol><li><p>one</p></li></ol>" in html
     assert "<blockquote><p>q</p></blockquote>" in html and "<hr>" in html
+
+
+def test_empty_paragraphs_are_not_rendered():
+    html = render_html(doc(para(text("a")), {"type": "paragraph"}, para()), {}, "fa")
+    assert html == "<p>a</p>"
 
 
 def test_external_links_get_a_safe_rel():

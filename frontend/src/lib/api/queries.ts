@@ -28,6 +28,9 @@ export const keys = {
   projects: ["portfolio", "projects"] as const,
   groups: ["pricing", "groups"] as const,
   packages: ["pricing", "packages"] as const,
+  articles: ["blog", "articles"] as const,
+  blogCategories: ["blog", "categories"] as const,
+  blogTags: ["blog", "tags"] as const,
 };
 
 type Schemas = components["schemas"];
@@ -37,6 +40,9 @@ export type Category = Schemas["Category"];
 export type Project = Schemas["Project"];
 export type PackageGroup = Schemas["PackageGroup"];
 export type Package = Schemas["Package"];
+export type Article = Schemas["Article"];
+export type BlogCategory = Schemas["BlogCategory"];
+export type BlogTag = Schemas["BlogTag"];
 
 export function useMe() {
   return useQuery({ queryKey: keys.me, queryFn: () => unwrap(api.GET("/api/auth/me")), staleTime: 30_000 });
@@ -383,6 +389,123 @@ export function useReorderPackages() {
     onSettled: async () => {
       await revalidatePublic("packages");
       await client.invalidateQueries({ queryKey: keys.packages });
+    },
+  });
+}
+
+// ---- journal ---------------------------------------------------------------------------------------
+// Journal pages are read from the API without a cache, so saving needs no cache refresh here.
+
+export type ArticleFilters = { status?: "draft" | "published"; language?: "fa" | "en"; q?: string };
+
+export function useArticles(filters: ArticleFilters) {
+  return useQuery({
+    queryKey: [...keys.articles, "list", filters],
+    queryFn: () => unwrap(api.GET("/api/admin/blog/articles/", { params: { query: filters } })),
+  });
+}
+
+export function useArticle(id: number | undefined) {
+  return useQuery({
+    queryKey: [...keys.articles, "one", id],
+    queryFn: () => unwrap(api.GET("/api/admin/blog/articles/{id}/", { params: { path: { id: id! } } })),
+    enabled: id !== undefined,
+  });
+}
+
+export function useSaveArticle() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedArticle"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/blog/articles/", { body: body as Article }))
+        : unwrap(api.PATCH("/api/admin/blog/articles/{id}/", { params: { path: { id } }, body })),
+    onSuccess: async (article) => {
+      client.setQueryData([...keys.articles, "one", article.id], article);
+      await client.invalidateQueries({ queryKey: [...keys.articles, "list"] });
+      await client.invalidateQueries({ queryKey: keys.blogCategories });
+    },
+  });
+}
+
+export function useDeleteArticle() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/blog/articles/{id}/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.articles }),
+  });
+}
+
+export function usePreviewLink() {
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.POST("/api/admin/blog/articles/{id}/preview-link/", { params: { path: { id } } })),
+  });
+}
+
+export function useTranslateArticle() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.POST("/api/admin/blog/articles/{id}/translate/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.articles }),
+  });
+}
+
+export function useBlogCategories() {
+  return useQuery({
+    queryKey: keys.blogCategories,
+    queryFn: () => unwrap(api.GET("/api/admin/blog/categories/")),
+  });
+}
+
+export function useSaveBlogCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedBlogCategory"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/blog/categories/", { body: body as BlogCategory }))
+        : unwrap(api.PATCH("/api/admin/blog/categories/{id}/", { params: { path: { id } }, body })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.blogCategories }),
+  });
+}
+
+export function useDeleteBlogCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/blog/categories/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.blogCategories });
+      await client.invalidateQueries({ queryKey: keys.articles });
+    },
+  });
+}
+
+export function useBlogTags() {
+  return useQuery({ queryKey: keys.blogTags, queryFn: () => unwrap(api.GET("/api/admin/blog/tags/")) });
+}
+
+export function useSaveBlogTag() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedBlogTag"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/blog/tags/", { body: body as BlogTag }))
+        : unwrap(api.PATCH("/api/admin/blog/tags/{id}/", { params: { path: { id } }, body })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.blogTags }),
+  });
+}
+
+export function useDeleteBlogTag() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/blog/tags/{id}/", { params: { path: { id } } })),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.blogTags });
+      await client.invalidateQueries({ queryKey: keys.articles });
     },
   });
 }

@@ -62,7 +62,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/Article"
+                                        "$ref": "#/components/schemas/ArticleList"
                                     }
                                 }
                             }
@@ -3804,6 +3804,13 @@
                         "type": "string"
                     },
                     "body": {},
+                    "body_media": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PublicMedia"
+                        },
+                        "readOnly": true
+                    },
                     "cover": {
                         "type": "string",
                         "format": "uuid",
@@ -3891,6 +3898,7 @@
                     }
                 },
                 "required": [
+                    "body_media",
                     "cover_detail",
                     "created_at",
                     "id",
@@ -3901,6 +3909,101 @@
                     "title",
                     "translation_group",
                     "translations",
+                    "updated_at"
+                ]
+            },
+            "ArticleList": {
+                "type": "object",
+                "description": "One row of the panel's list: no body, no embedded-media lookups, no translation queries.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "translation_group": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 120,
+                                "pattern": "^[-\\w]+$"
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "category": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ArticleStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "reading_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_live": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "category",
+                    "created_at",
+                    "id",
+                    "is_live",
+                    "language",
+                    "published_at",
+                    "reading_minutes",
+                    "status",
+                    "summary",
+                    "title",
+                    "translation_group",
                     "updated_at"
                 ]
             },
@@ -4729,6 +4832,13 @@
                         "type": "string"
                     },
                     "body": {},
+                    "body_media": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PublicMedia"
+                        },
+                        "readOnly": true
+                    },
                     "cover": {
                         "type": "string",
                         "format": "uuid",
