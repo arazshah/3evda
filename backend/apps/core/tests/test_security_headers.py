@@ -70,3 +70,45 @@ def test_pages_and_files_that_are_not_json_are_not_given_a_download_name():
         RequestFactory().get("/api/public/x")
     )
     assert "Content-Disposition" not in image
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    [
+        "application/json",
+        "application/json; charset=utf-8",
+        "application/vnd.oai.openapi+json",
+        "application/problem+json",
+    ],
+)
+def test_every_json_flavour_is_saved_not_rendered(content_type):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    response = SecurityHeadersMiddleware(lambda r: HttpResponse("{}", content_type=content_type))(
+        RequestFactory().get("/api/x")
+    )
+    assert response["Content-Disposition"] == 'attachment; filename="api.json"'
+
+
+def test_the_openapi_schema_the_owner_requests_is_saved_not_rendered(owner_client):
+    r = owner_client.get("/api/schema/", HTTP_ACCEPT="application/vnd.oai.openapi+json")
+    assert r.status_code == 200
+    assert r["Content-Disposition"].startswith("attachment;")  # the view said "inline"; it is saved all the same
+
+
+@pytest.mark.parametrize(
+    "content_type", ["text/html", "text/plain", "image/webp", "application/pdf", "application/jsonp"]
+)
+def test_other_types_are_left_alone(content_type):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    response = SecurityHeadersMiddleware(lambda r: HttpResponse("x", content_type=content_type))(
+        RequestFactory().get("/api/x")
+    )
+    assert "Content-Disposition" not in response
