@@ -122,6 +122,7 @@ services:
       <<: *backend-env
       RESTIC_PASSWORD: ${RESTIC_PASSWORD:?}
       BACKUP_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}
+      RESTIC_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}  # so `restic …` works in the service's terminal too
       BACKUP_HOUR: ${BACKUP_HOUR:-3}
       BACKUP_WORKDIR: /backups/work
       # Only for a repository outside the server (see docs/runbooks/backup-restore.md).
