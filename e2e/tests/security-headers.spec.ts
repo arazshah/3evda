@@ -146,6 +146,15 @@ test.describe("content security policy", () => {
   test("an injected inline handler is refused by the browser", async ({
     page,
   }) => {
+    // Declared first: the fixture reads these while the events happen, not afterwards.
+    test.info().annotations.push({
+      type: "expected-csp-violation",
+      description: "the injected handler below",
+    });
+    test.info().annotations.push({
+      type: "expected-http-error",
+      description: "the missing image",
+    });
     await page.goto("/about");
     // (A <script> element added from script is trusted under 'strict-dynamic'; an inline event handler is not.)
     const outcome = await page.evaluate(
@@ -172,14 +181,5 @@ test.describe("content security policy", () => {
         }),
     );
     expect(outcome).toBe("blocked");
-    // the fixture must not treat this deliberate violation as a failure
-    test.info().annotations.push({
-      type: "expected-csp-violation",
-      description: "the injected handler above",
-    });
-    test.info().annotations.push({
-      type: "expected-http-error",
-      description: "the missing image",
-    });
   });
 });
