@@ -35,7 +35,10 @@ export const test = base.extend<{ page: Page }>({
     const violations = await watchCsp(page);
     page.on("console", (msg) => {
       // Resource errors are reported with their URL by the response listener below.
-      const refusal = msg.text().startsWith("Refused to");
+      // Chrome words a policy refusal as "Refused to …" or "<Doing x> violates the following Content Security Policy …".
+      const refusal =
+        msg.text().startsWith("Refused to") ||
+        msg.text().includes("violates the following Content Security Policy");
       const expectsViolation =
         refusal &&
         base
