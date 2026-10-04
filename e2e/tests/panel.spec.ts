@@ -510,10 +510,69 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   expect(gallery).toMatchObject({ title: "گالری آزمایشی", has_password: true, status: "published" });
   expect((await page.request.get(`/api/public/galleries/${galleryToken}/photos`)).status()).toBe(401);
   expect((await page.request.post(`/api/public/galleries/${galleryToken}/unlock`, { data: { password: "اشتباه" } })).status()).toBe(403);
+
+  // The client, on a phone in another browser: password, the photo, a choice with a note, a ZIP, and sending.
+  const clientContext = await browser.newContext({
+    baseURL: page.url().split("/panel")[0],
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
+  const client = await clientContext.newPage();
+  await client.goto(new URL(galleryLink).pathname);
+  await expect(client.getByRole("heading", { name: "این گالری رمز دارد" })).toBeVisible();
+  await expectNoSeriousViolations(client, "gallery password gate");
+  await client.getByLabel("رمز گالری", { exact: true }).fill("اشتباه");
+  await client.getByRole("button", { name: "باز کردن گالری" }).click();
+  await expect(client.getByRole("alert").filter({ hasText: "رمز درست نیست." })).toBeVisible(); // not the route announcer
+  await client.getByLabel("رمز گالری", { exact: true }).fill("راز-آزمایشی");
+  await client.getByRole("button", { name: "باز کردن گالری" }).click();
+  const clientPhotos = client.getByRole("list", { name: "عکس‌های گالری" });
+  await expect(clientPhotos.getByRole("listitem")).toHaveCount(1);
+  const clientThumb = clientPhotos.getByRole("img");
+  await expect.poll(() => clientThumb.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  await expectNoSeriousViolations(client, "client gallery");
+  await expectNoHorizontalOverflow(client);
+
+  await clientPhotos.getByRole("button", { name: /نمایش بزرگ/ }).click();
+  const lightbox = client.getByRole("dialog", { name: "نمایش بزرگ عکس" });
+  await expect(lightbox.getByRole("img")).toBeVisible();
+  await lightbox.getByRole("button", { name: /^انتخاب / }).click();
+  await expect(lightbox.getByRole("button", { name: /^برداشتن انتخاب / })).toBeVisible();
+  await lightbox.getByLabel("توضیح برای این عکس").fill("رنگ‌ها گرم‌تر شود");
+  await lightbox.getByRole("button", { name: "ذخیره‌ی توضیح" }).click();
+  await expect(lightbox.getByText("توضیح ذخیره شد.")).toBeVisible();
+  await expectNoSeriousViolations(client, "client lightbox");
+  await client.keyboard.press("Escape");
+  await expect(lightbox).toBeHidden();
+  await expect(client.getByText("۱ عکس انتخاب شده")).toBeVisible();
+
+  // The ZIP is made by the worker; what comes down is a real archive.
+  const [archive] = await Promise.all([
+    client.waitForEvent("download", { timeout: 90_000 }),
+    client.getByRole("button", { name: "دانلود همه به‌صورت ZIP" }).click(),
+  ]);
+  expect(archive.suggestedFilename()).toMatch(/\.zip$/);
+  expect(readFileSync((await archive.path())!).subarray(0, 2).toString()).toBe("PK");
+
+  client.once("dialog", (d) => d.accept());
+  await client.getByRole("button", { name: "ارسال انتخاب نهایی" }).click();
+  await expect(client.getByText("انتخاب شما ارسال شد")).toBeVisible();
+  await expect(client.getByRole("button", { name: /^برداشتن انتخاب / })).toBeDisabled();
+  await client.reload(); // a reload keeps the unlocked session and shows the locked state
+  await expect(client.getByText("انتخاب شما ارسال شد")).toBeVisible();
+  await clientContext.close();
+
+  // The owner sees the choice, the note and the file names to paste into Lightroom, and the download in the log.
   await page.goto("/panel/galleries");
-  await expect(page.getByRole("list", { name: "گالری‌ها" }).getByText("منتشرشده")).toBeVisible();
+  await expect(page.getByRole("list", { name: "گالری‌ها" }).getByText("نهایی‌شده")).toBeVisible();
   await page.getByRole("link", { name: /گالری آزمایشی/ }).click();
-  await expect(page.getByText(/۰ انتخاب از ۱ عکس/)).toBeVisible();
+  await expect(page.getByText(/۱ انتخاب از ۱ عکس/)).toBeVisible();
+  await expect(page.getByLabel("نام فایل‌های انتخاب‌شده برای Lightroom")).toHaveValue("photo-with-gps");
+  await expect(page.getByRole("list", { name: "انتخاب‌ها" })).toContainText("رنگ‌ها گرم‌تر شود");
+  await expect(page.getByRole("list", { name: "لاگ دانلود" })).toContainText("ZIP");
+  await page.getByRole("button", { name: "بازکردن دوباره برای مشتری" }).click();
+  await expect(page.getByText(/دوباره باز شد/)).toBeVisible();
   acceptNextDialog();
   await page.getByRole("button", { name: "حذف گالری" }).click();
   await expect(page).toHaveURL(/\/panel\/galleries$/);
