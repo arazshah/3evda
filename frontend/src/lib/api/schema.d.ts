@@ -527,6 +527,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/galleries/{id}/downloads/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_downloads_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/finals/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_finals_list"];
+    put?: never;
+    post: operations["admin_galleries_finals_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/finals/{final_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["admin_galleries_finals_destroy"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/galleries/{id}/new-link/": {
     parameters: {
       query?: never;
@@ -1560,6 +1608,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/galleries/{token}/finals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    get: operations["public_galleries_finals"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/finals/{final_id}/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    get: operations["public_galleries_final_download"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/galleries/{token}/photos": {
     parameters: {
       query?: never;
@@ -1569,6 +1651,23 @@ export interface paths {
     };
     /** @description A view that needs the access token (given by `unlock`) as well as the link. */
     get: operations["public_galleries_photos"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/photos/{photo_id}/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    get: operations["public_galleries_photo_download"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1621,6 +1720,40 @@ export interface paths {
     get?: never;
     put?: never;
     post: operations["public_galleries_unlock"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/zip": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    post: operations["public_galleries_zip_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/zip/{job_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    get: operations["public_galleries_zip_retrieve"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -2190,6 +2323,26 @@ export interface components {
      * @enum {string}
      */
     DownloadLevelEnum: "none" | "selected" | "all_web" | "selected_original" | "all_original";
+    DownloadLink: {
+      /** @description Works for 60 seconds */
+      url: string;
+      filename: string;
+    };
+    DownloadLog: {
+      readonly id: number;
+      readonly kind: components["schemas"]["DownloadLogKindEnum"];
+      readonly files: number;
+      readonly originals: boolean;
+      /** Format: date-time */
+      readonly created_at: string;
+    };
+    /**
+     * @description * `photo` - عکس
+     *     * `zip` - ZIP
+     *     * `final` - نهایی
+     * @enum {string}
+     */
+    DownloadLogKindEnum: "photo" | "zip" | "final";
     Error: {
       code: string;
       detail: string;
@@ -2199,6 +2352,15 @@ export interface components {
       text_en?: string;
       /** @description False shows the line as not included */
       included?: boolean;
+    };
+    FinalFile: {
+      readonly id: number;
+      readonly filename: string;
+      readonly mime: string;
+      readonly size_bytes: number;
+      readonly position: number;
+      /** Format: date-time */
+      readonly created_at: string;
     };
     Gallery: {
       readonly id: number;
@@ -3158,6 +3320,14 @@ export interface components {
       /** @description False shows the line as not included */
       readonly included: boolean;
     };
+    PublicFinal: {
+      id: number;
+      filename: string;
+      size_bytes: number;
+    };
+    PublicFinals: {
+      finals: components["schemas"]["PublicFinal"][];
+    };
     PublicGallery: {
       title: string;
       client_name: string;
@@ -3602,6 +3772,23 @@ export interface components {
       /** Format: time */
       end: string;
     };
+    ZipJob: {
+      id: number;
+      status: components["schemas"]["ZipJobStatusEnum"];
+      total: number;
+      done: number;
+      /** @description Only when ready; works for 60 seconds */
+      url: string | null;
+      filename: string | null;
+    };
+    /**
+     * @description * `queued` - در صف
+     *     * `running` - در حال ساخت
+     *     * `ready` - آماده
+     *     * `failed` - ناموفق
+     * @enum {string}
+     */
+    ZipJobStatusEnum: "queued" | "running" | "ready" | "failed";
   };
   responses: never;
   parameters: never;
@@ -5190,6 +5377,99 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Gallery"];
         };
+      };
+    };
+  };
+  admin_galleries_downloads_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DownloadLog"][];
+        };
+      };
+    };
+  };
+  admin_galleries_finals_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FinalFile"][];
+        };
+      };
+    };
+  };
+  admin_galleries_finals_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["PhotoUpload"];
+        "application/x-www-form-urlencoded": components["schemas"]["PhotoUpload"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FinalFile"];
+        };
+      };
+    };
+  };
+  admin_galleries_finals_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        final_id: number;
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -7445,6 +7725,53 @@ export interface operations {
       };
     };
   };
+  public_galleries_finals: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicFinals"];
+        };
+      };
+    };
+  };
+  public_galleries_final_download: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        final_id: number;
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DownloadLink"];
+        };
+      };
+    };
+  };
   public_galleries_photos: {
     parameters: {
       query?: never;
@@ -7464,6 +7791,30 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicPhotos"];
+        };
+      };
+    };
+  };
+  public_galleries_photo_download: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        photo_id: number;
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DownloadLink"];
         };
       };
     };
@@ -7544,6 +7895,53 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["UnlockResponse"];
+        };
+      };
+    };
+  };
+  public_galleries_zip_create: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ZipJob"];
+        };
+      };
+    };
+  };
+  public_galleries_zip_retrieve: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        job_id: number;
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ZipJob"];
         };
       };
     };

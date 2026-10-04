@@ -8,7 +8,7 @@ from apps.core.signed import signed_path
 
 from . import service
 from .links import public_url
-from .models import Gallery, GalleryPhoto
+from .models import DownloadLog, FinalFile, Gallery, GalleryPhoto
 
 PREVIEW_TTL = 300
 
@@ -50,7 +50,9 @@ class GallerySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
 
     def get_usage_bytes(self, obj: Gallery) -> int:
         value = getattr(obj, "usage_bytes", None)
-        return int(value) if value is not None else service.usage_bytes(obj)
+        if value is None:
+            return service.usage_bytes(obj)
+        return int(value) + service.extra_bytes(obj)  # the annotation counts the photos only
 
     def _apply_password(self, gallery: Gallery, data: dict[str, Any]) -> None:
         raw = data.pop("password", None)
@@ -104,3 +106,17 @@ class PhotoUploadSerializer(serializers.Serializer):  # type: ignore[type-arg]
 
 class PhotoOrderSerializer(serializers.Serializer):  # type: ignore[type-arg]
     ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=True)
+
+
+class FinalFileSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    class Meta:
+        model = FinalFile
+        fields = ["id", "filename", "mime", "size_bytes", "position", "created_at"]
+        read_only_fields = fields
+
+
+class DownloadLogSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    class Meta:
+        model = DownloadLog
+        fields = ["id", "kind", "files", "originals", "created_at"]
+        read_only_fields = fields

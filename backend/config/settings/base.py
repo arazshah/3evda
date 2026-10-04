@@ -173,6 +173,13 @@ CELERY_RESULT_BACKEND = None
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULE = {
+    "galleries-cleanup-zips": {
+        "task": "apps.galleries.tasks.cleanup_zips",
+        "schedule": 3600.0,
+        "options": {"queue": "galleries"},
+    },
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
