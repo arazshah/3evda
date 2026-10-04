@@ -498,7 +498,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   expect((await page.request.get(thumbSrc)).status()).toBe(200);
   expect((await page.request.get(thumbSrc.split("?")[0]!)).status()).toBeGreaterThanOrEqual(400); // unsigned: refused
   await page.getByLabel("انتخاب عکس برای آپلود در گالری").setInputFiles(PHOTO); // the same photo again
-  await expect(page.getByText(/قبلاً بارگذاری شده/)).toBeVisible();
+  await expect(page.getByText(/قبلاً در همین گالری بارگذاری شده/)).toBeVisible();
   await expectNoSeriousViolations(page, "gallery detail");
   await page.getByRole("button", { name: "انتشار" }).click();
   await expect(page.getByText(/گالری منتشر شد/)).toBeVisible();
