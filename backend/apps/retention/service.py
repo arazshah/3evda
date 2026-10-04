@@ -25,7 +25,7 @@ from apps.audit.service import record
 from apps.booking.models import Booking
 from apps.galleries.models import Gallery
 from apps.galleries.service import delete_gallery
-from apps.galleries.tasks import delete_files
+from apps.inquiries import attachments
 from apps.inquiries.models import Inquiry
 from apps.proformas.models import Proforma
 
@@ -62,14 +62,17 @@ def _bookings(s: RetentionSettings, now: datetime) -> QuerySet[Booking]:
 
 def _galleries(s: RetentionSettings, now: datetime) -> QuerySet[Gallery]:
     cutoff = now - timedelta(days=s.gallery_days)
-    return Gallery.objects.filter(Q(expires_at__lt=cutoff) | Q(status=Gallery.Status.ARCHIVED, updated_at__lt=cutoff))
+    # Only a published or submitted gallery can be "expired"; a draft carries a default expiry date but is
+    # still work in progress, so it is never removed for it.
+    live = [Gallery.Status.PUBLISHED, Gallery.Status.SUBMITTED]
+    return Gallery.objects.filter(
+        Q(status__in=live, expires_at__lt=cutoff) | Q(status=Gallery.Status.ARCHIVED, updated_at__lt=cutoff)
+    )
 
 
 def _proformas(s: RetentionSettings, now: datetime) -> QuerySet[Proforma]:
-    cutoff = months_ago(now, s.proforma_months)
-    return Proforma.objects.filter(anonymized_at__isnull=True).filter(
-        Q(issued_at__lt=cutoff) | Q(issued_at__isnull=True, created_at__lt=cutoff)
-    )
+    # Months after *issue*. A draft was never issued, may still be live work, and is left alone.
+    return Proforma.objects.filter(anonymized_at__isnull=True, issued_at__lt=months_ago(now, s.proforma_months))
 
 
 RULES = [
@@ -103,13 +106,12 @@ def preview(now: datetime | None = None, settings: RetentionSettings | None = No
 # ---- the steps ------------------------------------------------------------------------------------------
 
 
-def _forget_files(keys: list[str]) -> None:
-    keys = [k for k in keys if k]
-    if keys:
-        transaction.on_commit(lambda: delete_files.apply_async(args=[keys], queue="galleries"))
-
-
 def anonymise_inquiry(inquiry: Inquiry, now: datetime) -> bool:
+    """The attachment files go first, while the rows that name them still exist. If the store is down this
+    raises, the enquiry stays as it was, and tomorrow's run tries again; nothing is ever left behind with
+    its only record of the files already gone."""
+    for key in list(inquiry.attachments.values_list("key", flat=True)):
+        attachments.delete(key)
     with transaction.atomic():
         changed = Inquiry.objects.filter(pk=inquiry.pk, anonymized_at__isnull=True).update(
             name=ANONYMOUS,
@@ -125,9 +127,7 @@ def anonymise_inquiry(inquiry: Inquiry, now: datetime) -> bool:
         )
         if not changed:
             return False
-        keys = list(inquiry.attachments.values_list("key", flat=True))
-        inquiry.attachments.all().delete()
-        _forget_files(keys)
+        inquiry.attachments.all().delete()  # the files are gone already; the model's own hook is then a no-op
     return True
 
 

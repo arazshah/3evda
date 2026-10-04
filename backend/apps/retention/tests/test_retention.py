@@ -190,6 +190,31 @@ def test_attachments_of_an_anonymised_enquiry_are_removed_with_their_files(s3_bu
     assert s3_buckets.list_objects_v2(Bucket=settings.S3_PRIVATE_BUCKET).get("KeyCount", 0) == 0
 
 
+def test_a_store_that_is_down_leaves_the_enquiry_for_the_next_run(s3_buckets, settings, monkeypatch):
+    from apps.inquiries import attachments
+
+    inquiry = make_inquiry(30)
+    s3_buckets.put_object(Bucket=settings.S3_PRIVATE_BUCKET, Key="inquiries/a.pdf", Body=b"data")
+    InquiryAttachment.objects.create(inquiry=inquiry, key="inquiries/a.pdf", original_name="x", mime="a/b", size=4)
+
+    def down(key):
+        raise ConnectionError("store down")
+
+    real = attachments.delete
+    monkeypatch.setattr(attachments, "delete", down)
+    first = service.run(now=NOW)
+    assert first["counts"]["inquiries"] == 0
+    row = Inquiry.objects.get(pk=inquiry.pk)
+    assert row.phone == "09123456789" and row.anonymized_at is None  # untouched, still findable
+    assert InquiryAttachment.objects.filter(inquiry=inquiry).exists()  # the record of the file is still there
+
+    monkeypatch.setattr(attachments, "delete", real)
+    second = service.run(now=NOW)
+    assert second["counts"]["inquiries"] == 1
+    assert Inquiry.objects.get(pk=inquiry.pk).phone == ""
+    assert s3_buckets.list_objects_v2(Bucket=settings.S3_PRIVATE_BUCKET).get("KeyCount", 0) == 0
+
+
 def test_the_history_of_status_changes_stays():
     inquiry = make_inquiry(30)
     InquiryStatusChange.objects.create(inquiry=inquiry, from_status="new", to_status="converted")
@@ -257,6 +282,18 @@ def test_a_gallery_that_expired_long_ago_goes_with_all_its_files(s3_buckets, set
     assert s3_buckets.list_objects_v2(Bucket=settings.S3_PRIVATE_BUCKET).get("KeyCount", 0) == 0
 
 
+def test_a_draft_is_never_removed_for_its_default_expiry_date():
+    gallery = make_gallery(status="draft", expires_at=NOW - timedelta(days=400))
+    service.run(now=NOW)
+    assert Gallery.objects.filter(pk=gallery.pk).exists()
+
+
+def test_a_submitted_gallery_expires_like_a_published_one():
+    gallery = make_gallery(status="submitted", expires_at=NOW - timedelta(days=100))
+    service.run(now=NOW)
+    assert not Gallery.objects.filter(pk=gallery.pk).exists()
+
+
 def test_an_archived_gallery_goes_after_the_same_time():
     gallery = make_gallery(expires_at=None, status="archived")
     aged(Gallery, gallery.pk, updated_at=NOW - timedelta(days=100))
@@ -303,6 +340,14 @@ def test_an_issued_proforma_keeps_every_financial_field_byte_for_byte_while_the_
     ):
         assert getattr(row, field) == "", field
     assert row.anonymized_at is not None
+
+
+def test_a_draft_proforma_is_never_touched_however_old():
+    draft = Proforma.objects.create(customer_name="سارا رحیمی", customer_contact="0912", status="draft")
+    Proforma.objects.filter(pk=draft.pk).update(created_at=ago(120))
+    service.run(now=NOW)
+    row = Proforma.objects.get(pk=draft.pk)
+    assert row.customer_name == "سارا رحیمی" and row.customer_contact == "0912" and row.anonymized_at is None
 
 
 def test_an_issued_proforma_is_never_deleted_however_old():
