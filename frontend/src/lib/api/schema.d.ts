@@ -479,6 +479,166 @@ export interface paths {
     patch: operations["admin_cms_settings_partial_update"];
     trace?: never;
   };
+  "/api/admin/galleries/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_list"];
+    put?: never;
+    post: operations["admin_galleries_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_retrieve"];
+    put: operations["admin_galleries_update"];
+    post?: never;
+    delete: operations["admin_galleries_destroy"];
+    options?: never;
+    head?: never;
+    patch: operations["admin_galleries_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/archive/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_galleries_archive_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/new-link/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_galleries_new_link_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/photos/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_photos_list"];
+    put?: never;
+    post: operations["admin_galleries_photos_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/photos/{photo_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["admin_galleries_photos_destroy"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/photos/order/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_galleries_photos_order_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/publish/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_galleries_publish_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/reopen/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_galleries_reopen_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/galleries/{id}/unarchive/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_galleries_unarchive_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/inquiries/": {
     parameters: {
       query?: never;
@@ -1938,6 +2098,15 @@ export interface components {
       username: string;
       password: string;
     };
+    /**
+     * @description * `none` - فقط دیدن
+     *     * `selected` - انتخاب‌ها (اندازه‌ی نمایش)
+     *     * `all_web` - همه (اندازه‌ی نمایش)
+     *     * `selected_original` - انتخاب‌ها با اصل فایل
+     *     * `all_original` - همه با اصل فایل
+     * @enum {string}
+     */
+    DownloadLevelEnum: "none" | "selected" | "all_web" | "selected_original" | "all_original";
     Error: {
       code: string;
       detail: string;
@@ -1948,6 +2117,57 @@ export interface components {
       /** @description False shows the line as not included */
       included?: boolean;
     };
+    Gallery: {
+      readonly id: number;
+      title: string;
+      client_name?: string;
+      language?: components["schemas"]["LanguageEnum"];
+      readonly status: string;
+      readonly has_password: boolean;
+      password?: string;
+      /** @default false */
+      clear_password: boolean;
+      /** Format: date-time */
+      expires_at?: string | null;
+      /** @description Empty: no limit */
+      selection_limit?: number | null;
+      download_level?: components["schemas"]["DownloadLevelEnum"];
+      /** @description Previews carry the watermark */
+      watermark?: boolean;
+      /** @description Private; never shown to the client */
+      note?: string;
+      inquiry?: number | null;
+      booking?: number | null;
+      proforma?: number | null;
+      readonly link: string;
+      readonly photo_count: number;
+      readonly ready_count: number;
+      readonly usage_bytes: number;
+      /** Format: date-time */
+      readonly submitted_at: string | null;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    GalleryPhoto: {
+      readonly id: number;
+      readonly original_filename: string;
+      readonly status: components["schemas"]["GalleryPhotoStatusEnum"];
+      readonly width: number | null;
+      readonly height: number | null;
+      readonly size_bytes: number;
+      readonly position: number;
+      readonly error: string;
+      readonly thumb_url: string | null;
+    };
+    /**
+     * @description * `pending` - در صف
+     *     * `ready` - آماده
+     *     * `failed` - ناموفق
+     * @enum {string}
+     */
+    GalleryPhotoStatusEnum: "pending" | "ready" | "failed";
     Inquiry: {
       readonly id: number;
       readonly name: string;
@@ -2331,6 +2551,39 @@ export interface components {
       /** Format: date-time */
       readonly updated_at?: string;
     };
+    PatchedGallery: {
+      readonly id?: number;
+      title?: string;
+      client_name?: string;
+      language?: components["schemas"]["LanguageEnum"];
+      readonly status?: string;
+      readonly has_password?: boolean;
+      password?: string;
+      /** @default false */
+      clear_password: boolean;
+      /** Format: date-time */
+      expires_at?: string | null;
+      /** @description Empty: no limit */
+      selection_limit?: number | null;
+      download_level?: components["schemas"]["DownloadLevelEnum"];
+      /** @description Previews carry the watermark */
+      watermark?: boolean;
+      /** @description Private; never shown to the client */
+      note?: string;
+      inquiry?: number | null;
+      booking?: number | null;
+      proforma?: number | null;
+      readonly link?: string;
+      readonly photo_count?: number;
+      readonly ready_count?: number;
+      readonly usage_bytes?: number;
+      /** Format: date-time */
+      readonly submitted_at?: string | null;
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     PatchedInquiry: {
       readonly id?: number;
       readonly name?: string;
@@ -2422,6 +2675,9 @@ export interface components {
       readonly position?: number;
       is_published?: boolean;
       readonly package_count?: number;
+    };
+    PatchedPhotoOrder: {
+      ids?: number[];
     };
     PatchedProforma: {
       readonly id?: number;
@@ -2574,6 +2830,10 @@ export interface components {
       footer_text_en?: string;
       /** Format: date-time */
       readonly updated_at?: string;
+    };
+    PhotoUpload: {
+      /** Format: uri */
+      file: string;
     };
     /**
      * @description * `bottom_right` - پایین راست
@@ -4631,6 +4891,356 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SiteSettings"];
+        };
+      };
+    };
+  };
+  admin_galleries_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"][];
+        };
+      };
+    };
+  };
+  admin_galleries_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Gallery"];
+        "application/x-www-form-urlencoded": components["schemas"]["Gallery"];
+        "multipart/form-data": components["schemas"]["Gallery"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Gallery"];
+        "application/x-www-form-urlencoded": components["schemas"]["Gallery"];
+        "multipart/form-data": components["schemas"]["Gallery"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_galleries_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedGallery"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedGallery"];
+        "multipart/form-data": components["schemas"]["PatchedGallery"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_archive_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_new_link_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_photos_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GalleryPhoto"][];
+        };
+      };
+    };
+  };
+  admin_galleries_photos_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["PhotoUpload"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GalleryPhoto"];
+        };
+      };
+    };
+  };
+  admin_galleries_photos_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+        photo_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_galleries_photos_order_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedPhotoOrder"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedPhotoOrder"];
+        "multipart/form-data": components["schemas"]["PatchedPhotoOrder"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_galleries_publish_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_reopen_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_unarchive_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Gallery"];
         };
       };
     };

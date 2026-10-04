@@ -19,7 +19,7 @@ case "${1:-web}" in
       --forwarded-allow-ips "*"
     ;;
   worker)
-    exec celery -A config worker -B \
+    exec celery -A config worker -B -Q celery,galleries \
       --loglevel "${LOG_LEVEL:-INFO}" \
       --concurrency "${CELERY_CONCURRENCY:-2}" \
       --schedule /tmp/celerybeat-schedule

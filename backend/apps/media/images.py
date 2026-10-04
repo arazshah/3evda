@@ -4,6 +4,7 @@ import base64
 import io
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from django.conf import settings
 from PIL import Image, ImageCms, ImageDraw, ImageFont, ImageOps
@@ -55,6 +56,16 @@ def target_widths(width: int) -> list[int]:
     return sorted(set(widths))
 
 
+def fit_long_edge(img: Image.Image, edge: int) -> Image.Image:
+    """Scale so that the longer side is at most `edge` (portrait and landscape alike)."""
+    longest = max(img.size)
+    if edge >= longest:
+        return img.copy()
+    ratio = edge / longest
+    size = (max(1, round(img.width * ratio)), max(1, round(img.height * ratio)))
+    return img.resize(size, Image.Resampling.LANCZOS, reducing_gap=3.0)
+
+
 def resize(img: Image.Image, width: int) -> Image.Image:
     if width >= img.width:
         return img.copy()
@@ -94,11 +105,13 @@ def copyright_exif() -> bytes:
     return exif.tobytes()
 
 
-def encode(img: Image.Image, fmt: str) -> bytes:
+def encode(img: Image.Image, fmt: str, *, exif: bool = True) -> bytes:
     buf = io.BytesIO()
-    params = dict(ENCODERS[fmt])
+    params: dict[str, Any] = dict(ENCODERS[fmt])
     pil_format = str(params.pop("format"))
-    img.save(buf, pil_format, exif=copyright_exif(), **params)
+    if exif:
+        params["exif"] = copyright_exif()
+    img.save(buf, pil_format, **params)
     return buf.getvalue()
 
 
