@@ -15,7 +15,6 @@ export type NavLabels = {
   menu: string;
   switchLanguage: string;
   quote: string;
-  book: string;
 };
 
 export function SiteHeader({
@@ -40,7 +39,6 @@ export function SiteHeader({
         { label: labels.portfolio, to: "/portfolio" },
         { label: labels.services, to: "/services" },
         { label: labels.packages, to: "/packages" },
-        { label: labels.book, to: "/book" },
         { label: labels.blog, to: "/blog" },
         { label: labels.about, to: "/about" },
         { label: labels.contact, to: "/contact" },

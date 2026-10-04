@@ -1,5 +1,14 @@
 import type { Locale } from "@/i18n/config";
-import { block, instagramUrl, localized, pick, telHref, telegramUrl, whatsappUrl } from "@/lib/site/text";
+import {
+  block,
+  href,
+  instagramUrl,
+  localized,
+  pick,
+  telHref,
+  telegramUrl,
+  whatsappUrl,
+} from "@/lib/site/text";
 import type { SiteData } from "@/lib/site/types";
 
 export function SiteFooter({
@@ -45,6 +54,12 @@ export function SiteFooter({
             </li>
           ) : null}
           {address ? <li>{address}</li> : null}
+          {/* Not in the header menu: one more item there re-wraps the menu when the web font loads and shifts the page. */}
+          <li>
+            <a className="inline-flex min-h-11 items-center hover:text-text" href={href(locale, "/book")}>
+              {labels.book}
+            </a>
+          </li>
         </ul>
         {socials.length ? (
           <ul className="flex flex-wrap gap-4 md:justify-end">

@@ -32,7 +32,6 @@ export async function SitePage({
     menu: t("nav.menu"),
     switchLanguage: t("nav.switchLanguage"),
     quote: t("nav.quote"),
-    book: t("nav.book"),
   };
   return (
     <>
@@ -51,6 +50,7 @@ export async function SitePage({
           instagram: t("footer.instagram"),
           telegram: t("footer.telegram"),
           whatsapp: t("footer.whatsapp"),
+          book: t("nav.book"),
         }}
       />
     </>
