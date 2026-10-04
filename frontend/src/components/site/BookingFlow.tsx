@@ -11,7 +11,8 @@ import type { BookingLabels } from "@/lib/site/booking-labels";
 import type { BookingOptions } from "@/lib/site/booking-api";
 
 type Days = Record<string, string[]>;
-type Done = { link: string; date: string; time: string; session_label: string };
+/** The server's answer. A trapped bot is told "pending" and nothing else, so every detail may be missing. */
+type Done = { link?: string; date?: string; time?: string; session_label?: string };
 const FIELDS = ["name", "brand", "phone", "whatsapp", "telegram", "email", "notes"] as const;
 type Field = (typeof FIELDS)[number];
 type Errors = Partial<Record<Field | "time" | "form", string>>;
@@ -113,7 +114,8 @@ export function BookingFlow({
     const found: Errors = {};
     if (!day || !time) found.time = labels.errorNeedTime;
     if (!text.name.trim()) found.name = labels.errorRequired;
-    if (!(text.phone || text.whatsapp || text.telegram || text.email).trim())
+    // Each contact field is trimmed on its own: a blank phone must not hide a real email.
+    if (![text.phone, text.whatsapp, text.telegram, text.email].some((v) => v.trim()))
       found.phone = labels.errorContact;
     if (Object.keys(found).length > 0) {
       setErrors(found);
@@ -170,17 +172,24 @@ export function BookingFlow({
   };
 
   if (phase === "done" && done) {
-    const path = new URL(done.link, "http://x").pathname;
+    const path = done.link ? new URL(done.link, "http://x").pathname : null;
+    const when =
+      done.date && done.time
+        ? `${formatDay(done.date, locale, "full")} · ${timeText(done.time, locale)}`
+        : "";
     return (
       <Card className="max-w-2xl space-y-4">
         <div ref={thanksRef} tabIndex={-1} role="status" className="space-y-3 outline-none">
           <h2 className="font-display text-2xl font-extrabold">{labels.thanksTitle}</h2>
-          <p>
-            {done.session_label} · {formatDay(done.date, locale, "full")} · {timeText(done.time, locale)}
-          </p>
+          {when && (
+            <p>
+              {done.session_label ? `${done.session_label} · ` : ""}
+              {when}
+            </p>
+          )}
           <p className="text-muted">{labels.thanksBody}</p>
         </div>
-        <ButtonLink href={path}>{labels.statusLink}</ButtonLink>
+        {path && <ButtonLink href={path}>{labels.statusLink}</ButtonLink>}
       </Card>
     );
   }

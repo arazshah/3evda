@@ -139,6 +139,31 @@ describe("BookingFlow", () => {
     expect(post.body!.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  it("shows a plain thank-you, and does not fall over, when the answer has no details (a trapped bot)", async () => {
+    stub({ status: 201, body: { status: "pending" } });
+    flow();
+    await pickFirstFreeDay();
+    fireEvent.click(await screen.findByRole("button", { name: "10:00" }));
+    fireEvent.change(screen.getByLabelText(enLabels.name), { target: { value: "Sara" } });
+    fireEvent.change(screen.getByLabelText(enLabels.phone), { target: { value: "0912" } });
+    fireEvent.click(screen.getByRole("button", { name: enLabels.submit }));
+    expect(await screen.findByText(enLabels.thanksTitle)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: enLabels.statusLink })).not.toBeInTheDocument();
+  });
+
+  it("accepts a real email when the phone is only blanks", async () => {
+    const calls = stub({ status: 201, body: { status: "pending" } });
+    flow();
+    await pickFirstFreeDay();
+    fireEvent.click(await screen.findByRole("button", { name: "10:00" }));
+    fireEvent.change(screen.getByLabelText(enLabels.name), { target: { value: "Sara" } });
+    fireEvent.change(screen.getByLabelText(enLabels.phone), { target: { value: "   " } });
+    fireEvent.change(screen.getByLabelText(enLabels.email), { target: { value: "s@example.com" } });
+    fireEvent.click(screen.getByRole("button", { name: enLabels.submit }));
+    expect(await screen.findByText(enLabels.thanksTitle)).toBeInTheDocument();
+    expect(calls.find((c) => c.method === "POST")!.body).toMatchObject({ phone: "", email: "s@example.com" });
+  });
+
   it("when the time was taken meanwhile, says so, forgets the time and reloads what is free", async () => {
     const calls = stub({
       status: 409,
