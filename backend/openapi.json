@@ -911,6 +911,1276 @@
                 }
             }
         },
+        "/api/admin/booking/closed/": {
+            "get": {
+                "operationId": "admin_booking_closed_list",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ClosedPeriod"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_booking_closed_create",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClosedPeriod"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClosedPeriod"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClosedPeriod"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClosedPeriod"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/closed/{id}/": {
+            "get": {
+                "operationId": "admin_booking_closed_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این closed period را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClosedPeriod"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_booking_closed_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این closed period را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedClosedPeriod"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedClosedPeriod"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedClosedPeriod"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClosedPeriod"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_booking_closed_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این closed period را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/hours/": {
+            "get": {
+                "operationId": "booking_hours_retrieve",
+                "description": "The whole week at once: PUT replaces every interval.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WeeklyHours"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "booking_hours_update",
+                "description": "The whole week at once: PUT replaces every interval.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WeeklyHours"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WeeklyHours"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WeeklyHours"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WeeklyHours"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/session-types/": {
+            "get": {
+                "operationId": "admin_booking_session_types_list",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SessionType"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_booking_session_types_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SessionType"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SessionType"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SessionType"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SessionType"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/session-types/{id}/": {
+            "get": {
+                "operationId": "admin_booking_session_types_retrieve",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این session type را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SessionType"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_booking_session_types_partial_update",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این session type را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSessionType"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSessionType"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSessionType"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SessionType"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "admin_booking_session_types_destroy",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این session type را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/session-types/reorder/": {
+            "post": {
+                "operationId": "admin_booking_session_types_reorder_create",
+                "description": "New rows go to the end of the list; create and update are written to the audit log.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReorderIds"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/admin/booking/settings/": {
+            "get": {
+                "operationId": "admin_booking_settings_retrieve",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_booking_settings_partial_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBookingSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBookingSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBookingSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/": {
+            "get": {
+                "operationId": "admin_bookings_list",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "تعداد نتایج برای نمایش در هر صفحه.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedBookingListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_bookings_create",
+                "description": "A booking made by the owner (after a phone call, say): outside the hours is fine, overlap never.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminBookingCreate"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminBookingCreate"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminBookingCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/": {
+            "get": {
+                "operationId": "admin_bookings_retrieve",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_bookings_partial_update",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBooking"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBooking"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedBooking"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/cancel/": {
+            "post": {
+                "operationId": "admin_bookings_cancel_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reason"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reason"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reason"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/complete/": {
+            "post": {
+                "operationId": "admin_bookings_complete_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/confirm/": {
+            "post": {
+                "operationId": "admin_bookings_confirm_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/reschedule/": {
+            "post": {
+                "operationId": "admin_bookings_reschedule_create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reschedule"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reschedule"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Reschedule"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/summary/": {
+            "get": {
+                "operationId": "bookings_summary",
+                "description": "Upcoming bookings still waiting for an answer (for the badge on the panel menu).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cancelled",
+                                "completed",
+                                "confirmed",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD (Tehran)"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingSummary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/cms/blocks/": {
             "get": {
                 "operationId": "admin_cms_blocks_list",
@@ -5193,6 +6463,174 @@
                 }
             }
         },
+        "/api/public/booking/availability": {
+            "get": {
+                "operationId": "public_booking_availability",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "YYYY-MM-DD",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Availability"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/booking/options": {
+            "get": {
+                "operationId": "public_booking_options",
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicOptions"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/bookings": {
+            "post": {
+                "operationId": "public_bookings_create",
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCreate"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCreate"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingReceived"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/bookings/{token}": {
+            "get": {
+                "operationId": "public_bookings_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBooking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/bookings/{token}/cancel": {
+            "post": {
+                "operationId": "public_bookings_cancel",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicBooking"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/inquiries": {
             "post": {
                 "operationId": "public_inquiries_create",
@@ -5612,6 +7050,101 @@
     },
     "components": {
         "schemas": {
+            "AdminBookingCreate": {
+                "type": "object",
+                "properties": {
+                    "session_type": {
+                        "type": "integer"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "time": {
+                        "type": "string",
+                        "format": "time"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AdminBookingCreateStatusEnum"
+                            }
+                        ],
+                        "default": "confirmed"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "brand": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "email": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "email",
+                                "maxLength": 254
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "maxLength": 2000
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "default": "fa"
+                    },
+                    "package": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "inquiry": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "proforma": {
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "date",
+                    "name",
+                    "session_type",
+                    "time"
+                ]
+            },
+            "AdminBookingCreateStatusEnum": {
+                "enum": [
+                    "pending",
+                    "confirmed"
+                ],
+                "type": "string",
+                "description": "* `pending` - pending\n* `confirmed` - confirmed"
+            },
             "Alternate": {
                 "type": "object",
                 "properties": {
@@ -5927,6 +7460,39 @@
                     "username"
                 ]
             },
+            "Availability": {
+                "type": "object",
+                "properties": {
+                    "days": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AvailableDay"
+                        }
+                    }
+                },
+                "required": [
+                    "days"
+                ]
+            },
+            "AvailableDay": {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "times": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "date",
+                    "times"
+                ]
+            },
             "BlankEnum": {
                 "enum": [
                     ""
@@ -6039,6 +7605,457 @@
                     "title_fa"
                 ]
             },
+            "Booking": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BookingStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "session_label": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Title as the customer saw it"
+                    },
+                    "session_type": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "start_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "end_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "date": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "notes": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "package": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "package_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "inquiry": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "proforma": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "internal_note": {
+                        "type": "string"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "cancelled_by": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CancelledByEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "cancel_reason": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_by_admin": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "link": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "is_new": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "brand",
+                    "cancel_reason",
+                    "cancelled_by",
+                    "created_at",
+                    "created_by_admin",
+                    "date",
+                    "email",
+                    "end_at",
+                    "end_time",
+                    "id",
+                    "inquiry",
+                    "is_new",
+                    "language",
+                    "link",
+                    "name",
+                    "notes",
+                    "package",
+                    "package_label",
+                    "phone",
+                    "proforma",
+                    "seen_at",
+                    "session_label",
+                    "session_type",
+                    "start_at",
+                    "status",
+                    "telegram",
+                    "time",
+                    "updated_at",
+                    "whatsapp"
+                ]
+            },
+            "BookingCreate": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "time": {
+                        "type": "string",
+                        "format": "time"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "brand": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "email": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "email",
+                                "maxLength": 254
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "maxLength": 2000
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "default": "fa"
+                    },
+                    "package": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "website": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "maxLength": 200
+                    }
+                },
+                "required": [
+                    "date",
+                    "name",
+                    "time",
+                    "type"
+                ]
+            },
+            "BookingList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BookingStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "session_label": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Title as the customer saw it"
+                    },
+                    "session_type": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "start_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "end_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "date": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "package_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "is_new": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "brand",
+                    "date",
+                    "end_at",
+                    "end_time",
+                    "id",
+                    "is_new",
+                    "name",
+                    "package_label",
+                    "phone",
+                    "session_label",
+                    "session_type",
+                    "start_at",
+                    "status",
+                    "time"
+                ]
+            },
+            "BookingReceived": {
+                "type": "object",
+                "description": "What the customer sees of their own booking (no ids, no internal notes).",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "session_label": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "time": {
+                        "type": "string"
+                    },
+                    "end_time": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "package_label": {
+                        "type": "string"
+                    },
+                    "cancelled_by": {
+                        "type": "string"
+                    },
+                    "can_cancel": {
+                        "type": "boolean"
+                    },
+                    "link": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "can_cancel",
+                    "cancelled_by",
+                    "date",
+                    "end_time",
+                    "language",
+                    "link",
+                    "name",
+                    "package_label",
+                    "session_label",
+                    "status",
+                    "time"
+                ]
+            },
+            "BookingSettings": {
+                "type": "object",
+                "properties": {
+                    "max_per_day": {
+                        "type": "integer",
+                        "maximum": 50,
+                        "minimum": 1,
+                        "description": "Active bookings per day"
+                    },
+                    "min_notice_hours": {
+                        "type": "integer",
+                        "maximum": 720,
+                        "minimum": 0
+                    },
+                    "horizon_days": {
+                        "type": "integer",
+                        "maximum": 365,
+                        "minimum": 1
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "updated_at"
+                ]
+            },
+            "BookingStatusEnum": {
+                "enum": [
+                    "pending",
+                    "confirmed",
+                    "completed",
+                    "cancelled"
+                ],
+                "type": "string",
+                "description": "* `pending` - در انتظار تأیید\n* `confirmed` - تأییدشده\n* `completed` - انجام‌شده\n* `cancelled` - لغو"
+            },
+            "BookingSummary": {
+                "type": "object",
+                "properties": {
+                    "pending": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "pending"
+                ]
+            },
+            "CancelledByEnum": {
+                "enum": [
+                    "customer",
+                    "admin"
+                ],
+                "type": "string",
+                "description": "* `customer` - مشتری\n* `admin` - ادمین"
+            },
             "Category": {
                 "type": "object",
                 "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
@@ -6106,6 +8123,32 @@
                     "position",
                     "project_count",
                     "title_fa"
+                ]
+            },
+            "ClosedPeriod": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 200
+                    }
+                },
+                "required": [
+                    "end_date",
+                    "id",
+                    "start_date"
                 ]
             },
             "Code": {
@@ -6954,6 +8997,37 @@
                     "title_fa"
                 ]
             },
+            "PaginatedBookingListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingList"
+                        }
+                    }
+                }
+            },
             "PaginatedInquiryListList": {
                 "type": "object",
                 "required": [
@@ -7280,6 +9354,179 @@
                     }
                 }
             },
+            "PatchedBooking": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BookingStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "session_label": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Title as the customer saw it"
+                    },
+                    "session_type": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "start_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "end_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "date": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "brand": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "whatsapp": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "telegram": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "notes": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "package": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "package_label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "inquiry": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "proforma": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "internal_note": {
+                        "type": "string"
+                    },
+                    "seen_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "cancelled_by": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CancelledByEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "cancel_reason": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_by_admin": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "link": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "is_new": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedBookingSettings": {
+                "type": "object",
+                "properties": {
+                    "max_per_day": {
+                        "type": "integer",
+                        "maximum": 50,
+                        "minimum": 1,
+                        "description": "Active bookings per day"
+                    },
+                    "min_notice_hours": {
+                        "type": "integer",
+                        "maximum": 720,
+                        "minimum": 0
+                    },
+                    "horizon_days": {
+                        "type": "integer",
+                        "maximum": 365,
+                        "minimum": 1
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PatchedCategory": {
                 "type": "object",
                 "description": "`slug` may be left empty: it is then made from the English (or Persian) title.",
@@ -7339,6 +9586,27 @@
                     "project_count": {
                         "type": "integer",
                         "readOnly": true
+                    }
+                }
+            },
+            "PatchedClosedPeriod": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 200
                     }
                 }
             },
@@ -8152,6 +10420,45 @@
                         "type": "integer",
                         "maximum": 100000,
                         "minimum": 1
+                    }
+                }
+            },
+            "PatchedSessionType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "pattern": "^[A-Za-z0-9_\\-]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "duration_minutes": {
+                        "type": "integer",
+                        "maximum": 720,
+                        "minimum": 15
+                    },
+                    "buffer_minutes": {
+                        "type": "integer",
+                        "maximum": 240,
+                        "minimum": 0
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
                     }
                 }
             },
@@ -9106,6 +11413,55 @@
                     "tags"
                 ]
             },
+            "PublicBooking": {
+                "type": "object",
+                "description": "What the customer sees of their own booking (no ids, no internal notes).",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "session_label": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "time": {
+                        "type": "string"
+                    },
+                    "end_time": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "package_label": {
+                        "type": "string"
+                    },
+                    "cancelled_by": {
+                        "type": "string"
+                    },
+                    "can_cancel": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "can_cancel",
+                    "cancelled_by",
+                    "date",
+                    "end_time",
+                    "language",
+                    "name",
+                    "package_label",
+                    "session_label",
+                    "status",
+                    "time"
+                ]
+            },
             "PublicCategory": {
                 "type": "object",
                 "properties": {
@@ -9428,6 +11784,28 @@
                     "lqip",
                     "variants",
                     "width"
+                ]
+            },
+            "PublicOptions": {
+                "type": "object",
+                "properties": {
+                    "session_types": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicSessionType"
+                        }
+                    },
+                    "horizon_days": {
+                        "type": "integer"
+                    },
+                    "min_notice_hours": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "horizon_days",
+                    "min_notice_hours",
+                    "session_types"
                 ]
             },
             "PublicPackage": {
@@ -9846,6 +12224,34 @@
                     "title_en",
                     "title_fa",
                     "year"
+                ]
+            },
+            "PublicSessionType": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "duration_minutes": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "duration_minutes",
+                    "key",
+                    "title_en",
+                    "title_fa"
                 ]
             },
             "PublicSettings": {
@@ -10275,6 +12681,16 @@
                     }
                 }
             },
+            "Reason": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "default": "",
+                        "maxLength": 300
+                    }
+                }
+            },
             "RecoveryCodes": {
                 "type": "object",
                 "properties": {
@@ -10329,6 +12745,69 @@
                 },
                 "required": [
                     "ids"
+                ]
+            },
+            "Reschedule": {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "time": {
+                        "type": "string",
+                        "format": "time"
+                    }
+                },
+                "required": [
+                    "date",
+                    "time"
+                ]
+            },
+            "SessionType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "pattern": "^[A-Za-z0-9_\\-]+$"
+                    },
+                    "title_fa": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "title_en": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "duration_minutes": {
+                        "type": "integer",
+                        "maximum": 720,
+                        "minimum": 15
+                    },
+                    "buffer_minutes": {
+                        "type": "integer",
+                        "maximum": 240,
+                        "minimum": 0
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "duration_minutes",
+                    "id",
+                    "key",
+                    "position",
+                    "title_fa"
                 ]
             },
             "SiteSettings": {
@@ -10667,6 +13146,43 @@
                 },
                 "required": [
                     "updated_at"
+                ]
+            },
+            "WeeklyHours": {
+                "type": "object",
+                "properties": {
+                    "hours": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WorkingHours"
+                        }
+                    }
+                },
+                "required": [
+                    "hours"
+                ]
+            },
+            "WorkingHours": {
+                "type": "object",
+                "properties": {
+                    "weekday": {
+                        "type": "integer",
+                        "maximum": 6,
+                        "minimum": 0
+                    },
+                    "start": {
+                        "type": "string",
+                        "format": "time"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "time"
+                    }
+                },
+                "required": [
+                    "end",
+                    "start",
+                    "weekday"
                 ]
             }
         },

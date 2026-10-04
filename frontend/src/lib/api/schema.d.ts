@@ -149,6 +149,240 @@ export interface paths {
     patch: operations["admin_blog_tags_partial_update"];
     trace?: never;
   };
+  "/api/admin/booking/closed/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_booking_closed_list"];
+    put?: never;
+    post: operations["admin_booking_closed_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/booking/closed/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_booking_closed_retrieve"];
+    put?: never;
+    post?: never;
+    delete: operations["admin_booking_closed_destroy"];
+    options?: never;
+    head?: never;
+    patch: operations["admin_booking_closed_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/booking/hours/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The whole week at once: PUT replaces every interval. */
+    get: operations["booking_hours_retrieve"];
+    /** @description The whole week at once: PUT replaces every interval. */
+    put: operations["booking_hours_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/booking/session-types/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_booking_session_types_list"];
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_booking_session_types_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/booking/session-types/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    get: operations["admin_booking_session_types_retrieve"];
+    put?: never;
+    post?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    delete: operations["admin_booking_session_types_destroy"];
+    options?: never;
+    head?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    patch: operations["admin_booking_session_types_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/booking/session-types/reorder/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description New rows go to the end of the list; create and update are written to the audit log. */
+    post: operations["admin_booking_session_types_reorder_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/booking/settings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_booking_settings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_booking_settings_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/bookings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_bookings_list"];
+    put?: never;
+    /** @description A booking made by the owner (after a phone call, say): outside the hours is fine, overlap never. */
+    post: operations["admin_bookings_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/bookings/{id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_bookings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_bookings_partial_update"];
+    trace?: never;
+  };
+  "/api/admin/bookings/{id}/cancel/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_bookings_cancel_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/bookings/{id}/complete/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_bookings_complete_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/bookings/{id}/confirm/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_bookings_confirm_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/bookings/{id}/reschedule/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["admin_bookings_reschedule_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/bookings/summary/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Upcoming bookings still waiting for an answer (for the badge on the panel menu). */
+    get: operations["bookings_summary"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/cms/blocks/": {
     parameters: {
       query?: never;
@@ -1070,6 +1304,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/booking/availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_booking_availability"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/booking/options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_booking_options"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/bookings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_bookings_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/bookings/{token}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_bookings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/bookings/{token}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_bookings_cancel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/inquiries": {
     parameters: {
       query?: never;
@@ -1289,6 +1603,33 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    AdminBookingCreate: {
+      session_type: number;
+      /** Format: date */
+      date: string;
+      /** Format: time */
+      time: string;
+      /** @default confirmed */
+      status: components["schemas"]["AdminBookingCreateStatusEnum"];
+      name: string;
+      brand?: string;
+      phone?: string;
+      whatsapp?: string;
+      telegram?: string;
+      email?: string;
+      notes?: string;
+      /** @default fa */
+      language: components["schemas"]["LanguageEnum"];
+      package?: number | null;
+      inquiry?: number | null;
+      proforma?: number | null;
+    };
+    /**
+     * @description * `pending` - pending
+     *     * `confirmed` - confirmed
+     * @enum {string}
+     */
+    AdminBookingCreateStatusEnum: "pending" | "confirmed";
     Alternate: {
       language: string;
       slug: string;
@@ -1366,6 +1707,14 @@ export interface components {
       username: string;
       display_name: string;
     };
+    Availability: {
+      days: components["schemas"]["AvailableDay"][];
+    };
+    AvailableDay: {
+      /** Format: date */
+      date: string;
+      times: string[];
+    };
     /** @enum {unknown} */
     BlankEnum: "";
     BlogCategory: {
@@ -1390,6 +1739,122 @@ export interface components {
       title_en: string;
       count: number;
     };
+    Booking: {
+      readonly id: number;
+      readonly status: components["schemas"]["BookingStatusEnum"];
+      readonly language: components["schemas"]["LanguageEnum"];
+      /** @description Title as the customer saw it */
+      readonly session_label: string;
+      readonly session_type: number;
+      /** Format: date-time */
+      readonly start_at: string;
+      /** Format: date-time */
+      readonly end_at: string;
+      readonly date: string;
+      readonly time: string;
+      readonly end_time: string;
+      readonly name: string;
+      readonly brand: string;
+      readonly phone: string;
+      readonly whatsapp: string;
+      readonly telegram: string;
+      /** Format: email */
+      readonly email: string;
+      readonly notes: string;
+      readonly package: number | null;
+      readonly package_label: string;
+      readonly inquiry: number | null;
+      readonly proforma: number | null;
+      internal_note?: string;
+      /** Format: date-time */
+      readonly seen_at: string | null;
+      readonly cancelled_by: components["schemas"]["CancelledByEnum"];
+      readonly cancel_reason: string;
+      readonly created_by_admin: boolean;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+      readonly link: string;
+      readonly is_new: boolean;
+    };
+    BookingCreate: {
+      type: string;
+      /** Format: date */
+      date: string;
+      /** Format: time */
+      time: string;
+      name: string;
+      brand?: string;
+      phone?: string;
+      whatsapp?: string;
+      telegram?: string;
+      email?: string;
+      notes?: string;
+      /** @default fa */
+      language: components["schemas"]["LanguageEnum"];
+      package?: number | null;
+      website?: string;
+    };
+    BookingList: {
+      readonly id: number;
+      readonly status: components["schemas"]["BookingStatusEnum"];
+      /** @description Title as the customer saw it */
+      readonly session_label: string;
+      readonly session_type: number;
+      /** Format: date-time */
+      readonly start_at: string;
+      /** Format: date-time */
+      readonly end_at: string;
+      readonly date: string;
+      readonly time: string;
+      readonly end_time: string;
+      readonly name: string;
+      readonly brand: string;
+      readonly phone: string;
+      readonly package_label: string;
+      readonly is_new: boolean;
+    };
+    /** @description What the customer sees of their own booking (no ids, no internal notes). */
+    BookingReceived: {
+      status: string;
+      language: string;
+      session_label: string;
+      /** Format: date */
+      date: string;
+      time: string;
+      end_time: string;
+      name: string;
+      package_label: string;
+      cancelled_by: string;
+      can_cancel: boolean;
+      link: string;
+    };
+    BookingSettings: {
+      /** @description Active bookings per day */
+      max_per_day?: number;
+      min_notice_hours?: number;
+      horizon_days?: number;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    /**
+     * @description * `pending` - در انتظار تأیید
+     *     * `confirmed` - تأییدشده
+     *     * `completed` - انجام‌شده
+     *     * `cancelled` - لغو
+     * @enum {string}
+     */
+    BookingStatusEnum: "pending" | "confirmed" | "completed" | "cancelled";
+    BookingSummary: {
+      pending: number;
+    };
+    /**
+     * @description * `customer` - مشتری
+     *     * `admin` - ادمین
+     * @enum {string}
+     */
+    CancelledByEnum: "customer" | "admin";
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     Category: {
       readonly id: number;
@@ -1404,6 +1869,14 @@ export interface components {
       readonly position: number;
       is_published?: boolean;
       readonly project_count: number;
+    };
+    ClosedPeriod: {
+      readonly id: number;
+      /** Format: date */
+      start_date: string;
+      /** Format: date */
+      end_date: string;
+      reason?: string;
     };
     Code: {
       code: string;
@@ -1638,6 +2111,21 @@ export interface components {
       is_published?: boolean;
       readonly package_count: number;
     };
+    PaginatedBookingListList: {
+      /** @example 123 */
+      count: number;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null;
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null;
+      results: components["schemas"]["BookingList"][];
+    };
     PaginatedInquiryListList: {
       /** @example 123 */
       count: number;
@@ -1740,6 +2228,53 @@ export interface components {
       title_en?: string;
       readonly article_count?: number;
     };
+    PatchedBooking: {
+      readonly id?: number;
+      readonly status?: components["schemas"]["BookingStatusEnum"];
+      readonly language?: components["schemas"]["LanguageEnum"];
+      /** @description Title as the customer saw it */
+      readonly session_label?: string;
+      readonly session_type?: number;
+      /** Format: date-time */
+      readonly start_at?: string;
+      /** Format: date-time */
+      readonly end_at?: string;
+      readonly date?: string;
+      readonly time?: string;
+      readonly end_time?: string;
+      readonly name?: string;
+      readonly brand?: string;
+      readonly phone?: string;
+      readonly whatsapp?: string;
+      readonly telegram?: string;
+      /** Format: email */
+      readonly email?: string;
+      readonly notes?: string;
+      readonly package?: number | null;
+      readonly package_label?: string;
+      readonly inquiry?: number | null;
+      readonly proforma?: number | null;
+      internal_note?: string;
+      /** Format: date-time */
+      readonly seen_at?: string | null;
+      readonly cancelled_by?: components["schemas"]["CancelledByEnum"];
+      readonly cancel_reason?: string;
+      readonly created_by_admin?: boolean;
+      /** Format: date-time */
+      readonly created_at?: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
+      readonly link?: string;
+      readonly is_new?: boolean;
+    };
+    PatchedBookingSettings: {
+      /** @description Active bookings per day */
+      max_per_day?: number;
+      min_notice_hours?: number;
+      horizon_days?: number;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     /** @description `slug` may be left empty: it is then made from the English (or Persian) title. */
     PatchedCategory: {
       readonly id?: number;
@@ -1754,6 +2289,14 @@ export interface components {
       readonly position?: number;
       is_published?: boolean;
       readonly project_count?: number;
+    };
+    PatchedClosedPeriod: {
+      readonly id?: number;
+      /** Format: date */
+      start_date?: string;
+      /** Format: date */
+      end_date?: string;
+      reason?: string;
     };
     PatchedContentBlock: {
       readonly key?: string;
@@ -1995,6 +2538,16 @@ export interface components {
       min_quantity?: number;
       max_quantity?: number;
     };
+    PatchedSessionType: {
+      readonly id?: number;
+      key?: string;
+      title_fa?: string;
+      title_en?: string;
+      duration_minutes?: number;
+      buffer_minutes?: number;
+      is_active?: boolean;
+      readonly position?: number;
+    };
     PatchedSiteSettings: {
       /** Format: uuid */
       logo?: string | null;
@@ -2223,6 +2776,20 @@ export interface components {
       categories: components["schemas"]["BlogTaxonomyItem"][];
       tags: components["schemas"]["BlogTaxonomyItem"][];
     };
+    /** @description What the customer sees of their own booking (no ids, no internal notes). */
+    PublicBooking: {
+      status: string;
+      language: string;
+      session_label: string;
+      /** Format: date */
+      date: string;
+      time: string;
+      end_time: string;
+      name: string;
+      package_label: string;
+      cancelled_by: string;
+      can_cancel: boolean;
+    };
     PublicCategory: {
       readonly slug: string;
       readonly title_fa: string;
@@ -2287,6 +2854,11 @@ export interface components {
       readonly alt_en: string;
       readonly lqip: string;
       readonly variants: components["schemas"]["MediaVariant"][];
+    };
+    PublicOptions: {
+      session_types: components["schemas"]["PublicSessionType"][];
+      horizon_days: number;
+      min_notice_hours: number;
     };
     PublicPackage: {
       readonly id: number;
@@ -2378,6 +2950,12 @@ export interface components {
       readonly images: components["schemas"]["PublicImage"][];
       readonly previous: string | null;
       readonly next: string | null;
+    };
+    PublicSessionType: {
+      readonly key: string;
+      readonly title_fa: string;
+      readonly title_en: string;
+      readonly duration_minutes: number;
     };
     PublicSettings: {
       readonly logo: components["schemas"]["PublicMedia"] | null;
@@ -2486,6 +3064,10 @@ export interface components {
       min_quantity?: number;
       max_quantity?: number;
     };
+    Reason: {
+      /** @default  */
+      reason: string;
+    };
     RecoveryCodes: {
       recovery_codes: string[];
     };
@@ -2499,6 +3081,22 @@ export interface components {
     };
     ReorderIds: {
       ids: number[];
+    };
+    Reschedule: {
+      /** Format: date */
+      date: string;
+      /** Format: time */
+      time: string;
+    };
+    SessionType: {
+      readonly id: number;
+      key: string;
+      title_fa: string;
+      title_en?: string;
+      duration_minutes: number;
+      buffer_minutes?: number;
+      is_active?: boolean;
+      readonly position: number;
     };
     SiteSettings: {
       /** Format: uuid */
@@ -2600,6 +3198,16 @@ export interface components {
       size_ratio?: number;
       /** Format: date-time */
       readonly updated_at: string;
+    };
+    WeeklyHours: {
+      hours: components["schemas"]["WorkingHours"][];
+    };
+    WorkingHours: {
+      weekday: number;
+      /** Format: time */
+      start: string;
+      /** Format: time */
+      end: string;
     };
   };
   responses: never;
@@ -3030,6 +3638,628 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["BlogTag"];
+        };
+      };
+    };
+  };
+  admin_booking_closed_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClosedPeriod"][];
+        };
+      };
+    };
+  };
+  admin_booking_closed_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClosedPeriod"];
+        "application/x-www-form-urlencoded": components["schemas"]["ClosedPeriod"];
+        "multipart/form-data": components["schemas"]["ClosedPeriod"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClosedPeriod"];
+        };
+      };
+    };
+  };
+  admin_booking_closed_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این closed period را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClosedPeriod"];
+        };
+      };
+    };
+  };
+  admin_booking_closed_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این closed period را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_booking_closed_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این closed period را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedClosedPeriod"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedClosedPeriod"];
+        "multipart/form-data": components["schemas"]["PatchedClosedPeriod"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClosedPeriod"];
+        };
+      };
+    };
+  };
+  booking_hours_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WeeklyHours"];
+        };
+      };
+    };
+  };
+  booking_hours_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WeeklyHours"];
+        "application/x-www-form-urlencoded": components["schemas"]["WeeklyHours"];
+        "multipart/form-data": components["schemas"]["WeeklyHours"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WeeklyHours"];
+        };
+      };
+    };
+  };
+  admin_booking_session_types_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionType"][];
+        };
+      };
+    };
+  };
+  admin_booking_session_types_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SessionType"];
+        "application/x-www-form-urlencoded": components["schemas"]["SessionType"];
+        "multipart/form-data": components["schemas"]["SessionType"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionType"];
+        };
+      };
+    };
+  };
+  admin_booking_session_types_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این session type را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionType"];
+        };
+      };
+    };
+  };
+  admin_booking_session_types_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این session type را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_booking_session_types_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این session type را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedSessionType"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedSessionType"];
+        "multipart/form-data": components["schemas"]["PatchedSessionType"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionType"];
+        };
+      };
+    };
+  };
+  admin_booking_session_types_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReorderIds"];
+        "application/x-www-form-urlencoded": components["schemas"]["ReorderIds"];
+        "multipart/form-data": components["schemas"]["ReorderIds"];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  admin_booking_settings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingSettings"];
+        };
+      };
+    };
+  };
+  admin_booking_settings_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedBookingSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedBookingSettings"];
+        "multipart/form-data": components["schemas"]["PatchedBookingSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingSettings"];
+        };
+      };
+    };
+  };
+  admin_bookings_list: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        /** @description یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده. */
+        page?: number;
+        /** @description تعداد نتایج برای نمایش در هر صفحه. */
+        page_size?: number;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedBookingListList"];
+        };
+      };
+    };
+  };
+  admin_bookings_create: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminBookingCreate"];
+        "application/x-www-form-urlencoded": components["schemas"]["AdminBookingCreate"];
+        "multipart/form-data": components["schemas"]["AdminBookingCreate"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_retrieve: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_partial_update: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedBooking"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedBooking"];
+        "multipart/form-data": components["schemas"]["PatchedBooking"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_cancel_create: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Reason"];
+        "application/x-www-form-urlencoded": components["schemas"]["Reason"];
+        "multipart/form-data": components["schemas"]["Reason"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_complete_create: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_confirm_create: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  admin_bookings_reschedule_create: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این booking را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Reschedule"];
+        "application/x-www-form-urlencoded": components["schemas"]["Reschedule"];
+        "multipart/form-data": components["schemas"]["Reschedule"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Booking"];
+        };
+      };
+    };
+  };
+  bookings_summary: {
+    parameters: {
+      query?: {
+        /** @description YYYY-MM-DD (Tehran) */
+        from?: string;
+        q?: string;
+        status?: "cancelled" | "completed" | "confirmed" | "pending";
+        /** @description YYYY-MM-DD (Tehran) */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingSummary"];
         };
       };
     };
@@ -5300,6 +6530,117 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicBlogTaxonomy"];
+        };
+      };
+    };
+  };
+  public_booking_availability: {
+    parameters: {
+      query: {
+        /** @description YYYY-MM-DD */
+        from: string;
+        /** @description YYYY-MM-DD */
+        to: string;
+        type: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Availability"];
+        };
+      };
+    };
+  };
+  public_booking_options: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicOptions"];
+        };
+      };
+    };
+  };
+  public_bookings_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BookingCreate"];
+        "application/x-www-form-urlencoded": components["schemas"]["BookingCreate"];
+        "multipart/form-data": components["schemas"]["BookingCreate"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingReceived"];
+        };
+      };
+    };
+  };
+  public_bookings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBooking"];
+        };
+      };
+    };
+  };
+  public_bookings_cancel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicBooking"];
         };
       };
     };
