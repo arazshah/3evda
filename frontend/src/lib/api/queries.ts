@@ -34,6 +34,10 @@ export const keys = {
   inquirySummary: ["inquiries", "summary"] as const,
   proformas: ["proformas"] as const,
   proformaSettings: ["proformas", "settings"] as const,
+  sessionTypes: ["booking", "session-types"] as const,
+  bookingHours: ["booking", "hours"] as const,
+  closedPeriods: ["booking", "closed"] as const,
+  bookingSettings: ["booking", "settings"] as const,
   articles: ["blog", "articles"] as const,
   blogCategories: ["blog", "categories"] as const,
   blogTags: ["blog", "tags"] as const,
@@ -56,6 +60,10 @@ export type InquiryStatus = Schemas["InquiryStatusEnum"];
 export type Proforma = Schemas["Proforma"];
 export type ProformaListItem = Schemas["ProformaList"];
 export type ProformaSettings = Schemas["ProformaSettings"];
+export type SessionType = Schemas["SessionType"];
+export type ClosedPeriod = Schemas["ClosedPeriod"];
+export type WorkingHours = Schemas["WorkingHours"];
+export type BookingSettings = Schemas["BookingSettings"];
 export type Article = Schemas["Article"];
 export type BlogCategory = Schemas["BlogCategory"];
 export type BlogTag = Schemas["BlogTag"];
@@ -632,6 +640,100 @@ export function useSaveProformaSettings() {
     mutationFn: (body: Schemas["PatchedProformaSettings"]) =>
       unwrap(api.PATCH("/api/admin/proformas/settings/", { body })),
     onSuccess: (data) => client.setQueryData(keys.proformaSettings, data),
+  });
+}
+
+// ---- booking settings ------------------------------------------------------------------------------
+
+export function useSessionTypes() {
+  return useQuery({
+    queryKey: keys.sessionTypes,
+    queryFn: () => unwrap(api.GET("/api/admin/booking/session-types/")),
+  });
+}
+
+export function useSaveSessionType() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }: Schemas["PatchedSessionType"] & { id?: number }) =>
+      id === undefined
+        ? unwrap(api.POST("/api/admin/booking/session-types/", { body: body as SessionType }))
+        : unwrap(api.PATCH("/api/admin/booking/session-types/{id}/", { params: { path: { id } }, body })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.sessionTypes }),
+  });
+}
+
+export function useDeleteSessionType() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/booking/session-types/{id}/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.sessionTypes }),
+  });
+}
+
+export function useReorderSessionTypes() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      unwrap(api.POST("/api/admin/booking/session-types/reorder/", { body: { ids } })),
+    onSettled: () => client.invalidateQueries({ queryKey: keys.sessionTypes }),
+  });
+}
+
+export function useBookingHours() {
+  return useQuery({
+    queryKey: keys.bookingHours,
+    queryFn: () => unwrap(api.GET("/api/admin/booking/hours/")),
+  });
+}
+
+export function useSaveBookingHours() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (hours: WorkingHours[]) => unwrap(api.PUT("/api/admin/booking/hours/", { body: { hours } })),
+    onSuccess: (data) => client.setQueryData(keys.bookingHours, data),
+  });
+}
+
+export function useClosedPeriods() {
+  return useQuery({
+    queryKey: keys.closedPeriods,
+    queryFn: () => unwrap(api.GET("/api/admin/booking/closed/")),
+  });
+}
+
+export function useSaveClosedPeriod() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Omit<ClosedPeriod, "id">) =>
+      unwrap(api.POST("/api/admin/booking/closed/", { body: body as ClosedPeriod })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.closedPeriods }),
+  });
+}
+
+export function useDeleteClosedPeriod() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      unwrap(api.DELETE("/api/admin/booking/closed/{id}/", { params: { path: { id } } })),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.closedPeriods }),
+  });
+}
+
+export function useBookingSettings() {
+  return useQuery({
+    queryKey: keys.bookingSettings,
+    queryFn: () => unwrap(api.GET("/api/admin/booking/settings/")),
+  });
+}
+
+export function useSaveBookingSettings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas["PatchedBookingSettings"]) =>
+      unwrap(api.PATCH("/api/admin/booking/settings/", { body })),
+    onSuccess: (data) => client.setQueryData(keys.bookingSettings, data),
   });
 }
 
