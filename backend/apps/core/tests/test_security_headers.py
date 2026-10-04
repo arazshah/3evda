@@ -33,3 +33,117 @@ def test_a_view_that_chose_its_own_caching_keeps_it():
 
 def test_the_request_id_is_still_there():
     assert APIClient().get("/api/health/live", HTTP_X_REQUEST_ID="abc123")["X-Request-ID"] == "abc123"
+
+
+def test_api_answers_are_saved_not_rendered_if_a_browser_opens_them():
+    r = APIClient().get("/api/health/live")
+    assert r["Content-Type"].startswith("application/json")
+    assert r["Content-Disposition"] == 'attachment; filename="api.json"'
+
+
+def test_an_answer_that_names_its_own_download_keeps_its_name(owner_client):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    def view(request):
+        response = HttpResponse(b"{}", content_type="application/json")
+        response["Content-Disposition"] = 'attachment; filename="mine.json"'
+        return response
+
+    response = SecurityHeadersMiddleware(view)(RequestFactory().get("/api/x"))
+    assert response["Content-Disposition"] == 'attachment; filename="mine.json"'
+
+
+def test_pages_and_files_that_are_not_json_are_not_given_a_download_name():
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    html = SecurityHeadersMiddleware(lambda r: HttpResponse("<p>", content_type="text/html"))(
+        RequestFactory().get("/x")
+    )
+    assert "Content-Disposition" not in html
+    image = SecurityHeadersMiddleware(lambda r: HttpResponse(b"x", content_type="image/webp"))(
+        RequestFactory().get("/api/public/x")
+    )
+    assert "Content-Disposition" not in image
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    [
+        "application/json",
+        "application/json; charset=utf-8",
+        "application/vnd.oai.openapi+json",
+        "application/problem+json",
+    ],
+)
+def test_every_json_flavour_is_saved_not_rendered(content_type):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    response = SecurityHeadersMiddleware(lambda r: HttpResponse("{}", content_type=content_type))(
+        RequestFactory().get("/api/x")
+    )
+    assert response["Content-Disposition"] == 'attachment; filename="api.json"'
+
+
+def test_the_openapi_schema_the_owner_requests_is_saved_not_rendered(owner_client):
+    r = owner_client.get("/api/schema/", HTTP_ACCEPT="application/vnd.oai.openapi+json")
+    assert r.status_code == 200
+    assert r["Content-Disposition"].startswith("attachment;")  # the view said "inline"; it is saved all the same
+
+
+@pytest.mark.parametrize(
+    "content_type", ["text/html", "text/plain", "image/webp", "application/pdf", "application/jsonp"]
+)
+def test_other_types_are_left_alone(content_type):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    response = SecurityHeadersMiddleware(lambda r: HttpResponse("x", content_type=content_type))(
+        RequestFactory().get("/api/x")
+    )
+    assert "Content-Disposition" not in response
+
+
+def test_what_the_api_answers_may_never_be_rendered_or_framed():
+    r = APIClient().get("/api/health/live")
+    csp = r["Content-Security-Policy"]
+    assert "default-src 'none'" in csp and "frame-ancestors 'none'" in csp
+
+
+def test_the_django_admin_has_its_own_strict_policy_and_still_works(client):
+    r = client.get("/django-admin/login/")
+    assert r.status_code == 200
+    csp = r["Content-Security-Policy"]
+    assert "default-src 'self'" in csp and "frame-ancestors 'none'" in csp and "object-src 'none'" in csp
+    assert "script-src" not in csp or "unsafe-inline" not in csp.split("script-src")[1].split(";")[0]
+
+
+def test_a_policy_a_view_set_itself_is_kept():
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    def view(request):
+        response = HttpResponse("x")
+        response["Content-Security-Policy"] = "default-src 'self'"
+        return response
+
+    assert (
+        SecurityHeadersMiddleware(view)(RequestFactory().get("/api/x"))["Content-Security-Policy"]
+        == "default-src 'self'"
+    )
+
+
+def test_static_files_are_not_opened_to_every_origin(settings):
+    assert settings.WHITENOISE_ALLOW_ALL_ORIGINS is False

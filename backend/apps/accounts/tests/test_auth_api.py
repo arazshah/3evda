@@ -170,3 +170,35 @@ def test_logout_ends_the_session(verified):
 def test_django_admin_requires_otp(logged_in):
     response = logged_in.get("/django-admin/")
     assert response.status_code == 302  # back to the admin login, which asks for the OTP
+
+
+@pytest.mark.parametrize(
+    "new_password",
+    [
+        "a" * 128 + "-Z9",  # far longer than 64 characters: never truncated, never refused for length
+        "a passphrase with several spaces in it 2026",  # spaces are allowed
+        "گذرواژه‌ی-بسیار-طولانی-و-فارسی-۱۴۰۵",  # any Unicode
+    ],
+)
+def test_long_passphrases_with_spaces_and_unicode_are_accepted_whole(verified, enrolled_owner, new_password):
+    response = verified.post(
+        "/api/auth/password", {"current_password": PASSWORD, "new_password": new_password}, format="json"
+    )
+    assert response.status_code == 200, response.content
+    enrolled_owner.refresh_from_db()
+    assert enrolled_owner.check_password(new_password)  # the whole thing, not a cut-off prefix
+    assert not enrolled_owner.check_password(new_password[:-1])  # nothing is cut off the end
+
+
+def test_signing_in_gives_a_new_session_key(api, enrolled_owner, settings):
+    from django.conf import settings as django_settings
+
+    csrf(api)
+    anonymous = api.session
+    anonymous["probe"] = 1  # a session an attacker could have planted before the visitor signed in
+    anonymous.save()
+    before = api.cookies[django_settings.SESSION_COOKIE_NAME].value
+    r = api.post("/api/auth/login", {"username": "owner", "password": PASSWORD}, format="json")
+    assert r.status_code == 200
+    after = api.cookies[django_settings.SESSION_COOKIE_NAME].value
+    assert after != before

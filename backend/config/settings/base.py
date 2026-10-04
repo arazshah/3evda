@@ -237,6 +237,9 @@ SPECTACULAR_SETTINGS = {
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 X_FRAME_OPTIONS = "DENY"
+# WhiteNoise would otherwise add "Access-Control-Allow-Origin: *" to every static file (ZAP 10098); nothing here
+# is meant to be read cross-origin.
+WHITENOISE_ALLOW_ALL_ORIGINS = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
