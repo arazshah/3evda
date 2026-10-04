@@ -3161,6 +3161,170 @@
                 }
             }
         },
+        "/api/admin/galleries/{id}/downloads/": {
+            "get": {
+                "operationId": "admin_galleries_downloads_list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این gallery را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/DownloadLog"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/galleries/{id}/finals/": {
+            "get": {
+                "operationId": "admin_galleries_finals_list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این gallery را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FinalFile"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_galleries_finals_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این gallery را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PhotoUpload"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PhotoUpload"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FinalFile"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/galleries/{id}/finals/{final_id}/": {
+            "delete": {
+                "operationId": "admin_galleries_finals_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "final_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این gallery را شناسایی میکند.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/admin/galleries/{id}/new-link/": {
             "post": {
                 "operationId": "admin_galleries_new_link_create",
@@ -7394,6 +7558,92 @@
                 }
             }
         },
+        "/api/public/galleries/{token}/finals": {
+            "get": {
+                "operationId": "public_galleries_finals",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicFinals"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/finals/{final_id}/download": {
+            "get": {
+                "operationId": "public_galleries_final_download",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "final_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DownloadLink"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/galleries/{token}/photos": {
             "get": {
                 "operationId": "public_galleries_photos",
@@ -7425,6 +7675,53 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PublicPhotos"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/photos/{photo_id}/download": {
+            "get": {
+                "operationId": "public_galleries_photo_download",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "photo_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DownloadLink"
                                 }
                             }
                         },
@@ -7579,6 +7876,92 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UnlockResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/zip": {
+            "post": {
+                "operationId": "public_galleries_zip_create",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ZipJob"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/zip/{job_id}": {
+            "get": {
+                "operationId": "public_galleries_zip_retrieve",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "job_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ZipJob"
                                 }
                             }
                         },
@@ -9292,6 +9675,68 @@
                 "type": "string",
                 "description": "* `none` - فقط دیدن\n* `selected` - انتخاب‌ها (اندازه‌ی نمایش)\n* `all_web` - همه (اندازه‌ی نمایش)\n* `selected_original` - انتخاب‌ها با اصل فایل\n* `all_original` - همه با اصل فایل"
             },
+            "DownloadLink": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "Works for 60 seconds"
+                    },
+                    "filename": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "filename",
+                    "url"
+                ]
+            },
+            "DownloadLog": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "kind": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DownloadLogKindEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "files": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "originals": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "files",
+                    "id",
+                    "kind",
+                    "originals"
+                ]
+            },
+            "DownloadLogKindEnum": {
+                "enum": [
+                    "photo",
+                    "zip",
+                    "final"
+                ],
+                "type": "string",
+                "description": "* `photo` - عکس\n* `zip` - ZIP\n* `final` - نهایی"
+            },
             "Error": {
                 "type": "object",
                 "properties": {
@@ -9325,6 +9770,44 @@
                 },
                 "required": [
                     "text_fa"
+                ]
+            },
+            "FinalFile": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "filename": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "mime": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "size_bytes": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "position": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "filename",
+                    "id",
+                    "mime",
+                    "position",
+                    "size_bytes"
                 ]
             },
             "Gallery": {
@@ -12877,6 +13360,39 @@
                     "text_fa"
                 ]
             },
+            "PublicFinal": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "filename": {
+                        "type": "string"
+                    },
+                    "size_bytes": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "filename",
+                    "id",
+                    "size_bytes"
+                ]
+            },
+            "PublicFinals": {
+                "type": "object",
+                "properties": {
+                    "finals": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicFinal"
+                        }
+                    }
+                },
+                "required": [
+                    "finals"
+                ]
+            },
             "PublicGallery": {
                 "type": "object",
                 "properties": {
@@ -14655,6 +15171,50 @@
                     "start",
                     "weekday"
                 ]
+            },
+            "ZipJob": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ZipJobStatusEnum"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "done": {
+                        "type": "integer"
+                    },
+                    "url": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Only when ready; works for 60 seconds"
+                    },
+                    "filename": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "done",
+                    "filename",
+                    "id",
+                    "status",
+                    "total",
+                    "url"
+                ]
+            },
+            "ZipJobStatusEnum": {
+                "enum": [
+                    "queued",
+                    "running",
+                    "ready",
+                    "failed"
+                ],
+                "type": "string",
+                "description": "* `queued` - در صف\n* `running` - در حال ساخت\n* `ready` - آماده\n* `failed` - ناموفق"
             }
         },
         "securitySchemes": {

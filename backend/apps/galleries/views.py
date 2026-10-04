@@ -12,8 +12,15 @@ from rest_framework.response import Response
 from apps.audit.service import record
 
 from . import service
-from .models import Gallery, GalleryPhoto
-from .serializers import GalleryPhotoSerializer, GallerySerializer, PhotoOrderSerializer, PhotoUploadSerializer
+from .models import DownloadLog, FinalFile, Gallery, GalleryPhoto
+from .serializers import (
+    DownloadLogSerializer,
+    FinalFileSerializer,
+    GalleryPhotoSerializer,
+    GallerySerializer,
+    PhotoOrderSerializer,
+    PhotoUploadSerializer,
+)
 
 
 def _error(error: service.GalleryError) -> Response:
@@ -142,4 +149,39 @@ class GalleryViewSet(
             return Response({"code": "not_found", "detail": "عکس پیدا نشد."}, status=status.HTTP_404_NOT_FOUND)
         service.delete_photo(found)
         record("galleries.photo.delete", request=request._request, target=gallery, photo=wanted)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(responses=DownloadLogSerializer(many=True))
+    @action(detail=True, methods=["get"], url_path="downloads")
+    def downloads(self, request: Request, pk: str | None = None) -> Response:
+        gallery = self.get_object()
+        rows = DownloadLog.objects.filter(gallery=gallery)[:200]
+        return Response(DownloadLogSerializer(rows, many=True).data)
+
+    @extend_schema(methods=["POST"], request=PhotoUploadSerializer, responses={201: FinalFileSerializer})
+    @extend_schema(methods=["GET"], responses=FinalFileSerializer(many=True))
+    @action(detail=True, methods=["get", "post"], url_path="finals", parser_classes=[MultiPartParser, FormParser])
+    def finals(self, request: Request, pk: str | None = None) -> Response:
+        gallery = self.get_object()
+        if request.method == "GET":
+            return Response(FinalFileSerializer(gallery.finals.all(), many=True).data)
+        body = PhotoUploadSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        try:
+            final = service.add_final(gallery, body.validated_data["file"])
+        except service.GalleryError as error:
+            return _error(error)
+        record("galleries.final.add", request=request._request, target=gallery, file=final.filename)
+        return Response(FinalFileSerializer(final).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(parameters=[OpenApiParameter("final_id", int, OpenApiParameter.PATH)], responses={204: None})
+    @action(detail=True, methods=["delete"], url_path=r"finals/(?P<final_id>[^/.]+)")
+    def remove_final(self, request: Request, pk: str | None = None, final_id: str | None = None) -> Response:
+        gallery = self.get_object()
+        raw = final_id or ""
+        found = FinalFile.objects.filter(gallery=gallery, pk=int(raw) if raw.isdigit() else 0).first()
+        if found is None:
+            return Response({"code": "not_found", "detail": "فایل پیدا نشد."}, status=status.HTTP_404_NOT_FOUND)
+        service.delete_final(found)
+        record("galleries.final.delete", request=request._request, target=gallery)
         return Response(status=status.HTTP_204_NO_CONTENT)

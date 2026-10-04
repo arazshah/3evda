@@ -4,19 +4,20 @@ from __future__ import annotations
 
 import hashlib
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
-from django.db.models import Sum
+from django.db.models import QuerySet, Sum
 from django.utils import timezone
 
+from apps.core.signed import signed_path
 from apps.media.storage import private_storage
 from apps.media.validation import UploadRejected, inspect_upload
 
-from .models import Gallery, GalleryPhoto, Selection
+from .models import DownloadLog, FinalFile, Gallery, GalleryPhoto, Selection, ZipJob
 
 EXPIRED = "expired"  # shown, never stored: it follows from the date
 
@@ -117,6 +118,7 @@ def delete_gallery(gallery: Gallery) -> None:
     """The rows go at once; the files follow in the worker (and are retried if the store is busy)."""
     with transaction.atomic():
         keys = [k for photo in gallery.photos.all() for k in photo_keys(photo)]
+        keys += [f.key for f in gallery.finals.all()] + [z.key for z in gallery.zips.all()]
         gallery.delete()
         _forget_files(keys)
 
@@ -131,9 +133,16 @@ def reorder(gallery: Gallery, ids: list[int]) -> None:
             GalleryPhoto.objects.filter(pk=pk).update(position=position)
 
 
+def extra_bytes(gallery: Gallery) -> int:
+    """Space taken besides the photos: finished files and archives."""
+    finals = gallery.finals.aggregate(a=Sum("size_bytes"))["a"] or 0
+    zips = gallery.zips.filter(status=ZipJob.Status.READY).aggregate(a=Sum("size_bytes"))["a"] or 0
+    return int(finals) + int(zips)
+
+
 def usage_bytes(gallery: Gallery) -> int:
     total = gallery.photos.aggregate(a=Sum("size_bytes"), b=Sum("stored_bytes"))
-    return int(total["a"] or 0) + int(total["b"] or 0)
+    return int(total["a"] or 0) + int(total["b"] or 0) + extra_bytes(gallery)
 
 
 def publish(gallery: Gallery) -> Gallery:
@@ -226,3 +235,122 @@ def submit(gallery: Gallery, ip_hash: str) -> Gallery:
         locked.submitted_ip_hash = ip_hash
         locked.save(update_fields=["status", "submitted_at", "submitted_ip_hash", "updated_at"])
         return locked
+
+
+# ---- downloads --------------------------------------------------------------------------------------
+
+DOWNLOAD_TTL = 60
+ZIP_KEEP = timedelta(hours=24)
+
+# What each level lets the client take: (only the chosen photos?, the original file?). `none` allows nothing.
+LEVELS: dict[str, tuple[bool, bool] | None] = {
+    Gallery.DownloadLevel.NONE: None,
+    Gallery.DownloadLevel.SELECTED: (True, False),
+    Gallery.DownloadLevel.ALL_WEB: (False, False),
+    Gallery.DownloadLevel.SELECTED_ORIGINAL: (True, True),
+    Gallery.DownloadLevel.ALL_ORIGINAL: (False, True),
+}
+
+
+def download_scope(gallery: Gallery) -> tuple[bool, bool]:
+    """(only_selected, originals) for the gallery's level, or a refusal."""
+    scope = LEVELS.get(gallery.download_level)
+    if scope is None:
+        raise GalleryError("download_disabled", "دانلود برای این گالری فعال نیست.", 403)
+    return scope
+
+
+def downloadable(gallery: Gallery, only_selected: bool) -> QuerySet[GalleryPhoto]:
+    photos = gallery.photos.filter(status=GalleryPhoto.Status.READY)
+    return photos.filter(selection__selected=True) if only_selected else photos
+
+
+def _safe_name(name: str, fallback: str) -> str:
+    cleaned = name.replace("\\", "/").rsplit("/", 1)[-1].replace("\x00", "").strip().lstrip(".")
+    return cleaned[:200] or fallback
+
+
+def file_name(photo: GalleryPhoto, originals: bool) -> str:
+    base = _safe_name(photo.original_filename, f"photo-{photo.pk}")
+    if originals:
+        return base
+    stem = base.rsplit(".", 1)[0] if "." in base else base
+    return f"{stem}.webp"
+
+
+def log_download(gallery: Gallery, kind: str, files: int, originals: bool, ip_hash: str) -> None:
+    DownloadLog.objects.create(gallery=gallery, kind=kind, files=files, originals=originals, ip_hash=ip_hash)
+
+
+def photo_download(gallery: Gallery, photo_id: int, ip_hash: str) -> tuple[str, str]:
+    """A 60-second link to one photo, if the level allows that photo. Returns (url, filename)."""
+    only_selected, originals = download_scope(gallery)
+    photo = downloadable(gallery, only_selected).filter(pk=photo_id).first()
+    if photo is None:
+        raise GalleryError("not_found", "این عکس برای دانلود در دسترس نیست.", 404)
+    name = file_name(photo, originals)
+    key = photo.original_key if originals else photo.preview_key
+    log_download(gallery, DownloadLog.Kind.PHOTO, 1, originals, ip_hash)
+    return signed_path(key, expire=DOWNLOAD_TTL, filename=name), name
+
+
+def start_zip(gallery: Gallery) -> ZipJob:
+    """Queue an archive of everything the level allows. A second request while one is being made gets that one."""
+    from .tasks import build_zip
+
+    only_selected, originals = download_scope(gallery)
+    with transaction.atomic():
+        locked = Gallery.objects.select_for_update().get(pk=gallery.pk)
+        active = locked.zips.filter(status__in=[ZipJob.Status.QUEUED, ZipJob.Status.RUNNING]).first()
+        if active is not None:
+            return active
+        total = downloadable(locked, only_selected).count()
+        if total == 0:
+            raise GalleryError("nothing_to_download", "عکسی برای دانلود وجود ندارد.", 409)
+        job = ZipJob.objects.create(gallery=locked, originals=originals, only_selected=only_selected, total=total)
+        transaction.on_commit(lambda: build_zip.apply_async(args=[job.pk], queue="galleries"))
+    return job
+
+
+def zip_link(job: ZipJob, ip_hash: str) -> str:
+    """A 60-second link to a finished archive (the level is checked again: it may have changed since)."""
+    download_scope(job.gallery)
+    name = f"{_safe_name(job.gallery.title, 'gallery')}.zip"
+    log_download(job.gallery, DownloadLog.Kind.ZIP, job.total, job.originals, ip_hash)
+    return signed_path(job.key, expire=DOWNLOAD_TTL, filename=name)
+
+
+def add_final(gallery: Gallery, upload: UploadedFile[bytes]) -> FinalFile:
+    try:
+        info = inspect_upload(upload)
+    except UploadRejected as error:
+        raise GalleryError(error.code, error.message, 400) from error
+    if info.kind != "image":
+        raise GalleryError("unsupported_type", "فقط عکس را می‌توان به‌عنوان نسخه‌ی نهایی گذاشت.", 400)
+    with transaction.atomic():
+        locked = Gallery.objects.select_for_update().get(pk=gallery.pk)
+        last = locked.finals.order_by("-position").first()
+        key = private_storage().save(f"galleries/{locked.public_id.hex}/finals/{uuid.uuid4()}{info.ext}", upload)
+        return FinalFile.objects.create(
+            gallery=locked,
+            key=key,
+            filename=_safe_name(upload.name or "", "final"),
+            mime=info.mime,
+            size_bytes=info.size,
+            position=(last.position + 1) if last else 0,
+        )
+
+
+def delete_final(final: FinalFile) -> None:
+    with transaction.atomic():
+        key = final.key
+        final.delete()
+        _forget_files([key])
+
+
+def final_download(gallery: Gallery, final_id: int, ip_hash: str) -> tuple[str, str]:
+    final = gallery.finals.filter(pk=final_id).first()
+    if final is None:
+        raise GalleryError("not_found", "فایل پیدا نشد.", 404)
+    log_download(gallery, DownloadLog.Kind.FINAL, 1, True, ip_hash)
+    return signed_path(final.key, expire=DOWNLOAD_TTL, filename=final.filename), final.filename

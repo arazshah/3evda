@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib.auth.hashers import check_password
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
@@ -18,8 +19,10 @@ from apps.core.signed import signed_path
 
 from . import access, service
 from .links import find_by_token
-from .models import Gallery, GalleryPhoto, Selection
+from .models import Gallery, GalleryPhoto, Selection, ZipJob
 from .public_serializers import (
+    DownloadLinkSerializer,
+    PublicFinalsSerializer,
     PublicGallerySerializer,
     PublicPhotosSerializer,
     SelectionRequestSerializer,
@@ -27,6 +30,7 @@ from .public_serializers import (
     SubmitResponseSerializer,
     UnlockRequestSerializer,
     UnlockResponseSerializer,
+    ZipJobSerializer,
 )
 
 NO_STORE = "no-store"
@@ -221,3 +225,117 @@ class PublicSubmitView(_Unlocked):
         except service.GalleryError as error:
             return _problem(error.code, error.detail, error.status)
         return _reply({"submitted": True, "selected_count": _chosen(done)})
+
+
+class PublicPhotoDownloadView(_Unlocked):
+    throttle_scope = "gallery_write"
+
+    @extend_schema(
+        parameters=[TOKEN_PARAMETER],
+        responses=DownloadLinkSerializer,
+        operation_id="public_galleries_photo_download",
+        auth=[],
+    )
+    def get(self, request: Request, token: str, photo_id: int) -> Response:
+        gallery = self.gate(request, token)
+        if isinstance(gallery, Response):
+            return gallery
+        try:
+            url, name = service.photo_download(gallery, photo_id, ip_digest(request._request, "gallery"))
+        except service.GalleryError as error:
+            return _problem(error.code, error.detail, error.status)
+        return _reply({"url": url, "filename": name})
+
+
+def _zip_data(job: ZipJob, url: str | None) -> dict[str, Any]:
+    return {
+        "id": job.pk,
+        "status": job.status,
+        "total": job.total,
+        "done": job.done,
+        "url": url,
+        "filename": f"{job.gallery.title}.zip" if url else None,
+    }
+
+
+class PublicZipCreateView(_Unlocked):
+    throttle_scope = "gallery_write"
+
+    @extend_schema(
+        parameters=[TOKEN_PARAMETER],
+        request=None,
+        responses={202: ZipJobSerializer},
+        operation_id="public_galleries_zip_create",
+        auth=[],
+    )
+    def post(self, request: Request, token: str) -> Response:
+        gallery = self.gate(request, token)
+        if isinstance(gallery, Response):
+            return gallery
+        try:
+            job = service.start_zip(gallery)
+        except service.GalleryError as error:
+            return _problem(error.code, error.detail, error.status)
+        return _reply(ZipJobSerializer(_zip_data(job, None)).data, 202)
+
+
+class PublicZipView(_Unlocked):
+    @extend_schema(
+        parameters=[TOKEN_PARAMETER],
+        responses=ZipJobSerializer,
+        operation_id="public_galleries_zip_retrieve",
+        auth=[],
+    )
+    def get(self, request: Request, token: str, job_id: int) -> Response:
+        gallery = self.gate(request, token)
+        if isinstance(gallery, Response):
+            return gallery
+        job = gallery.zips.select_related("gallery").filter(pk=job_id).first()
+        if job is None:
+            return _missing()
+        if job.status != ZipJob.Status.READY:
+            return _reply(ZipJobSerializer(_zip_data(job, None)).data)
+        if job.expires_at and job.expires_at <= timezone.now():
+            return _problem("expired", "این ZIP منقضی شده است؛ دوباره بسازید.", 410)
+        try:
+            url = service.zip_link(job, ip_digest(request._request, "gallery"))
+        except service.GalleryError as error:
+            return _problem(error.code, error.detail, error.status)
+        return _reply(ZipJobSerializer(_zip_data(job, url)).data)
+
+
+class PublicFinalsView(_Unlocked):
+    @extend_schema(
+        parameters=[TOKEN_PARAMETER],
+        responses=PublicFinalsSerializer,
+        operation_id="public_galleries_finals",
+        auth=[],
+    )
+    def get(self, request: Request, token: str) -> Response:
+        gallery = self.gate(request, token)
+        if isinstance(gallery, Response):
+            return gallery
+        data = {
+            "finals": [{"id": f.pk, "filename": f.filename, "size_bytes": f.size_bytes} for f in gallery.finals.all()]
+        }
+        return _reply(PublicFinalsSerializer(data).data)
+
+
+class PublicFinalDownloadView(_Unlocked):
+    throttle_scope = "gallery_write"
+
+    @extend_schema(
+        parameters=[TOKEN_PARAMETER],
+        responses=DownloadLinkSerializer,
+        operation_id="public_galleries_final_download",
+        auth=[],
+    )
+    def get(self, request: Request, token: str, final_id: int) -> Response:
+        gallery = self.gate(request, token)
+        if isinstance(gallery, Response):
+            return gallery
+        try:
+            url, name = service.final_download(gallery, final_id, ip_digest(request._request, "gallery"))
+        except service.GalleryError as error:
+            return _problem(error.code, error.detail, error.status)
+        return _reply({"url": url, "filename": name})

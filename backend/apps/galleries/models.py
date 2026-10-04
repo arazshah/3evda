@@ -113,3 +113,76 @@ class Selection(models.Model):
 
     def __str__(self) -> str:
         return f"{self.photo_id}: {'selected' if self.selected else '-'}"
+
+
+class FinalFile(models.Model):
+    """A finished picture the photographer hands over; the client can always download these."""
+
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name="finals")
+    key = models.CharField(max_length=255, unique=True)
+    filename = models.CharField(max_length=255)
+    mime = models.CharField(max_length=100)
+    size_bytes = models.PositiveBigIntegerField()
+    position = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["position", "id"]
+
+    def __str__(self) -> str:
+        return self.filename
+
+
+class ZipJob(models.Model):
+    """One archive being built for the client. At most one is active per gallery."""
+
+    class Status(models.TextChoices):
+        QUEUED = "queued", "در صف"
+        RUNNING = "running", "در حال ساخت"
+        READY = "ready", "آماده"
+        FAILED = "failed", "ناموفق"
+
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name="zips")
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.QUEUED)
+    originals = models.BooleanField(default=False, help_text="Original files instead of display size")
+    only_selected = models.BooleanField(default=True)
+    total = models.PositiveIntegerField(default=0)
+    done = models.PositiveIntegerField(default=0)
+    key = models.CharField(max_length=255, blank=True)
+    size_bytes = models.PositiveBigIntegerField(default=0)
+    error = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["gallery"],
+                condition=Q(status__in=["queued", "running"]),
+                name="one_active_zip_per_gallery",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"zip {self.pk} ({self.status})"
+
+
+class DownloadLog(models.Model):
+    class Kind(models.TextChoices):
+        PHOTO = "photo", "عکس"
+        ZIP = "zip", "ZIP"
+        FINAL = "final", "نهایی"
+
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name="downloads")
+    kind = models.CharField(max_length=10, choices=Kind.choices)
+    files = models.PositiveIntegerField(default=1)
+    originals = models.BooleanField(default=False)
+    ip_hash = models.CharField(max_length=64, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+
+    def __str__(self) -> str:
+        return f"{self.kind} x{self.files}"

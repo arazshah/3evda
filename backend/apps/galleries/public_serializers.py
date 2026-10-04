@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from .models import Gallery, Selection
+from .models import Gallery, Selection, ZipJob
 
 
 class PublicGallerySerializer(serializers.Serializer):  # type: ignore[type-arg]
@@ -62,3 +62,27 @@ class SelectionSerializer(serializers.Serializer):  # type: ignore[type-arg]
 class SubmitResponseSerializer(serializers.Serializer):  # type: ignore[type-arg]
     submitted = serializers.BooleanField()
     selected_count = serializers.IntegerField()
+
+
+class DownloadLinkSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    url = serializers.CharField(help_text="Works for 60 seconds")
+    filename = serializers.CharField()
+
+
+class ZipJobSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    id = serializers.IntegerField()
+    status = serializers.ChoiceField(choices=ZipJob.Status.choices)
+    total = serializers.IntegerField()
+    done = serializers.IntegerField()
+    url = serializers.CharField(allow_null=True, help_text="Only when ready; works for 60 seconds")
+    filename = serializers.CharField(allow_null=True)
+
+
+class PublicFinalSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    id = serializers.IntegerField()
+    filename = serializers.CharField()
+    size_bytes = serializers.IntegerField()
+
+
+class PublicFinalsSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    finals = PublicFinalSerializer(many=True)
