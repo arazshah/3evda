@@ -20,7 +20,8 @@ class Gallery(models.Model):
         NONE = "none", "فقط دیدن"
         SELECTED = "selected", "انتخاب‌ها (اندازه‌ی نمایش)"
         ALL_WEB = "all_web", "همه (اندازه‌ی نمایش)"
-        ORIGINAL = "original", "اصل فایل‌ها"
+        SELECTED_ORIGINAL = "selected_original", "انتخاب‌ها با اصل فایل"
+        ALL_ORIGINAL = "all_original", "همه با اصل فایل"
 
     # The address is `public_id` plus a signature that depends on `link_version`: a new link is a new version.
     public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -32,7 +33,7 @@ class Gallery(models.Model):
     password_hash = models.CharField(max_length=256, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     selection_limit = models.PositiveIntegerField(null=True, blank=True, help_text="Empty: no limit")
-    download_level = models.CharField(max_length=10, choices=DownloadLevel.choices, default=DownloadLevel.SELECTED)
+    download_level = models.CharField(max_length=20, choices=DownloadLevel.choices, default=DownloadLevel.SELECTED)
     watermark = models.BooleanField(default=True, help_text="Previews carry the watermark")
     note = models.TextField(blank=True, help_text="Private; never shown to the client")
 

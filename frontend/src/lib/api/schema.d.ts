@@ -2102,10 +2102,11 @@ export interface components {
      * @description * `none` - فقط دیدن
      *     * `selected` - انتخاب‌ها (اندازه‌ی نمایش)
      *     * `all_web` - همه (اندازه‌ی نمایش)
-     *     * `original` - اصل فایل‌ها
+     *     * `selected_original` - انتخاب‌ها با اصل فایل
+     *     * `all_original` - همه با اصل فایل
      * @enum {string}
      */
-    DownloadLevelEnum: "none" | "selected" | "all_web" | "original";
+    DownloadLevelEnum: "none" | "selected" | "all_web" | "selected_original" | "all_original";
     Error: {
       code: string;
       detail: string;

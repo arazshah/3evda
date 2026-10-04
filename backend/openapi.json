@@ -9063,10 +9063,11 @@
                     "none",
                     "selected",
                     "all_web",
-                    "original"
+                    "selected_original",
+                    "all_original"
                 ],
                 "type": "string",
-                "description": "* `none` - فقط دیدن\n* `selected` - انتخاب‌ها (اندازه‌ی نمایش)\n* `all_web` - همه (اندازه‌ی نمایش)\n* `original` - اصل فایل‌ها"
+                "description": "* `none` - فقط دیدن\n* `selected` - انتخاب‌ها (اندازه‌ی نمایش)\n* `all_web` - همه (اندازه‌ی نمایش)\n* `selected_original` - انتخاب‌ها با اصل فایل\n* `all_original` - همه با اصل فایل"
             },
             "Error": {
                 "type": "object",

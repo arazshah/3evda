@@ -75,10 +75,20 @@ def test_the_password_is_stored_hashed_and_never_returned(owner_client):
     assert "خصوصی" not in str(log.metadata)
 
 
+def test_every_download_level_names_its_scope(owner_client):
+    levels = [c for c, _ in Gallery.DownloadLevel.choices]
+    assert levels == ["none", "selected", "all_web", "selected_original", "all_original"]
+    for level in levels:
+        assert make(owner_client, download_level=level)["download_level"] == level
+
+
 def test_validation(owner_client):
     assert owner_client.post(ADMIN, {"client_name": "x"}, format="json").status_code == 400
     assert owner_client.post(ADMIN, {"title": "x", "selection_limit": 0}, format="json").status_code == 400
     assert owner_client.post(ADMIN, {"title": "x", "download_level": "everything"}, format="json").status_code == 400
+    assert (
+        owner_client.post(ADMIN, {"title": "x", "download_level": "original"}, format="json").status_code == 400
+    )  # say which originals
 
 
 def test_the_link_is_signed_and_a_new_link_cancels_the_old_one(owner_client):
