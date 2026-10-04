@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { api } from "@/lib/api/client";
 import { useMe } from "@/lib/api/queries";
+import { BookingBadge } from "./booking/BookingBadge";
 import { InquiryBadge } from "./inquiries/InquiryBadge";
 import { Button } from "./ui";
 
@@ -19,6 +20,7 @@ const NAV = [
   { href: "/panel/categories", label: "دسته‌ها" },
   { href: "/panel/packages", label: "پکیج‌ها و قیمت‌ها" },
   { href: "/panel/pricing", label: "قواعد قیمت" },
+  { href: "/panel/booking", label: "رزروها" },
   { href: "/panel/booking/settings", label: "تنظیمات رزرو" },
   { href: "/panel/articles", label: "مقاله‌های مجله" },
   { href: "/panel/settings", label: "تنظیمات سایت" },
@@ -66,7 +68,12 @@ export function PanelShell({ children }: { children: ReactNode }) {
         <nav aria-label="منوی پنل" className="overflow-x-auto">
           <ul className="flex gap-1 px-2 pb-2 md:flex-col">
             {NAV.map((item) => {
-              const active = item.href === "/panel" ? pathname === "/panel" : pathname.startsWith(item.href);
+              const active =
+                item.href === "/panel"
+                  ? pathname === "/panel"
+                  : item.href === "/panel/booking"
+                    ? pathname.startsWith("/panel/booking") && !pathname.startsWith("/panel/booking/settings")
+                    : pathname.startsWith(item.href);
               return (
                 <li key={item.href}>
                   <Link
@@ -78,6 +85,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
                   >
                     {item.label}
                     {item.href === "/panel/inquiries" && <InquiryBadge />}
+                    {item.href === "/panel/booking" && <BookingBadge />}
                   </Link>
                 </li>
               );

@@ -15,6 +15,8 @@ export function telegramLink(value: string): string | null {
 export function whatsappLink(value: string): string | null {
   const text = value.trim();
   if (!PHONE_NUMBER.test(text)) return null;
-  const digits = text.replace(/\D/g, "");
+  let digits = text.replace(/\D/g, "");
+  // wa.me wants the country code: an Iranian mobile written the local way (0912…) would open nothing.
+  if (/^09\d{9}$/.test(digits)) digits = `98${digits.slice(1)}`;
   return digits ? `https://wa.me/${digits}` : null;
 }

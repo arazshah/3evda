@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/queries";
 import { formatDate, formatNumber } from "@/lib/format";
 import { Alert, Button, Card, Field, TextArea } from "../ui";
+import { LinkedBookings } from "../booking/LinkedBookings";
 import { isOpen, statusLabel } from "./status";
 
 type Row = { description: string; quantity: string; unit_price: string };
@@ -430,6 +431,8 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
       </Card>
 
       <Totals proforma={proforma} />
+
+      <LinkedBookings inquiry={proforma.inquiry} proforma={proforma.id} />
 
       <div className="flex flex-wrap gap-3">
         <a

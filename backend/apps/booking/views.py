@@ -139,6 +139,8 @@ def _day(request: Request, name: str) -> date | None:
         OpenApiParameter("from", str, description="YYYY-MM-DD (Tehran)"),
         OpenApiParameter("to", str, description="YYYY-MM-DD (Tehran)"),
         OpenApiParameter("q", str),
+        OpenApiParameter("inquiry", int, description="Only bookings linked to this enquiry"),
+        OpenApiParameter("proforma", int, description="Only bookings linked to this proforma"),
     ]
 )
 class BookingViewSet(
@@ -164,6 +166,12 @@ class BookingViewSet(
             qs = qs.filter(start_at__gte=at(start, time(0)))
         if end := _day(self.request, "to"):
             qs = qs.filter(start_at__lt=at(end + timedelta(days=1), time(0)))
+        for link in ("inquiry", "proforma"):
+            raw = params.get(link)
+            if raw:
+                if not raw.isdigit():
+                    raise serializers.ValidationError({link: "must be a number"})
+                qs = qs.filter(**{f"{link}_id": int(raw)})
         if q := (params.get("q") or "").strip():
             qs = qs.filter(
                 Q(name__icontains=q) | Q(brand__icontains=q) | Q(phone__icontains=q) | Q(whatsapp__icontains=q)

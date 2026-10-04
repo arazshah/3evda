@@ -359,6 +359,88 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await found.getByRole("link").click();
   await expect(page.getByLabel("وضعیت", { exact: true })).toHaveValue("proforma_sent");
 
+  // Bookings: a visitor books, the owner is told, confirms; a manual booking from the enquiry; the visitor cancels.
+  test.info().annotations.push({ type: "expected-http-error", description: "the second manual booking at the same time is refused with 409" });
+  const bookedName = `Booking E2E ${Date.now()}`;
+  const from = new Date();
+  const until = new Date(from.getTime() + 40 * 86_400_000);
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const free = await (await page.request.get(`/api/public/booking/availability?type=studio&from=${iso(from)}&to=${iso(until)}`)).json();
+  expect(free.days.length).toBeGreaterThan(0);
+  // The last free time of the last free day: the booking test in smoke.spec takes the first, and runs at the same time.
+  const lastDay = free.days.at(-1) as { date: string; times: string[] };
+  const lastTime = lastDay.times.at(-1)!;
+  const made = await page.request.post("/api/public/bookings", {
+    data: { type: "studio", date: lastDay.date, time: lastTime, name: bookedName, phone: "09127778899", language: "en" },
+  });
+  expect(made.status()).toBe(201);
+  const bookingLink = new URL((await made.json()).link).pathname;
+  const clash = await page.request.post("/api/public/bookings", {
+    data: { type: "studio", date: lastDay.date, time: lastTime, name: "Late", phone: "09120000000", language: "en" },
+  });
+  expect(clash.status()).toBe(409);
+  expect((await clash.json()).detail).toContain("no longer available");
+
+  await page.goto("/panel/booking");
+  await expect(page.getByRole("navigation", { name: "منوی پنل" }).getByText(/رزرو در انتظار تأیید/)).toBeVisible();
+  await page.getByRole("tab", { name: "فهرست" }).click();
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(bookedName);
+  const bookingRow = page.getByRole("list", { name: "رزروها" }).getByRole("listitem");
+  await expect(bookingRow).toHaveCount(1);
+  await expect(bookingRow.getByText("جدید", { exact: true })).toBeVisible();
+  await bookingRow.getByRole("link").click();
+  await expect(page.getByRole("heading", { level: 1, name: bookedName })).toBeVisible();
+  await expect(page.getByRole("link", { name: "09127778899" })).toHaveAttribute("href", "tel:09127778899");
+  await expectNoSeriousViolations(page, "booking detail");
+  await page.getByRole("button", { name: "تأیید رزرو" }).click();
+  await expect(page.getByText("رزرو تأیید شد.")).toBeVisible();
+
+  const visitorContext = await browser.newContext({ baseURL: page.url().split("/panel")[0] });
+  const visitorPage = await visitorContext.newPage();
+  await visitorPage.goto(bookingLink);
+  await expect(visitorPage.getByText("Booking confirmed")).toBeVisible();
+
+  // A manual booking made from the enquiry is filled in from it and links back to it.
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await found.getByRole("link").click();
+  await page.getByRole("link", { name: "ساخت رزرو" }).click();
+  await expect(page.getByLabel("نام مشتری", { exact: true })).toHaveValue(visitor);
+  await page.getByRole("button", { name: "ثبت رزرو" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: visitor })).toBeVisible();
+  await expect(page.getByRole("link", { name: "مشاهده" }).first()).toHaveAttribute("href", /\/panel\/inquiries\/\d+/);
+  const manualUrl = page.url();
+  // the same time again is refused with the server's reason
+  await page.goto("/panel/booking/new");
+  await page.getByLabel("نام مشتری", { exact: true }).fill("Overlap");
+  await page.getByRole("button", { name: "ثبت رزرو" }).click();
+  await expect(page.getByText(/این ساعت دیگر آزاد نیست/)).toBeVisible();
+  await page.goto(manualUrl);
+  acceptNextDialog();
+  await page.getByRole("button", { name: "لغو رزرو" }).click();
+  await expect(page.getByText("رزرو لغو شد.")).toBeVisible();
+
+  // The visitor cancels theirs from the link; the owner sees who cancelled, and the time is free again.
+  visitorPage.once("dialog", (d) => d.accept());
+  await visitorPage.getByRole("button", { name: "Cancel booking" }).click();
+  await expect(visitorPage.getByText("You cancelled this booking")).toBeVisible();
+  await visitorContext.close();
+  const freeAgain = await (await page.request.get(`/api/public/booking/availability?type=studio&from=${lastDay.date}&to=${lastDay.date}`)).json();
+  expect(freeAgain.days[0].times).toContain(lastTime);
+  await page.goto("/panel/booking");
+  await page.getByRole("tab", { name: "فهرست" }).click();
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(bookedName);
+  await expect(bookingRow).toHaveCount(1);
+  await bookingRow.getByRole("link").click();
+  await expect(page.getByText("توسط مشتری")).toBeVisible();
+
+  // The enquiry moved on when the manual booking was made.
+  await page.goto("/panel/inquiries");
+  await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
+  await found.getByRole("link").click();
+  await expect(page.getByLabel("وضعیت", { exact: true })).toHaveValue("converted");
+  await expect(page.getByRole("list", { name: "رزروهای وصل‌شده" })).toBeVisible();
+
   // Deleting it removes the row and the stored file.
   await page.goto("/panel/inquiries");
   await page.getByLabel("جست‌وجو", { exact: true }).fill(visitor);
@@ -456,7 +538,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   }
 
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/proformas", "/panel/proformas/new", "/panel/proformas/settings", "/panel/booking/settings", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/proformas", "/panel/proformas/new", "/panel/proformas/settings", "/panel/booking", "/panel/booking/new", "/panel/booking/settings", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);

@@ -38,6 +38,8 @@ export const keys = {
   bookingHours: ["booking", "hours"] as const,
   closedPeriods: ["booking", "closed"] as const,
   bookingSettings: ["booking", "settings"] as const,
+  bookings: ["bookings"] as const,
+  bookingSummary: ["bookings", "summary"] as const,
   articles: ["blog", "articles"] as const,
   blogCategories: ["blog", "categories"] as const,
   blogTags: ["blog", "tags"] as const,
@@ -60,6 +62,9 @@ export type InquiryStatus = Schemas["InquiryStatusEnum"];
 export type Proforma = Schemas["Proforma"];
 export type ProformaListItem = Schemas["ProformaList"];
 export type ProformaSettings = Schemas["ProformaSettings"];
+export type Booking = Schemas["Booking"];
+export type BookingListItem = Schemas["BookingList"];
+export type BookingStatus = Schemas["BookingStatusEnum"];
 export type SessionType = Schemas["SessionType"];
 export type ClosedPeriod = Schemas["ClosedPeriod"];
 export type WorkingHours = Schemas["WorkingHours"];
@@ -734,6 +739,106 @@ export function useSaveBookingSettings() {
     mutationFn: (body: Schemas["PatchedBookingSettings"]) =>
       unwrap(api.PATCH("/api/admin/booking/settings/", { body })),
     onSuccess: (data) => client.setQueryData(keys.bookingSettings, data),
+  });
+}
+
+// ---- bookings --------------------------------------------------------------------------------------
+
+export type BookingFilters = {
+  status?: BookingStatus;
+  q?: string;
+  from?: string;
+  to?: string;
+  inquiry?: number;
+  proforma?: number;
+  page?: number;
+  page_size?: number;
+};
+
+export function useBookings(filters: BookingFilters, enabled = true) {
+  return useQuery({
+    queryKey: [...keys.bookings, "list", filters],
+    queryFn: () => unwrap(api.GET("/api/admin/bookings/", { params: { query: filters } })),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+}
+
+/** Opening a booking marks it as seen on the server, so the list and the menu badge are refreshed too. */
+export function useBooking(id: number) {
+  const client = useQueryClient();
+  return useQuery({
+    queryKey: [...keys.bookings, "detail", id],
+    queryFn: async () => {
+      const booking = await unwrap(api.GET("/api/admin/bookings/{id}/", { params: { path: { id } } }));
+      void client.invalidateQueries({ queryKey: [...keys.bookings, "list"] });
+      void client.invalidateQueries({ queryKey: keys.bookingSummary });
+      return booking;
+    },
+  });
+}
+
+function useBookingWrite<V>(run: (variables: V) => Promise<Booking>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: async (booking) => {
+      client.setQueryData([...keys.bookings, "detail", booking.id], booking);
+      await client.invalidateQueries({ queryKey: [...keys.bookings, "list"] });
+      await client.invalidateQueries({ queryKey: keys.bookingSummary });
+      // Confirming moves the linked enquiry to «converted».
+      await client.invalidateQueries({ queryKey: [...keys.inquiries, "list"] });
+    },
+  });
+}
+
+export function useCreateBooking() {
+  return useBookingWrite((body: Schemas["AdminBookingCreate"]) =>
+    unwrap(api.POST("/api/admin/bookings/", { body })),
+  );
+}
+
+export function useSaveBookingNote() {
+  return useBookingWrite(({ id, internal_note }: { id: number; internal_note: string }) =>
+    unwrap(api.PATCH("/api/admin/bookings/{id}/", { params: { path: { id } }, body: { internal_note } })),
+  );
+}
+
+export type BookingAction =
+  | { id: number; action: "confirm" | "complete" }
+  | { id: number; action: "cancel"; reason: string }
+  | { id: number; action: "reschedule"; date: string; time: string };
+
+export function useBookingAction() {
+  return useBookingWrite((v: BookingAction) => {
+    const params = { params: { path: { id: v.id } } };
+    switch (v.action) {
+      case "confirm":
+        return unwrap(api.POST("/api/admin/bookings/{id}/confirm/", params));
+      case "complete":
+        return unwrap(api.POST("/api/admin/bookings/{id}/complete/", params));
+      case "cancel":
+        return unwrap(
+          api.POST("/api/admin/bookings/{id}/cancel/", { ...params, body: { reason: v.reason } }),
+        );
+      case "reschedule":
+        return unwrap(
+          api.POST("/api/admin/bookings/{id}/reschedule/", {
+            ...params,
+            body: { date: v.date, time: v.time },
+          }),
+        );
+    }
+  });
+}
+
+/** Upcoming bookings still waiting for an answer; refreshed every minute for the menu badge. */
+export function useBookingSummary() {
+  return useQuery({
+    queryKey: keys.bookingSummary,
+    queryFn: () => unwrap(api.GET("/api/admin/bookings/summary/")),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
   });
 }
 
