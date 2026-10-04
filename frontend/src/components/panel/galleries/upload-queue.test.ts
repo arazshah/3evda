@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isTransient, runUploads, type QueueItem } from "./upload-queue";
+import { createUploadPool, isTransient, runUploads, type QueueItem } from "./upload-queue";
 
 const file = (name: string) => new File(["x"], name, { type: "image/jpeg" });
 const jobs = (n: number) => Array.from({ length: n }, (_, i) => ({ id: i, file: file(`${i}.jpg`) }));
@@ -34,6 +34,31 @@ describe("runUploads", () => {
     );
     expect(peak).toBe(3);
     expect(finished).toBe(10);
+    expect([...items.values()].every((i) => i.state === "done")).toBe(true);
+  });
+
+  it("keeps the limit when more files are added while others are still going", async () => {
+    let running = 0;
+    let peak = 0;
+    const { items, update } = recorder();
+    const pool = createUploadPool(
+      async () => {
+        running += 1;
+        peak = Math.max(peak, running);
+        await new Promise((r) => setTimeout(r, 5));
+        running -= 1;
+      },
+      update,
+      () => undefined,
+      String,
+      { pause: noPause },
+    );
+    const first = pool.add(jobs(5));
+    const second = pool.add(jobs(5).map((j) => ({ ...j, id: j.id + 5 })));
+    const third = pool.add([{ id: 10, file: file("10.jpg") }]);
+    await Promise.all([first, second, third]);
+    expect(peak).toBe(3);
+    expect(items.size).toBe(11);
     expect([...items.values()].every((i) => i.state === "done")).toBe(true);
   });
 

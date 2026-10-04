@@ -213,6 +213,52 @@ describe("GalleryPhotos", () => {
     );
   });
 
+  it("renews its thumbnails before their signed addresses (five minutes) expire", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] });
+    try {
+      const api = fakeApi([
+        { method: "GET", path: `${BASE}5/photos/`, body: [photo(1)] },
+        {
+          method: "GET",
+          path: `${BASE}5/photos/`,
+          body: [photo(1, { thumb_url: "/storage-signed/renewed" })],
+        },
+      ]);
+      vi.stubGlobal("fetch", api.fetchImpl);
+      renderWithQuery(<GalleryPhotos galleryId={5} />);
+      await vi.advanceTimersByTimeAsync(50);
+      expect(screen.getByAltText("IMG_1.jpg")).toHaveAttribute("src", "/storage-signed/t1");
+      await vi.advanceTimersByTimeAsync(3 * 60 * 1000);
+      expect(api.calls.filter((c) => c.method === "GET")).toHaveLength(1); // not yet: still within the five minutes
+      await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
+      expect(api.calls.filter((c) => c.method === "GET")).toHaveLength(2);
+      expect(screen.getByAltText("IMG_1.jpg")).toHaveAttribute("src", "/storage-signed/renewed");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not start a second pool of uploads when more photos are added during a batch", async () => {
+    vi.stubGlobal("fetch", fakeApi([{ method: "GET", path: `${BASE}5/photos/`, body: [] }]).fetchImpl);
+    let running = 0;
+    let peak = 0;
+    const upload = vi.fn(async () => {
+      running += 1;
+      peak = Math.max(peak, running);
+      await new Promise((r) => setTimeout(r, 20));
+      running -= 1;
+      return {};
+    });
+    renderWithQuery(<GalleryPhotos galleryId={5} upload={upload} />);
+    const input = await screen.findByLabelText("انتخاب عکس برای آپلود در گالری");
+    const batch = (prefix: string) =>
+      Array.from({ length: 4 }, (_, i) => new File(["x"], `${prefix}${i}.jpg`));
+    fireEvent.change(input, { target: { files: batch("a") } });
+    fireEvent.change(input, { target: { files: batch("b") } });
+    await waitFor(() => expect(upload).toHaveBeenCalledTimes(8));
+    expect(peak).toBe(3);
+  });
+
   it("shows a refused upload and lets it be tried again", async () => {
     vi.stubGlobal(
       "fetch",
@@ -271,6 +317,24 @@ describe("GallerySelections", () => {
     fireEvent.click(screen.getByRole("button", { name: "کپی نام‌ها" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("IMG_1, IMG_3"));
     expect(await screen.findByText("کپی شد.")).toBeInTheDocument();
+  });
+
+  it("renews the thumbnails of the choices before they expire", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] });
+    try {
+      const api = fakeApi([
+        { method: "GET", path: `${BASE}5/selections/`, body: summary() },
+        { method: "GET", path: `${BASE}5/selections/`, body: summary() },
+      ]);
+      vi.stubGlobal("fetch", api.fetchImpl);
+      renderWithQuery(<GallerySelections galleryId={5} />);
+      await vi.advanceTimersByTimeAsync(50);
+      expect(api.calls).toHaveLength(1);
+      await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+      expect(api.calls).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("asks the server for the filtered view", async () => {

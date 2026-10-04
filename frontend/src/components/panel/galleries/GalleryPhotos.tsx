@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState, type DragEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type DragEvent } from "react";
 import { errorMessage } from "@/lib/api/client";
 import {
   galleryKeys,
@@ -14,7 +14,7 @@ import { formatBytes, formatNumber } from "@/lib/format";
 import { moveId } from "@/lib/reorder";
 import { uploadTo } from "@/lib/upload";
 import { Alert, Button, Card } from "../ui";
-import { runUploads, type QueueItem } from "./upload-queue";
+import { createUploadPool, type QueueItem } from "./upload-queue";
 
 export const PHOTO_ACCEPT = "image/jpeg,image/png,image/webp,image/avif,image/tiff";
 type Upload = (file: File, onProgress: (fraction: number) => void) => Promise<unknown>;
@@ -30,16 +30,30 @@ export function GalleryPhotos({ galleryId, upload }: { galleryId: number; upload
   const [items, setItems] = useState<QueueItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const send: Upload =
-    upload ?? ((file, onProgress) => uploadTo(`/api/admin/galleries/${galleryId}/photos/`, file, onProgress));
+  const refresh = useCallback(() => {
+    void client.invalidateQueries({ queryKey: galleryKeys.photos(galleryId) });
+    void client.invalidateQueries({ queryKey: galleryKeys.detail(galleryId) });
+  }, [client, galleryId]);
 
   const patch = (id: number, change: Partial<QueueItem>) =>
     setItems((list) => list.map((item) => (item.id === id ? { ...item, ...change } : item)));
 
-  const refresh = () => {
-    void client.invalidateQueries({ queryKey: galleryKeys.photos(galleryId) });
-    void client.invalidateQueries({ queryKey: galleryKeys.detail(galleryId) });
-  };
+  // One pool for the whole page: a second batch added while the first is still going waits its turn, so the
+  // limit of three uploads at once holds however often files are added.
+  const pool = useMemo(() => {
+    const send: Upload =
+      upload ??
+      ((file, onProgress) => uploadTo(`/api/admin/galleries/${galleryId}/photos/`, file, onProgress));
+    return createUploadPool(
+      send,
+      (id, change) =>
+        setItems((list) => list.map((item) => (item.id === id ? { ...item, ...change } : item))),
+      (finished) => {
+        if (finished % 10 === 0) refresh(); // a long batch shows its photos as it goes
+      },
+      errorMessage,
+    );
+  }, [upload, galleryId, refresh]);
 
   const start = async (chosen: File[]) => {
     if (chosen.length === 0) return;
@@ -52,17 +66,7 @@ export function GalleryPhotos({ galleryId, upload }: { galleryId: number; upload
       ...jobs.map(({ file, id }) => ({ id, name: file.name, progress: 0, state: "queued" as const })),
       ...list,
     ]);
-    let finished = 0;
-    await runUploads(
-      jobs,
-      send,
-      patch,
-      () => {
-        finished += 1;
-        if (finished % 10 === 0) refresh(); // a long batch shows its photos as it goes, not 500 reloads
-      },
-      errorMessage,
-    );
+    await pool.add(jobs);
     refresh();
   };
 
@@ -70,7 +74,7 @@ export function GalleryPhotos({ galleryId, upload }: { galleryId: number; upload
     const file = files.current.get(id);
     if (!file) return;
     patch(id, { state: "queued", progress: 0, message: undefined });
-    void runUploads([{ id, file }], send, patch, () => undefined, errorMessage).then(refresh);
+    void pool.add([{ id, file }]).then(refresh);
   };
 
   const onDrop = (event: DragEvent) => {

@@ -13,6 +13,9 @@ export type FinalFile = Schemas["FinalFile"];
 export type DownloadLogRow = Schemas["DownloadLog"];
 export type Selections = Schemas["Selections"];
 
+/** Thumbnail addresses are signed for five minutes; lists that show them are renewed a little sooner. */
+export const SIGNED_REFRESH_MS = 4 * 60 * 1000;
+
 export const galleryKeys = {
   all: ["galleries"] as const,
   list: ["galleries", "list"] as const,
@@ -121,7 +124,10 @@ export function useGalleryPhotos(id: number) {
   return useQuery({
     queryKey: galleryKeys.photos(id),
     queryFn: () => unwrap(api.GET("/api/admin/galleries/{id}/photos/", { params: { path: { id } } })),
-    refetchInterval: (query) => (query.state.data?.some((p) => p.status === "pending") ? 3000 : false),
+    // While the worker prepares previews: often. Otherwise before the signed thumbnail addresses (5 minutes) expire.
+    refetchInterval: (query) =>
+      query.state.data?.some((p) => p.status === "pending") ? 3000 : SIGNED_REFRESH_MS,
+    refetchOnWindowFocus: "always",
   });
 }
 
@@ -166,6 +172,8 @@ export function useSelections(id: number, only: string) {
           params: { path: { id }, query: only ? { only } : {} },
         }),
       ),
+    refetchInterval: SIGNED_REFRESH_MS,
+    refetchOnWindowFocus: "always",
   });
 }
 

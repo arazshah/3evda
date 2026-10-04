@@ -15,20 +15,27 @@ export function isTransient(error: unknown): boolean {
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+type Upload = (file: File, onProgress: (fraction: number) => void) => Promise<unknown>;
+
 /**
- * Upload `jobs` with at most `concurrency` in flight, trying a transient failure again up to `retries` times.
- * Progress and results are reported through `update`; `done` is called after each finished (or given-up) file.
+ * One shared pool: however many batches are added, at most `concurrency` uploads are in flight, and a transient
+ * failure is tried again up to `retries` times. Progress and results go through `update`; `done` is called after
+ * each finished (or given-up) file, with the number finished so far. `add` resolves when the pool has nothing left to do.
  */
-export async function runUploads(
-  jobs: Job[],
-  upload: (file: File, onProgress: (fraction: number) => void) => Promise<unknown>,
+export function createUploadPool(
+  upload: Upload,
   update: (id: number, change: Partial<QueueItem>) => void,
-  done: () => void,
+  done: (finished: number) => void,
   describe: (error: unknown) => string,
   options: { concurrency?: number; retries?: number; pause?: (ms: number) => Promise<void> } = {},
-): Promise<void> {
+) {
   const { concurrency = CONCURRENCY, retries = RETRIES, pause = wait } = options;
-  const work = [...jobs];
+  const work: Job[] = [];
+  let active = 0;
+  let finished = 0;
+  let idle: Promise<void> = Promise.resolve();
+  let release: () => void = () => undefined;
+
   const worker = async () => {
     for (let job = work.shift(); job; job = work.shift()) {
       for (let attempt = 0; ; attempt += 1) {
@@ -46,8 +53,35 @@ export async function runUploads(
           break;
         }
       }
-      done();
+      finished += 1;
+      done(finished);
     }
+    active -= 1;
+    if (active === 0) release();
   };
-  await Promise.all(Array.from({ length: Math.min(concurrency, jobs.length) }, worker));
+
+  return {
+    add(jobs: Job[]): Promise<void> {
+      if (jobs.length === 0) return idle;
+      if (active === 0) idle = new Promise<void>((resolve) => (release = resolve));
+      work.push(...jobs);
+      for (let spawn = Math.min(concurrency - active, work.length); spawn > 0; spawn -= 1) {
+        active += 1;
+        void worker();
+      }
+      return idle;
+    },
+  };
+}
+
+/** Upload `jobs` through a pool of their own (see `createUploadPool`). */
+export function runUploads(
+  jobs: Job[],
+  upload: Upload,
+  update: (id: number, change: Partial<QueueItem>) => void,
+  done: (finished: number) => void,
+  describe: (error: unknown) => string,
+  options: { concurrency?: number; retries?: number; pause?: (ms: number) => Promise<void> } = {},
+): Promise<void> {
+  return createUploadPool(upload, update, done, describe, options).add(jobs);
 }
