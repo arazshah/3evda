@@ -183,3 +183,35 @@ test.describe("content security policy", () => {
     expect(outcome).toBe("blocked");
   });
 });
+
+test.describe("request id and tracking code", () => {
+  test("every answer carries the id of its request, and the page quotes it", async ({
+    request,
+  }) => {
+    for (const path of ["/", "/api/health/live", "/sitemap.xml"]) {
+      const res = await request.get(path);
+      expect(res.headers()["x-request-id"], path).toMatch(
+        /^[A-Za-z0-9_-]{1,64}$/,
+      );
+    }
+    const page = await request.get("/about");
+    const id = page.headers()["x-request-id"]!;
+    expect(await page.text()).toContain(
+      `<meta name="request-id" content="${id}"`,
+    );
+  });
+
+  test("a visitor's own well-formed id is kept, a malformed one is replaced", async ({
+    request,
+  }) => {
+    const kept = await request.get("/api/health/live", {
+      headers: { "X-Request-ID": "trace-123_abc" },
+    });
+    expect(kept.headers()["x-request-id"]).toBe("trace-123_abc");
+    const bad = await request.get("/api/health/live", {
+      headers: { "X-Request-ID": "bad id; <script>" },
+    });
+    expect(bad.headers()["x-request-id"]).not.toContain("<");
+    expect(bad.headers()["x-request-id"]).toMatch(/^[A-Za-z0-9_-]{1,64}$/);
+  });
+});

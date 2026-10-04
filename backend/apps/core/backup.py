@@ -61,6 +61,8 @@ class BackupStatus:
     size_bytes: int = 0
     duration_seconds: float = 0.0
     steps: list[str] = field(default_factory=list)
+    last_ok_at: str = ""  # the last run that succeeded, kept across failures so the panel can say how long ago
+    disk_free_percent: float | None = None  # free space on the backup volume after this run
 
 
 def retention_args() -> list[str]:
@@ -257,6 +259,14 @@ def snapshot_and_prune(workdir: Path, env: Mapping[str, str], runner: Runner) ->
         return ""
 
 
+def free_percent(path: Path) -> float | None:
+    try:
+        usage = shutil.disk_usage(path)
+    except OSError:
+        return None
+    return round(usage.free * 100 / usage.total, 1) if usage.total else None
+
+
 def directory_size(path: Path) -> int:
     return sum(p.stat().st_size for p in path.rglob("*") if p.is_file())
 
@@ -269,6 +279,11 @@ def write_status(status: BackupStatus, client: Any = None) -> None:
         from .health import s3_client
 
         client = s3_client()
+    if status.ok:
+        status.last_ok_at = status.at
+    elif not status.last_ok_at:
+        previous = read_status(client)
+        status.last_ok_at = str((previous or {}).get("last_ok_at") or "")
     client.put_object(
         Bucket=settings.S3_PRIVATE_BUCKET,
         Key=STATUS_KEY,
@@ -347,6 +362,7 @@ def run_backup(
         )
     status.steps = steps
     status.duration_seconds = round(time.monotonic() - started, 1)
+    status.disk_free_percent = free_percent(Path(os.environ.get("BACKUP_WORKDIR") or DEFAULT_WORKDIR).parent)
     try:
         status_writer(status)
     except Exception:

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { formatNumber } from "@/lib/format";
 import { useMediaList } from "@/lib/api/queries";
+import { SystemStatusCard } from "./SystemStatusCard";
 import { Card } from "./ui";
 
 function Stat({ label, value, href }: { label: string; value?: number; href: string }) {
@@ -25,6 +26,7 @@ export function Dashboard() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">داشبورد</h1>
+      <SystemStatusCard />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="همه‌ی فایل‌ها" value={all.data?.count} href="/panel/media" />
         <Stat label="عکس" value={images.data?.count} href="/panel/media?kind=image" />

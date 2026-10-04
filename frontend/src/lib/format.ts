@@ -27,3 +27,8 @@ export function formatDuration(seconds: number): string {
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 }
+
+/** Latin digits in a sentence from the server, shown as Persian digits. */
+export function toFaDigits(text: string): string {
+  return text.replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]!);
+}

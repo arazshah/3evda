@@ -16,6 +16,7 @@ case "${1:-web}" in
       --workers "${GUNICORN_WORKERS:-3}" \
       --timeout 60 \
       --access-logfile - \
+      --logger-class config.gunicorn_logging.AccessLogger \
       --forwarded-allow-ips "*"
     ;;
   worker)

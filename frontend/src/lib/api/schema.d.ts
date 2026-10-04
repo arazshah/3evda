@@ -1319,6 +1319,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/system/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Only the signed-in owner (default permission). Never cached, never contains a secret. */
+    get: operations["system_status"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/csrf": {
     parameters: {
       query?: never;
@@ -2262,6 +2279,20 @@ export interface components {
       is_published?: boolean;
       readonly project_count: number;
     };
+    Check: {
+      key: string;
+      label: string;
+      level: components["schemas"]["CheckLevelEnum"];
+      detail: string;
+    };
+    /**
+     * @description * `ok` - ok
+     *     * `warning` - warning
+     *     * `error` - error
+     *     * `unknown` - unknown
+     * @enum {string}
+     */
+    CheckLevelEnum: "ok" | "warning" | "error" | "unknown";
     ClosedPeriod: {
       readonly id: number;
       /** Format: date */
@@ -3765,6 +3796,20 @@ export interface components {
       submitted: boolean;
       selected_count: number;
     };
+    SystemStatus: {
+      level: components["schemas"]["SystemStatusLevelEnum"];
+      /** Format: date-time */
+      checked_at: string;
+      version: string;
+      checks: components["schemas"]["Check"][];
+    };
+    /**
+     * @description * `ok` - ok
+     *     * `warning` - warning
+     *     * `error` - error
+     * @enum {string}
+     */
+    SystemStatusLevelEnum: "ok" | "warning" | "error";
     TotpSetup: {
       otpauth_uri: string;
       secret: string;
@@ -7305,6 +7350,25 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["WatermarkSetting"];
+        };
+      };
+    };
+  };
+  system_status: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SystemStatus"];
         };
       };
     };
