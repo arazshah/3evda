@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
@@ -9,8 +10,16 @@ const BASE = process.env.INTERNAL_API_URL ?? "http://localhost:8000";
  */
 export async function get(path: string): Promise<Response> {
   await connection();
+  // The API tells visitors apart by the address its trusted proxies recorded. This request comes from the web
+  // container, so without the visitor's own forwarding chain every page view would count against one shared rate
+  // limit, and a flood of made-up links could lock everybody out of their private pages.
+  const forwarded = (await headers()).get("x-forwarded-for");
   try {
-    return await fetch(`${BASE}${path}`, { cache: "no-store", redirect: "manual" });
+    return await fetch(`${BASE}${path}`, {
+      cache: "no-store",
+      redirect: "manual",
+      headers: forwarded ? { "X-Forwarded-For": forwarded } : undefined,
+    });
   } catch (error) {
     throw new Error(`Public API unavailable: ${String(error)}`);
   }

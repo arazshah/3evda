@@ -73,3 +73,20 @@ export function jalaliMonthLength(jy: number, jm: number): number {
 export function gregorianMonthLength(gy: number, gm: number): number {
   return new Date(Date.UTC(gy, gm, 0)).getUTCDate();
 }
+
+const tehranDay = new Intl.DateTimeFormat("en-u-nu-latn", {
+  timeZone: "Asia/Tehran",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/**
+ * Today as `YYYY-MM-DD` in Tehran, the time zone the bookings are made in (the server decides days there too),
+ * whatever the visitor's own clock says: near midnight the two can be on different days.
+ */
+export function todayIso(now: Date = new Date()): string {
+  const parts = tehranDay.formatToParts(now);
+  const pick = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${pick("year")}-${pick("month")}-${pick("day")}`;
+}

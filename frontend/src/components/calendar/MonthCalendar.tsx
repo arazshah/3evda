@@ -5,6 +5,7 @@ import {
   addDays,
   gregorianMonthLength,
   isoOf,
+  todayIso,
   jalaliMonthLength,
   parseIso,
   toGregorian,
@@ -33,11 +34,6 @@ type Props = {
 type Cursor = { year: number; month: number };
 
 const LOCALE = { fa: "fa-IR", en: "en-US" } as const;
-
-function todayIso(): string {
-  const d = new Date();
-  return isoOf({ gy: d.getFullYear(), gm: d.getMonth() + 1, gd: d.getDate() });
-}
 
 function cursorOf(iso: string, locale: "fa" | "en"): Cursor {
   const g = parseIso(iso);
@@ -174,15 +170,15 @@ export function MonthCalendar({
                       aria-label={longDay.format(new Date(`${iso}T00:00:00Z`))}
                       aria-pressed={value === iso}
                       onClick={() => onSelect?.(iso)}
-                      className={`flex min-h-11 w-full flex-col items-center justify-center rounded-brand border text-sm transition disabled:cursor-not-allowed disabled:opacity-35 ${
+                      className={`flex min-h-11 w-full flex-col items-center justify-center rounded-brand border text-sm font-semibold disabled:cursor-not-allowed disabled:font-normal disabled:text-muted ${
                         value === iso
                           ? "border-accent bg-accent text-bg"
                           : iso === today
                             ? "border-accent hover:bg-elevated"
-                            : "border-transparent hover:border-accent hover:bg-elevated"
+                            : "border-line hover:border-accent hover:bg-elevated disabled:border-transparent disabled:hover:bg-transparent"
                       }`}
                     >
-                      <span aria-hidden="true">{label(iso)}</span>
+                      <span>{label(iso)}</span>
                       {badge?.(iso)}
                     </button>
                   )}

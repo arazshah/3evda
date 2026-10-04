@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addDays,
+  todayIso,
   gregorianMonthLength,
   isoOf,
   jalaliMonthLength,
@@ -59,5 +60,15 @@ describe("plain-day helpers", () => {
   });
   it("formats ISO days with leading zeros", () => {
     expect(isoOf({ gy: 2026, gm: 3, gd: 5 })).toBe("2026-03-05");
+  });
+});
+
+describe("todayIso", () => {
+  it("is the day in Tehran, not the day on the visitor's clock", () => {
+    // 21:00 UTC is 00:30 the next day in Tehran (UTC+3:30, no daylight saving)
+    expect(todayIso(new Date("2026-10-03T21:00:00Z"))).toBe("2026-10-04");
+    expect(todayIso(new Date("2026-10-03T20:00:00Z"))).toBe("2026-10-03");
+    expect(todayIso(new Date("2026-12-31T20:29:00Z"))).toBe("2026-12-31");
+    expect(todayIso(new Date("2026-12-31T20:30:00Z"))).toBe("2027-01-01");
   });
 });

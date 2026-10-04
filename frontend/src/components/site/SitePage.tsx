@@ -50,6 +50,7 @@ export async function SitePage({
           instagram: t("footer.instagram"),
           telegram: t("footer.telegram"),
           whatsapp: t("footer.whatsapp"),
+          book: t("nav.book"),
         }}
       />
     </>

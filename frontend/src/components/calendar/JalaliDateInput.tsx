@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { isoOf, jalaliMonthLength, parseIso, toGregorian, toJalali } from "@/lib/calendar/jalali";
+import { isoOf, jalaliMonthLength, parseIso, todayIso, toGregorian, toJalali } from "@/lib/calendar/jalali";
 
 const SELECT =
   "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent";
@@ -29,7 +29,7 @@ export function JalaliDateInput({
 }) {
   const id = useId();
   const { jy, jm, jd } = toJalali(parseIso(value));
-  const nowYear = toJalali(parseIso(isoOf(todayParts()))).jy;
+  const nowYear = toJalali(parseIso(todayIso())).jy;
   const choices = Array.from({ length: years * 2 + 1 }, (_, i) => nowYear - years + i);
   if (!choices.includes(jy)) choices.push(jy);
   const length = jalaliMonthLength(jy, jm);
@@ -89,10 +89,3 @@ export function JalaliDateInput({
     </fieldset>
   );
 }
-
-function todayParts() {
-  const d = new Date();
-  return { gy: d.getFullYear(), gm: d.getMonth() + 1, gd: d.getDate() };
-}
-
-export { todayParts };
