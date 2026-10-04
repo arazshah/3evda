@@ -32,6 +32,12 @@ function libraryImage(preview: (id: string) => string | null) {
 
 const SAFE_LINK = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i;
 
+/** The nonce of this page's policy: browsers hide the attribute but keep it readable on the element. */
+function pageNonce(): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  return document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce || undefined;
+}
+
 export function RichTextEditor({
   initial,
   previews,
@@ -65,6 +71,8 @@ export function RichTextEditor({
     extensions,
     content: initial && initial.content?.length ? initial : undefined,
     immediatelyRender: false,
+    // The editor adds its base stylesheet at runtime; the page policy only allows <style> carrying its nonce.
+    injectNonce: pageNonce(),
     shouldRerenderOnTransaction: true,
     onUpdate: ({ editor: e }) => onChange(e.getJSON()),
     editorProps: {

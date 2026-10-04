@@ -143,8 +143,11 @@ test.describe("content security policy", () => {
     }
   });
 
-  test("injected script is refused by the browser", async ({ page }) => {
+  test("an injected inline handler is refused by the browser", async ({
+    page,
+  }) => {
     await page.goto("/about");
+    // (A <script> element added from script is trusted under 'strict-dynamic'; an inline event handler is not.)
     const outcome = await page.evaluate(
       () =>
         new Promise<string>((resolve) => {
@@ -153,10 +156,10 @@ test.describe("content security policy", () => {
             () => resolve("blocked"),
             { once: true },
           );
-          (window as unknown as { __injected?: boolean }).__injected = false;
-          const el = document.createElement("script");
-          el.textContent = "window.__injected = true";
-          document.body.appendChild(el);
+          const img = document.createElement("img");
+          img.setAttribute("onerror", "window.__injected = true");
+          img.src = "/missing-image-for-csp-test.png";
+          document.body.appendChild(img);
           setTimeout(
             () =>
               resolve(
@@ -164,17 +167,23 @@ test.describe("content security policy", () => {
                   ? "ran"
                   : "blocked",
               ),
-            500,
+            2000,
           );
         }),
     );
     expect(outcome).toBe("blocked");
-    // the page itself noticed, and that is the point of this test, so it is not a failure of the fixture
+    // the fixture must not treat this deliberate violation as a failure
     test
       .info()
       .annotations.push({
         type: "expected-csp-violation",
-        description: "the injected script above",
+        description: "the injected handler above",
+      });
+    test
+      .info()
+      .annotations.push({
+        type: "expected-http-error",
+        description: "the missing image",
       });
   });
 });
