@@ -17,6 +17,8 @@ const pages = [
   { path: "/en/contact", lang: "en", dir: "ltr", heading: "Contact" },
   { path: "/quote", lang: "fa", dir: "rtl", heading: "استعلام قیمت" },
   { path: "/en/quote", lang: "en", dir: "ltr", heading: "Get a quote" },
+  { path: "/book", lang: "fa", dir: "rtl", heading: "رزرو وقت" },
+  { path: "/en/book", lang: "en", dir: "ltr", heading: "Book a session" },
   // The journal pages; the articles come from `seed_blog_demo`, which CI runs before the tests.
   { path: "/blog", lang: "fa", dir: "rtl", heading: "مجله" },
   { path: "/en/blog", lang: "en", dir: "ltr", heading: "Journal" },
@@ -140,6 +142,52 @@ test.describe("search engines", () => {
     const article = await ld("/blog/sample-article");
     expect(article).toContain('"@type":"Article"');
     expect(article).toContain('"BreadcrumbList"');
+  });
+});
+
+test.describe("booking", () => {
+  // The sample week comes from `seed_booking_demo`, which CI runs before the tests. One journey on desktop only:
+  // both projects would otherwise reach for the same first free time.
+  test.skip(({ isMobile }) => isMobile, "the booking journey runs once, on desktop");
+
+  test("a visitor books a free time, follows it from the link and cancels", async ({ page }) => {
+    await page.goto("/en/book");
+    const freeDays = page.locator("table[role=grid] button:not([disabled])");
+    await expect(page.getByText("Loading free times…")).toHaveCount(0);
+    if ((await freeDays.count()) === 0) {
+      await page.getByRole("button", { name: "Next month" }).click();
+      await expect(page.getByText("Loading free times…")).toHaveCount(0);
+    }
+    await freeDays.first().click();
+    const times = page.getByRole("group", { name: /Free times/ });
+    await expect(times).toBeVisible();
+    await times.getByRole("button").first().click();
+    await expect(page.getByText(/Your chosen time:/)).toBeVisible();
+
+    await page.getByLabel("Name", { exact: true }).fill("Booking Tester");
+    await page.getByLabel("Phone", { exact: true }).fill("09125556677");
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    await expect(page.getByText("Booking request received")).toBeVisible();
+
+    await page.getByRole("link", { name: "See the booking status" }).click();
+    await expect(page).toHaveURL(/\/en\/b\/[0-9a-f]{32}_/);
+    await expect(page.getByRole("heading", { level: 1, name: "Booking status" })).toBeVisible();
+    await expect(page.getByText("Waiting for confirmation")).toBeVisible();
+    expect(await page.locator('meta[name="robots"]').getAttribute("content")).toContain("noindex");
+
+    page.once("dialog", (d) => d.accept());
+    await page.getByRole("button", { name: "Cancel booking" }).click();
+    await expect(page.getByText("You cancelled this booking")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("You cancelled this booking")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Cancel booking" })).toHaveCount(0);
+  });
+
+  test("a made-up booking link is a 404, not a hint", async ({ page, request }) => {
+    const response = await page.goto("/b/00000000000000000000000000000000_forged");
+    expect(response?.status()).toBe(404);
+    const api = await request.get("/api/public/bookings/00000000000000000000000000000000_forged");
+    expect(api.status()).toBe(404);
   });
 });
 

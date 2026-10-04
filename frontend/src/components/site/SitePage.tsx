@@ -32,6 +32,7 @@ export async function SitePage({
     menu: t("nav.menu"),
     switchLanguage: t("nav.switchLanguage"),
     quote: t("nav.quote"),
+    book: t("nav.book"),
   };
   return (
     <>
