@@ -122,11 +122,12 @@ def build_zip(job_id: int) -> str:
     key = ""
     try:
         used: set[str] = set()
+        photos = list(downloadable(job.gallery, job.only_selected).order_by("position", "id"))
         items = [
             (p.original_key if job.originals else p.preview_key, _unique(file_name(p, job.originals), used))
-            for p in downloadable(job.gallery, job.only_selected).order_by("position", "id")
+            for p in photos
         ]
-        ZipJob.objects.filter(pk=job.pk).update(total=len(items))
+        ZipJob.objects.filter(pk=job.pk).update(total=len(items), photo_ids=[p.pk for p in photos])
         with tempfile.TemporaryFile() as tmp:
             # Photos are already compressed; storing them is faster and the size is the same.
             with zipfile.ZipFile(tmp, "w", zipfile.ZIP_STORED, allowZip64=True) as archive:
@@ -140,20 +141,21 @@ def build_zip(job_id: int) -> str:
             key = storage.save(f"galleries/{job.gallery.public_id.hex}/zips/{uuid.uuid4()}.zip", File(tmp))
     except Exception as exc:
         logger.exception("zip failed", extra={"job": job_id})
-        ZipJob.objects.filter(pk=job.pk).update(
+        ZipJob.objects.filter(pk=job.pk, status=ZipJob.Status.RUNNING).update(
             status=ZipJob.Status.FAILED, error=f"ساخت ZIP ناموفق بود ({type(exc).__name__})."[:300]
         )
         if key:
             delete_files.apply_async(args=[[key]], queue="galleries")
         return "failed"
-    changed = ZipJob.objects.filter(pk=job.pk).update(
+    # Only a job still running may become ready: one given up on (or whose gallery is gone) must stay as it is.
+    changed = ZipJob.objects.filter(pk=job.pk, status=ZipJob.Status.RUNNING).update(
         status=ZipJob.Status.READY,
         key=key,
         size_bytes=size,
         done=len(items),
         expires_at=timezone.now() + timedelta(hours=24),
     )
-    if not changed:  # the gallery was deleted while the archive was made
+    if not changed:  # given up on, or the gallery was deleted, while the archive was made
         delete_files.apply_async(args=[[key]], queue="galleries")
         return "gone"
     return "ready"

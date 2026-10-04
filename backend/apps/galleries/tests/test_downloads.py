@@ -340,3 +340,47 @@ def test_selection_rows_do_not_leak_into_downloads_of_other_galleries(client, s3
     choose(client, first, photos, authed(client, first), 0)
     assert Selection.objects.count() == 1
     assert client.post(url(second, "/zip"), **authed(client, second)).status_code == 409
+
+
+def test_a_zip_is_refused_when_the_level_or_the_choices_have_narrowed(client, s3_buckets):
+    gallery, _ = make_gallery(s3_buckets, download_level="all_original", count=3)
+    h = authed(client, gallery)
+    job = client.post(url(gallery, "/zip"), **h).data
+    assert client.get(url(gallery, f"/zip/{job['id']}"), **h).data["status"] == "ready"
+    # originals were built; the owner now allows only the display size
+    Gallery.objects.filter(pk=gallery.pk).update(download_level="all_web")
+    stale = client.get(url(gallery, f"/zip/{job['id']}"), **h)
+    assert stale.status_code == 409 and stale.data["code"] == "stale" and "url" not in stale.data
+    # everything was built; now only the chosen photos may be taken (and none is chosen)
+    Gallery.objects.filter(pk=gallery.pk).update(download_level="all_original")
+    assert client.get(url(gallery, f"/zip/{job['id']}"), **h).status_code == 200
+    Gallery.objects.filter(pk=gallery.pk).update(download_level="selected_original")
+    assert client.get(url(gallery, f"/zip/{job['id']}"), **h).status_code == 409
+
+
+def test_an_unselected_photo_makes_a_chosen_only_zip_stale(client, s3_buckets):
+    gallery, photos = make_gallery(s3_buckets, download_level="selected", count=2)
+    h = authed(client, gallery)
+    choose(client, gallery, photos, h, 0, 1)
+    job = client.post(url(gallery, "/zip"), **h).data
+    assert client.get(url(gallery, f"/zip/{job['id']}"), **h).status_code == 200
+    put(client, gallery, photos[1], h, selected=False)
+    assert client.get(url(gallery, f"/zip/{job['id']}"), **h).data["code"] == "stale"
+    assert DownloadLog.objects.filter(kind="zip").count() == 1  # the refused request issued no link
+
+
+def test_a_job_given_up_on_does_not_become_ready_again(s3_buckets, settings, monkeypatch):
+    gallery, _ = make_gallery(s3_buckets, download_level="all_web", count=1)
+    monkeypatch.setattr("apps.galleries.tasks.build_zip.apply_async", lambda *a, **k: None)
+    job = service.start_zip(gallery)
+    real = service.file_name
+
+    def cleanup_meanwhile(photo, originals):
+        ZipJob.objects.filter(pk=job.pk).update(status="failed", error="timeout")  # as cleanup_zips does
+        return real(photo, originals)
+
+    monkeypatch.setattr(service, "file_name", cleanup_meanwhile)
+    assert build_zip.run(job.pk) == "gone"
+    assert ZipJob.objects.get(pk=job.pk).status == "failed"
+    left = s3_buckets.list_objects_v2(Bucket=settings.S3_PRIVATE_BUCKET).get("Contents", [])
+    assert not [o for o in left if "/zips/" in o["Key"]]  # the archive it had just built is deleted

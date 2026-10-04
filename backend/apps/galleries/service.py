@@ -314,7 +314,11 @@ def start_zip(gallery: Gallery) -> ZipJob:
 
 def zip_link(job: ZipJob, ip_hash: str) -> str:
     """A 60-second link to a finished archive (the level is checked again: it may have changed since)."""
-    download_scope(job.gallery)
+    only_selected, originals = download_scope(job.gallery)
+    # The archive keeps its quality and contents for a day, but the permissions may have changed since it was made.
+    allowed = set(downloadable(job.gallery, only_selected).values_list("pk", flat=True))
+    if (job.originals and not originals) or not set(job.photo_ids) <= allowed:
+        raise GalleryError("stale", "تنظیمات یا انتخاب‌ها عوض شده؛ ZIP را دوباره بسازید.", 409)
     name = f"{_safe_name(job.gallery.title, 'gallery')}.zip"
     log_download(job.gallery, DownloadLog.Kind.ZIP, job.total, job.originals, ip_hash)
     return signed_path(job.key, expire=DOWNLOAD_TTL, filename=name)

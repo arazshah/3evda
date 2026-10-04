@@ -146,6 +146,7 @@ class ZipJob(models.Model):
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.QUEUED)
     originals = models.BooleanField(default=False, help_text="Original files instead of display size")
     only_selected = models.BooleanField(default=True)
+    photo_ids = models.JSONField(default=list, blank=True, help_text="Photos in the archive, as built")
     total = models.PositiveIntegerField(default=0)
     done = models.PositiveIntegerField(default=0)
     key = models.CharField(max_length=255, blank=True)
