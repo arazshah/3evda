@@ -382,6 +382,17 @@ def test_list_filters_search_and_summary(owner_client, week):
     assert owner_client.get(f"{ADMIN}summary/").data == {"pending": 1}
 
 
+def test_list_can_be_narrowed_to_one_enquiry_or_proforma(owner_client, week):
+    inquiry = Inquiry.objects.create(name="ا", phone="1")
+    a = admin_booking(week, "10:00", inquiry=inquiry)
+    admin_booking(week, "13:00")
+    r = owner_client.get(ADMIN, {"inquiry": inquiry.pk})
+    assert [x["id"] for x in r.data["results"]] == [a.pk]
+    assert owner_client.get(ADMIN, {"inquiry": "99999"}).data["count"] == 0
+    assert owner_client.get(ADMIN, {"proforma": "99999"}).data["count"] == 0
+    assert owner_client.get(ADMIN, {"inquiry": "x"}).status_code == 400
+
+
 def test_opening_marks_it_seen_and_notes_can_be_saved(owner_client, week):
     b = admin_booking(week)
     Booking.objects.filter(pk=b.pk).update(seen_at=None)

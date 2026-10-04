@@ -337,7 +337,8 @@ describe("contact links from visitors", () => {
     expect(telegramLink("@sara_photo")).toBe("https://t.me/sara_photo");
     expect(telegramLink("sara_photo")).toBe("https://t.me/sara_photo");
     expect(whatsappLink("+98 912 111 1111")).toBe("https://wa.me/989121111111");
-    expect(whatsappLink("0912-111-1111")).toBe("https://wa.me/09121111111");
+    expect(whatsappLink("0912-111-1111")).toBe("https://wa.me/989121111111"); // local form gets the country code
+    expect(whatsappLink("0212-111-1111")).toBe("https://wa.me/02121111111"); // only mobiles are rewritten
   });
 
   it.each([

@@ -15,6 +15,7 @@ import {
 import { formatBytes, formatDate, formatNumber } from "@/lib/format";
 import { telHref } from "@/lib/site/text";
 import { Alert, Button, Card, TextArea } from "../ui";
+import { LinkedBookings } from "../booking/LinkedBookings";
 import { telegramLink, whatsappLink } from "./links";
 import { rangeText, STATUS_LABELS, STATUS_ORDER } from "./status";
 
@@ -211,6 +212,8 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
           <p className="text-sm text-muted">فایل‌ها فقط دانلود می‌شوند و در مرورگر باز نمی‌شوند.</p>
         </Card>
       )}
+
+      <LinkedBookings inquiry={inquiry.id} />
 
       <Card>
         <form onSubmit={submit} className="space-y-4">

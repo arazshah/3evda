@@ -3989,10 +3989,14 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
         /** @description یک شماره صفحه‌ در مجموعه نتایج صفحه‌بندی شده. */
         page?: number;
         /** @description تعداد نتایج برای نمایش در هر صفحه. */
         page_size?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4019,6 +4023,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4051,6 +4059,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4080,6 +4092,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4115,6 +4131,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4150,6 +4170,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4179,6 +4203,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4208,6 +4236,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */
@@ -4243,6 +4275,10 @@ export interface operations {
       query?: {
         /** @description YYYY-MM-DD (Tehran) */
         from?: string;
+        /** @description Only bookings linked to this enquiry */
+        inquiry?: number;
+        /** @description Only bookings linked to this proforma */
+        proforma?: number;
         q?: string;
         status?: "cancelled" | "completed" | "confirmed" | "pending";
         /** @description YYYY-MM-DD (Tehran) */

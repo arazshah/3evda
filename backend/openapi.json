@@ -1479,6 +1479,14 @@
                         "description": "YYYY-MM-DD (Tehran)"
                     },
                     {
+                        "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
                         "name": "page",
                         "required": false,
                         "in": "query",
@@ -1495,6 +1503,14 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
                     },
                     {
                         "in": "query",
@@ -1557,6 +1573,22 @@
                             "type": "string"
                         },
                         "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
                     },
                     {
                         "in": "query",
@@ -1652,6 +1684,22 @@
                     },
                     {
                         "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
+                    },
+                    {
+                        "in": "query",
                         "name": "q",
                         "schema": {
                             "type": "string"
@@ -1719,6 +1767,22 @@
                         },
                         "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
                     },
                     {
                         "in": "query",
@@ -1813,6 +1877,22 @@
                     },
                     {
                         "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
+                    },
+                    {
+                        "in": "query",
                         "name": "q",
                         "schema": {
                             "type": "string"
@@ -1904,6 +1984,22 @@
                     },
                     {
                         "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
+                    },
+                    {
+                        "in": "query",
                         "name": "q",
                         "schema": {
                             "type": "string"
@@ -1976,6 +2072,22 @@
                     },
                     {
                         "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
+                    },
+                    {
+                        "in": "query",
                         "name": "q",
                         "schema": {
                             "type": "string"
@@ -2045,6 +2157,22 @@
                         },
                         "description": "یک مقداد عدد یکتا که این booking را شناسایی میکند.",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
                     },
                     {
                         "in": "query",
@@ -2129,6 +2257,22 @@
                             "type": "string"
                         },
                         "description": "YYYY-MM-DD (Tehran)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "inquiry",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this enquiry"
+                    },
+                    {
+                        "in": "query",
+                        "name": "proforma",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Only bookings linked to this proforma"
                     },
                     {
                         "in": "query",
