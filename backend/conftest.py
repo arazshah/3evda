@@ -48,3 +48,68 @@ def s3_buckets(settings):  # type: ignore[no-untyped-def]
     with mock_aws():
         ensure_buckets()
         yield boto3.client("s3", region_name=settings.S3_REGION)
+
+
+class FakeRedis:
+    """Just enough of redis.Redis for the backup window: keys with expiry, counters, a pipeline."""
+
+    store: dict[str, tuple[object, int | None]] = {}
+
+    def set(self, key, value, ex=None):  # type: ignore[no-untyped-def]
+        self.store[key] = (value, ex)
+
+    def get(self, key):  # type: ignore[no-untyped-def]
+        item = self.store.get(key)
+        return None if item is None else item[0]
+
+    def exists(self, key):  # type: ignore[no-untyped-def]
+        return int(key in self.store)
+
+    def delete(self, key):  # type: ignore[no-untyped-def]
+        self.store.pop(key, None)
+
+    def incr(self, key):  # type: ignore[no-untyped-def]
+        value = int(self.get(key) or 0) + 1
+        self.store[key] = (value, (self.store.get(key) or (0, None))[1])
+        return value
+
+    def decr(self, key):  # type: ignore[no-untyped-def]
+        value = int(self.get(key) or 0) - 1
+        self.store[key] = (value, (self.store.get(key) or (0, None))[1])
+        return value
+
+    def expire(self, key, seconds):  # type: ignore[no-untyped-def]
+        if key in self.store:
+            self.store[key] = (self.store[key][0], seconds)
+
+    def pipeline(self):  # type: ignore[no-untyped-def]
+        outer = self
+
+        class Pipe:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, tuple[object, ...]]] = []
+
+            def incr(self, *a):  # type: ignore[no-untyped-def]
+                self.calls.append(("incr", a))
+
+            def expire(self, *a):  # type: ignore[no-untyped-def]
+                self.calls.append(("expire", a))
+
+            def execute(self):  # type: ignore[no-untyped-def]
+                return [getattr(outer, name)(*args) for name, args in self.calls]
+
+        return Pipe()
+
+    def close(self):  # type: ignore[no-untyped-def]
+        pass
+
+
+@pytest.fixture(autouse=True)
+def fake_redis(monkeypatch):  # type: ignore[no-untyped-def]
+    """The backup window key lives in Redis; tests use an in-memory stand-in (no server needed)."""
+    from apps.core import backup_window
+
+    FakeRedis.store = {}
+    monkeypatch.setattr(backup_window, "_client", lambda: FakeRedis())
+    yield FakeRedis
+    FakeRedis.store = {}

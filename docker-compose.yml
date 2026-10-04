@@ -65,6 +65,7 @@ services:
   api:
     build:
       context: ./backend
+      target: runtime
       args:
         <<: *build-args
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
@@ -85,6 +86,7 @@ services:
   worker:
     build:
       context: ./backend
+      target: runtime
       args:
         <<: *build-args
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
@@ -101,6 +103,49 @@ services:
       retries: 3
     depends_on:
       api:
+        condition: service_healthy
+
+  # Nightly encrypted backup of the database and both buckets (restic), see docs/runbooks/backup-restore.md.
+  # While it copies (a few minutes at 03:00 Tehran) the site is read-only; the worker pauses and resumes by itself.
+  backup:
+    build:
+      context: ./backend
+      target: backup
+      args:
+        <<: *build-args
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        RESTIC_IMAGE: ${RESTIC_IMAGE:-docker.io/restic/restic:0.18.0}
+        RCLONE_IMAGE: ${RCLONE_IMAGE:-docker.io/rclone/rclone:1.69.3}
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_backup"]
+    environment:
+      <<: *backend-env
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD:?}
+      BACKUP_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}
+      RESTIC_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}  # so `restic …` works in the service's terminal too
+      BACKUP_HOUR: ${BACKUP_HOUR:-3}
+      BACKUP_WORKDIR: /backups/work
+      # Only for a repository outside the server (see docs/runbooks/backup-restore.md).
+      BACKUP_S3_ACCESS_KEY: ${BACKUP_S3_ACCESS_KEY:-}
+      BACKUP_S3_SECRET_KEY: ${BACKUP_S3_SECRET_KEY:-}
+      BACKUP_S3_REGION: ${BACKUP_S3_REGION:-}
+      BACKUP_SSH_KEY: ${BACKUP_SSH_KEY:-}
+      BACKUP_SSH_KNOWN_HOSTS: ${BACKUP_SSH_KNOWN_HOSTS:-}
+    healthcheck:
+      # The scheduler loop touches this file every minute; a stuck or dead loop lets it go stale.
+      test: ["CMD-SHELL", "test $$(( $$(date +%s) - $$(stat -c %Y /tmp/backup-heartbeat) )) -lt 180"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    volumes:
+      - backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage:
         condition: service_healthy
 
   postgres:
@@ -156,6 +201,7 @@ services:
       retries: 5
 
 volumes:
+  backups:
   pgdata_v2:
   redisdata:
   objects_v2:
