@@ -8,9 +8,9 @@ import hashlib
 import hmac
 import time
 
-from django.conf import settings
 from django.core.cache import cache
-from django.utils.crypto import constant_time_compare
+
+from apps.core.signing import current_key, signature_matches
 
 from .models import Gallery
 
@@ -22,10 +22,10 @@ PER_VISITOR = (5, 15 * 60)
 PER_GALLERY = (30, 3600)
 
 
-def _signature(gallery: Gallery, expires: int) -> str:
+def _signature(gallery: Gallery, expires: int, key: str | None = None) -> str:
     secret = hashlib.sha256(gallery.password_hash.encode()).hexdigest()
     message = f"gallery-access:{gallery.public_id}:{gallery.link_version}:{secret}:{expires}".encode()
-    return hmac.new(settings.SECRET_KEY.encode(), message, hashlib.sha256).hexdigest()
+    return hmac.new((key or current_key()).encode(), message, hashlib.sha256).hexdigest()
 
 
 def make_access_token(gallery: Gallery, now: float | None = None) -> str:
@@ -40,7 +40,7 @@ def check_access_token(gallery: Gallery, token: str, now: float | None = None) -
     expires = int(expires_text)
     if expires <= (now if now is not None else time.time()):
         return False
-    return bool(constant_time_compare(signature, _signature(gallery, expires)))
+    return signature_matches(signature, lambda key: _signature(gallery, expires, key))
 
 
 def _keys(gallery: Gallery, visitor: str) -> tuple[str, str]:

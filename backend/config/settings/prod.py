@@ -14,7 +14,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 # Only the local compose stack and CI (plain http://localhost) turn this off.
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = env.bool("COOKIE_SECURE", default=True)
-SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # Redirects to HTTPS are done by Coolify; doing it here would break internal health checks.
 SECURE_SSL_REDIRECT = False

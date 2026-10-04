@@ -19,8 +19,18 @@
 	header {
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()"
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Resource-Policy same-site
 		-Server
 	}
+
+	# TLS ends at Coolify's proxy, which tells us the original scheme; HSTS is only meaningful (and only
+	# honoured by browsers) over https.
+	@https header X-Forwarded-Proto https
+	# "?" sets it only when the upstream (Django in production) has not already sent one.
+	header @https ?Strict-Transport-Security "max-age=31536000"
 
 	@no_request_id not header X-Request-ID *
 	request_header @no_request_id X-Request-ID {http.request.uuid}

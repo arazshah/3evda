@@ -6,7 +6,8 @@ import hmac
 import uuid
 
 from django.conf import settings
-from django.utils.crypto import constant_time_compare
+
+from apps.core.signing import current_key, signature_matches
 
 from .models import Booking
 
@@ -14,8 +15,8 @@ SEPARATOR = "_"
 ID_LENGTH = 32
 
 
-def _signature(public_id: uuid.UUID) -> str:
-    digest = hmac.new(settings.SECRET_KEY.encode(), f"booking-link:{public_id}".encode(), hashlib.sha256).digest()
+def _signature(public_id: uuid.UUID, key: str | None = None) -> str:
+    digest = hmac.new((key or current_key()).encode(), f"booking-link:{public_id}".encode(), hashlib.sha256).digest()
     return base64.urlsafe_b64encode(digest).rstrip(b"=").decode()
 
 
@@ -39,4 +40,4 @@ def find_by_token(token: str) -> Booking | None:
     booking = Booking.objects.filter(public_id=public_id).select_related("session_type").first()
     if booking is None:
         return None
-    return booking if constant_time_compare(signature, _signature(booking.public_id)) else None
+    return booking if signature_matches(signature, lambda key: _signature(booking.public_id, key)) else None

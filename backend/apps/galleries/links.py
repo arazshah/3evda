@@ -9,7 +9,8 @@ import hmac
 import uuid
 
 from django.conf import settings
-from django.utils.crypto import constant_time_compare
+
+from apps.core.signing import current_key, signature_matches
 
 from .models import Gallery
 
@@ -17,9 +18,9 @@ SEPARATOR = "_"
 ID_LENGTH = 32
 
 
-def _signature(public_id: uuid.UUID, version: int) -> str:
+def _signature(public_id: uuid.UUID, version: int, key: str | None = None) -> str:
     message = f"gallery-link:{public_id}:{version}".encode()
-    digest = hmac.new(settings.SECRET_KEY.encode(), message, hashlib.sha256).digest()
+    digest = hmac.new((key or current_key()).encode(), message, hashlib.sha256).digest()
     return base64.urlsafe_b64encode(digest).rstrip(b"=").decode()
 
 
@@ -43,4 +44,5 @@ def find_by_token(token: str) -> Gallery | None:
     gallery = Gallery.objects.filter(public_id=public_id).first()
     if gallery is None:
         return None
-    return gallery if constant_time_compare(signature, _signature(gallery.public_id, gallery.link_version)) else None
+    ok = signature_matches(signature, lambda key: _signature(gallery.public_id, gallery.link_version, key))
+    return gallery if ok else None
