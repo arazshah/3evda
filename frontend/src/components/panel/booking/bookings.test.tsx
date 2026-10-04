@@ -101,6 +101,21 @@ describe("BookingsManager", () => {
     expect(within(list).getAllByRole("link")[0]).toHaveAttribute("href", "/panel/booking/1");
   });
 
+  it("forgets the chosen day when the month changes", async () => {
+    const api = fakeApi([
+      { method: "GET", path: LIST, body: page([row(1, "الف")]) },
+      { method: "GET", path: LIST, body: page([]) },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<BookingsManager />);
+    await waitFor(() => expect(document.querySelector("td button span.text-xs")).not.toBeNull());
+    fireEvent.click(document.querySelector("td button span.text-xs")!.closest("button") as HTMLElement);
+    await screen.findByRole("list", { name: "رزروهای این روز" });
+    fireEvent.click(screen.getByRole("button", { name: "ماه بعد" }));
+    await waitFor(() => expect(screen.getByText(/یک روز را انتخاب کنید/)).toBeInTheDocument());
+    expect(screen.queryByText("رزروی در این روز نیست.")).not.toBeInTheDocument();
+  });
+
   it("shows the week from Saturday, with the bookings under their days", async () => {
     const api = fakeApi([
       { method: "GET", path: LIST, body: page([]) },
@@ -348,6 +363,26 @@ describe("LinkedBookings", () => {
       "/panel/booking/new?inquiry=4&proforma=9",
     );
     expect(new URLSearchParams(api.calls[0]!.search).get("inquiry")).toBe("4");
+  });
+
+  it("shows a failure instead of claiming there are none", async () => {
+    vi.stubGlobal(
+      "fetch",
+      fakeApi([
+        { method: "GET", path: LIST, status: 500, body: { code: "server_error", detail: "خطای سرور" } },
+      ]).fetchImpl,
+    );
+    renderWithQuery(<LinkedBookings inquiry={4} />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("خطای سرور");
+    expect(screen.queryByText("هنوز رزروی وصل نشده است.")).not.toBeInTheDocument();
+  });
+
+  it("asks for as many as the server allows and says when it still shows only some", async () => {
+    const api = fakeApi([{ method: "GET", path: LIST, body: page([row(1, "الف")], 700) }]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<LinkedBookings inquiry={4} />);
+    expect(await screen.findByText(/۱ رزرو از ۷۰۰ نشان داده شد/)).toBeInTheDocument();
+    expect(new URLSearchParams(api.calls[0]!.search).get("page_size")).toBe("500");
   });
 
   it("says so when there are none", async () => {

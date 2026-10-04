@@ -81,7 +81,12 @@ function MonthView() {
           locale="fa"
           value={day}
           onSelect={setDay}
-          onMonthChange={(first, last) => setRange([first, last])}
+          onMonthChange={(first, last) => {
+            setRange([first, last]);
+            // The chosen day belongs to the month it was chosen in; showing it against another month's data
+            // would claim «no bookings» for a day that was never fetched.
+            setDay((chosen) => (chosen && chosen >= first && chosen <= last ? chosen : null));
+          }}
           badge={(iso) =>
             days[iso] ? (
               <span className="text-xs font-bold text-accent">{formatNumber(days[iso]!.length)}</span>

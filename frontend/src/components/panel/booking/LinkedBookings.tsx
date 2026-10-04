@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { errorMessage } from "@/lib/api/client";
 import { useBookings } from "@/lib/api/queries";
-import { Card } from "../ui";
+import { formatNumber } from "@/lib/format";
+import { Alert, Card } from "../ui";
 import { BookingRow } from "./BookingRow";
 
 /** The bookings made for an enquiry or a proforma, with a way to make another. */
 export function LinkedBookings({ inquiry, proforma }: { inquiry?: number | null; proforma?: number | null }) {
   const bookings = useBookings(
-    { inquiry: inquiry ?? undefined, proforma: proforma ?? undefined, page_size: 50 },
+    { inquiry: inquiry ?? undefined, proforma: proforma ?? undefined, page_size: 500 },
     Boolean(inquiry || proforma),
   );
   const list = bookings.data?.results ?? [];
+  const total = bookings.data?.count ?? 0;
   const query = new URLSearchParams();
   if (inquiry) query.set("inquiry", String(inquiry));
   if (proforma) query.set("proforma", String(proforma));
@@ -26,9 +29,12 @@ export function LinkedBookings({ inquiry, proforma }: { inquiry?: number | null;
           ساخت رزرو
         </Link>
       </div>
-      {list.length === 0 ? (
+      {bookings.isError && <Alert>{errorMessage(bookings.error)}</Alert>}
+      {bookings.isPending && !bookings.isError && <p className="text-sm text-muted">در حال بارگذاری…</p>}
+      {bookings.isSuccess && list.length === 0 && (
         <p className="text-sm text-muted">هنوز رزروی وصل نشده است.</p>
-      ) : (
+      )}
+      {list.length > 0 && (
         <ul aria-label="رزروهای وصل‌شده" className="flex flex-col gap-2">
           {list.map((b) => (
             <li key={b.id}>
@@ -36,6 +42,9 @@ export function LinkedBookings({ inquiry, proforma }: { inquiry?: number | null;
             </li>
           ))}
         </ul>
+      )}
+      {total > list.length && (
+        <p className="text-sm text-muted">{`${formatNumber(list.length)} رزرو از ${formatNumber(total)} نشان داده شد؛ بقیه را از فهرست رزروها ببینید.`}</p>
       )}
     </Card>
   );
