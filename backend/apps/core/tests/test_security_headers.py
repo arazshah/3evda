@@ -33,3 +33,40 @@ def test_a_view_that_chose_its_own_caching_keeps_it():
 
 def test_the_request_id_is_still_there():
     assert APIClient().get("/api/health/live", HTTP_X_REQUEST_ID="abc123")["X-Request-ID"] == "abc123"
+
+
+def test_api_answers_are_saved_not_rendered_if_a_browser_opens_them():
+    r = APIClient().get("/api/health/live")
+    assert r["Content-Type"].startswith("application/json")
+    assert r["Content-Disposition"] == 'attachment; filename="api.json"'
+
+
+def test_an_answer_that_names_its_own_download_keeps_its_name(owner_client):
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    def view(request):
+        response = HttpResponse(b"{}", content_type="application/json")
+        response["Content-Disposition"] = 'attachment; filename="mine.json"'
+        return response
+
+    response = SecurityHeadersMiddleware(view)(RequestFactory().get("/api/x"))
+    assert response["Content-Disposition"] == 'attachment; filename="mine.json"'
+
+
+def test_pages_and_files_that_are_not_json_are_not_given_a_download_name():
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    html = SecurityHeadersMiddleware(lambda r: HttpResponse("<p>", content_type="text/html"))(
+        RequestFactory().get("/x")
+    )
+    assert "Content-Disposition" not in html
+    image = SecurityHeadersMiddleware(lambda r: HttpResponse(b"x", content_type="image/webp"))(
+        RequestFactory().get("/api/public/x")
+    )
+    assert "Content-Disposition" not in image

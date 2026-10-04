@@ -1,0 +1,78 @@
+name: ZAP baseline
+
+# A passive OWASP ZAP scan of the running stack's public pages. Weekly and on demand; it also runs when this
+# workflow or its gate script changes. It does not block pull requests: a High finding is open work (see
+# docs/security/asvs-l1.md), not a reason to stop unrelated changes.
+on:
+  schedule:
+    - cron: "41 3 * * 2"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/zap.yml"
+      - "scripts/zap-gate.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate throwaway secrets
+        run: |
+          {
+            echo "DJANGO_SECRET_KEY=$(openssl rand -hex 40)"
+            echo "DJANGO_ALLOWED_HOSTS=localhost"
+            echo "PUBLIC_URL=http://localhost:8080"
+            echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)"
+            echo "S3_ACCESS_KEY=$(openssl rand -hex 12)"
+            echo "S3_SECRET_KEY=$(openssl rand -hex 24)"
+            echo "RESTIC_PASSWORD=$(openssl rand -hex 24)"
+            echo "SOURCE_COMMIT=${GITHUB_SHA}"
+            echo "INQUIRY_RATE=1000/hour"
+            echo "BOOKING_RATE=1000/hour"
+          } > .env
+      - name: Start the stack
+        run: docker compose -f docker-compose.yml -f compose.dev.yml up --build --wait --wait-timeout 300 -d
+      - name: Seed sample pages so there is something to crawl
+        run: |
+          docker compose exec -T api python manage.py seed_blog_demo
+          docker compose exec -T api python manage.py seed_quote_demo
+          docker compose exec -T api python manage.py seed_booking_demo
+      - name: ZAP baseline scan
+        run: |
+          mkdir -p zap && chmod 777 zap
+          # -I: do not fail on warnings here; scripts/zap-gate.py decides what counts as open work.
+          docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://localhost:8080 -J zap.json -r zap.html -I -m 3
+      - name: Gate on High findings
+        run: python3 scripts/zap-gate.py zap/zap.json "$GITHUB_STEP_SUMMARY"
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: zap-report
+          path: zap
+          retention-days: 30
+      - name: Collect service logs
+        if: failure()
+        run: docker compose logs --no-color --timestamps > compose-logs.txt
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: zap-logs
+          path: compose-logs.txt
+          retention-days: 7
+      - name: Stop the stack
+        if: always()
+        run: docker compose down --volumes

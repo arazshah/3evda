@@ -51,6 +51,14 @@ class SecurityHeadersMiddleware:
         response.setdefault("Cross-Origin-Resource-Policy", "same-site")
         if request.path.startswith(PRIVATE_PREFIXES) and "Cache-Control" not in response:
             response["Cache-Control"] = "private, no-store"
+        # An API answer is data, never a page: if a browser is ever pointed at one it saves the file instead of
+        # rendering it (ASVS 14.4.2). `fetch` does not care. Answers that choose their own name keep it.
+        if (
+            request.path.startswith("/api/")
+            and response.get("Content-Type", "").startswith("application/json")
+            and "Content-Disposition" not in response
+        ):
+            response["Content-Disposition"] = 'attachment; filename="api.json"'
         return response
 
 

@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 export function Button({
   variant = "primary",
@@ -24,22 +24,48 @@ export function Field({
   label,
   hint,
   error,
+  type,
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string; error?: string }) {
   const id = useId();
+  const [revealed, setRevealed] = useState(false);
+  const isPassword = type === "password";
   const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
+  const input = (
+    <input
+      id={id}
+      type={isPassword && revealed ? "text" : type}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={describedBy}
+      className="min-h-11 w-full rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent"
+      {...props}
+    />
+  );
   return (
     <div className="flex flex-col gap-1">
       <label htmlFor={id} className="text-sm text-muted">
         {label}
       </label>
-      <input
-        id={id}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent"
-        {...props}
-      />
+      {isPassword ? (
+        // A password can be shown while typing it (ASVS 2.1.12); it is hidden again as soon as the field is left.
+        <div
+          className="flex gap-2"
+          onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setRevealed(false)}
+        >
+          {input}
+          <button
+            type="button"
+            aria-controls={id}
+            aria-pressed={revealed}
+            onClick={() => setRevealed((value) => !value)}
+            className="min-h-11 shrink-0 rounded-brand border border-line px-3 text-sm hover:border-accent"
+          >
+            {revealed ? "پنهان" : "نمایش"}
+          </button>
+        </div>
+      ) : (
+        input
+      )}
       {hint && (
         <p id={`${id}-hint`} className="text-xs text-muted">
           {hint}
