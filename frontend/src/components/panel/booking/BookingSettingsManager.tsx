@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { JalaliDateInput } from "@/components/calendar/JalaliDateInput";
-import { isoOf } from "@/lib/calendar/jalali";
+import { todayIso } from "@/lib/calendar/jalali";
 import { formatDay } from "@/lib/calendar/format";
 import { errorMessage } from "@/lib/api/client";
 import {
@@ -303,11 +303,6 @@ function HoursForm({ initial }: { initial: Row[] }) {
 }
 
 // ---- closed days ----------------------------------------------------------------------------------
-
-function todayIso(): string {
-  const d = new Date();
-  return isoOf({ gy: d.getFullYear(), gm: d.getMonth() + 1, gd: d.getDate() });
-}
 
 function ClosedSection() {
   const closed = useClosedPeriods();

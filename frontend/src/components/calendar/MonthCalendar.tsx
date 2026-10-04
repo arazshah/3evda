@@ -5,6 +5,7 @@ import {
   addDays,
   gregorianMonthLength,
   isoOf,
+  todayIso,
   jalaliMonthLength,
   parseIso,
   toGregorian,
@@ -33,11 +34,6 @@ type Props = {
 type Cursor = { year: number; month: number };
 
 const LOCALE = { fa: "fa-IR", en: "en-US" } as const;
-
-function todayIso(): string {
-  const d = new Date();
-  return isoOf({ gy: d.getFullYear(), gm: d.getMonth() + 1, gd: d.getDate() });
-}
 
 function cursorOf(iso: string, locale: "fa" | "en"): Cursor {
   const g = parseIso(iso);
