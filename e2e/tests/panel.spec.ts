@@ -524,7 +524,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expectNoSeriousViolations(client, "gallery password gate");
   await client.getByLabel("رمز گالری", { exact: true }).fill("اشتباه");
   await client.getByRole("button", { name: "باز کردن گالری" }).click();
-  await expect(client.getByRole("alert")).toContainText("رمز درست نیست.");
+  await expect(client.getByRole("alert").filter({ hasText: "رمز درست نیست." })).toBeVisible(); // not the route announcer
   await client.getByLabel("رمز گالری", { exact: true }).fill("راز-آزمایشی");
   await client.getByRole("button", { name: "باز کردن گالری" }).click();
   const clientPhotos = client.getByRole("list", { name: "عکس‌های گالری" });
