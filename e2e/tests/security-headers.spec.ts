@@ -173,17 +173,13 @@ test.describe("content security policy", () => {
     );
     expect(outcome).toBe("blocked");
     // the fixture must not treat this deliberate violation as a failure
-    test
-      .info()
-      .annotations.push({
-        type: "expected-csp-violation",
-        description: "the injected handler above",
-      });
-    test
-      .info()
-      .annotations.push({
-        type: "expected-http-error",
-        description: "the missing image",
-      });
+    test.info().annotations.push({
+      type: "expected-csp-violation",
+      description: "the injected handler above",
+    });
+    test.info().annotations.push({
+      type: "expected-http-error",
+      description: "the missing image",
+    });
   });
 });
