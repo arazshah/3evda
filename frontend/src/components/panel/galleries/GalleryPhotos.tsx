@@ -153,7 +153,7 @@ export function GalleryPhotos({ galleryId, upload }: { galleryId: number; upload
                 <span className="truncate" dir="auto">
                   {item.name}
                 </span>
-                <span className={item.state === "error" ? "text-accent-2" : "text-muted"}>
+                <span className={item.state === "error" ? "font-semibold text-text" : "text-muted"}>
                   {item.state === "uploading"
                     ? `${formatNumber(Math.round(item.progress * 100))}٪`
                     : item.state === "retrying"

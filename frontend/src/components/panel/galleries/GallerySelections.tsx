@@ -65,7 +65,7 @@ export function GallerySelections({ galleryId }: { galleryId: number }) {
                 </span>
               )}
               {copied === "failed" && (
-                <span role="alert" className="text-sm text-accent-2">
+                <span role="alert" className="text-sm font-semibold text-text">
                   کپی خودکار ممکن نشد؛ متن را از کادر کپی کنید.
                 </span>
               )}
