@@ -112,3 +112,38 @@ def test_other_types_are_left_alone(content_type):
         RequestFactory().get("/api/x")
     )
     assert "Content-Disposition" not in response
+
+
+def test_what_the_api_answers_may_never_be_rendered_or_framed():
+    r = APIClient().get("/api/health/live")
+    csp = r["Content-Security-Policy"]
+    assert "default-src 'none'" in csp and "frame-ancestors 'none'" in csp
+
+
+def test_the_django_admin_has_its_own_strict_policy_and_still_works(client):
+    r = client.get("/django-admin/login/")
+    assert r.status_code == 200
+    csp = r["Content-Security-Policy"]
+    assert "default-src 'self'" in csp and "frame-ancestors 'none'" in csp and "object-src 'none'" in csp
+    assert "script-src" not in csp or "unsafe-inline" not in csp.split("script-src")[1].split(";")[0]
+
+
+def test_a_policy_a_view_set_itself_is_kept():
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import SecurityHeadersMiddleware
+
+    def view(request):
+        response = HttpResponse("x")
+        response["Content-Security-Policy"] = "default-src 'self'"
+        return response
+
+    assert (
+        SecurityHeadersMiddleware(view)(RequestFactory().get("/api/x"))["Content-Security-Policy"]
+        == "default-src 'self'"
+    )
+
+
+def test_static_files_are_not_opened_to_every_origin(settings):
+    assert settings.WHITENOISE_ALLOW_ALL_ORIGINS is False

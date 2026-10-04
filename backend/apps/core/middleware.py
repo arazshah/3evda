@@ -34,6 +34,14 @@ PERMISSIONS_POLICY = (
 )
 PRIVATE_PREFIXES = ("/api/admin/", "/api/auth/")
 
+# The pages are Next's (their policy, with a nonce, is made in the front end's proxy). What Django itself answers
+# gets its own, stricter one: the API never renders anything; the support-only Django admin is plain HTML.
+API_CSP = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+DJANGO_ADMIN_CSP = (
+    "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; "
+    "base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+)
+
 
 class SecurityHeadersMiddleware:
     """Headers every API answer carries, whatever view made it.
@@ -49,6 +57,10 @@ class SecurityHeadersMiddleware:
         response = self.get_response(request)
         response.setdefault("Permissions-Policy", PERMISSIONS_POLICY)
         response.setdefault("Cross-Origin-Resource-Policy", "same-site")
+        if request.path.startswith("/api/"):
+            response.setdefault("Content-Security-Policy", API_CSP)
+        elif request.path.startswith("/django-admin"):
+            response.setdefault("Content-Security-Policy", DJANGO_ADMIN_CSP)
         if request.path.startswith(PRIVATE_PREFIXES) and "Cache-Control" not in response:
             response["Cache-Control"] = "private, no-store"
         # An API answer is data, never a page: if a browser is ever pointed at one it saves the file instead of

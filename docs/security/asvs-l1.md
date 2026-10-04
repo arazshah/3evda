@@ -163,14 +163,14 @@
 | 14.3.3 | نسخه‌ی نرم‌افزار در هدرها نیست | ✅ | هدر Server حذف و `X-Powered-By` خاموش است: `e2e/tests/security-headers.spec.ts`، `frontend/next.config.ts` |
 | 14.4.1 | هر پاسخ Content-Type و charset دارد | ✅ | پیش‌فرض Django/Next؛ `backend/apps/core/tests/test_security_headers.py::test_api_answers_are_saved_not_rendered_if_a_browser_opens_them` |
 | 14.4.2 | پاسخ‌های API با Content-Disposition: attachment | ✅ | `backend/apps/core/tests/test_security_headers.py::test_api_answers_are_saved_not_rendered_if_a_browser_opens_them` |
-| 14.4.3 | CSP با nonce، بدون unsafe-inline برای اسکریپت | ✅ | `frontend/src/lib/security/csp.test.ts`، `e2e/tests/security-headers.spec.ts` |
+| 14.4.3 | CSP با nonce، بدون unsafe-inline برای اسکریپت | ✅ | `backend/apps/core/tests/test_security_headers.py::test_what_the_api_answers_may_never_be_rendered_or_framed`، `backend/apps/core/tests/test_security_headers.py::test_the_django_admin_has_its_own_strict_policy_and_still_works`، `frontend/src/lib/security/csp.test.ts`، `e2e/tests/security-headers.spec.ts` |
 | 14.4.4 | X-Content-Type-Options: nosniff | ✅ | `backend/apps/core/tests/test_security_headers.py::test_every_api_answer_carries_the_security_headers` |
 | 14.4.5 | HSTS | ✅ | `e2e/tests/security-headers.spec.ts` |
 | 14.4.6 | Referrer-Policy | ✅ | `backend/apps/core/tests/test_security_headers.py::test_every_api_answer_carries_the_security_headers` |
 | 14.4.7 | جلوگیری از قاب‌شدن (frame-ancestors / X-Frame-Options) | ✅ | `backend/apps/core/tests/test_security_headers.py::test_every_api_answer_carries_the_security_headers`، `e2e/tests/security-headers.spec.ts` |
 | 14.5.1 | فقط روش‌های HTTP مورد نیاز | ✅ | `backend/apps/media/tests/test_api.py::test_put_is_not_allowed` |
 | 14.5.2 | هدر Origin برای احراز هویت به‌کار نمی‌رود | ✅ | احراز هویت با کوکی نشست و توکن CSRF است؛ `backend/apps/accounts/api.py` |
-| 14.5.3 | CORS: هیچ مبدأ بیگانه‌ای مجاز نیست | ✅ | `backend/apps/core/tests/test_asvs_guards.py::test_no_cross_origin_access_is_ever_granted` |
+| 14.5.3 | CORS: هیچ مبدأ بیگانه‌ای مجاز نیست | ✅ | `backend/apps/core/tests/test_security_headers.py::test_static_files_are_not_opened_to_every_origin`، `backend/apps/core/tests/test_asvs_guards.py::test_no_cross_origin_access_is_ever_granted` |
 | 14.5.4 | هدرهای افزوده‌ی پروکسی فقط از پروکسی مورد اعتماد پذیرفته می‌شود | ✅ | `backend/apps/accounts/tests/test_client_ip.py::test_client_ip_uses_the_trusted_proxy_hop`؛ `trusted_proxies` در `infra/caddy/Caddyfile` |
 
 ## استثناهای ثبت‌شده
@@ -184,6 +184,17 @@
 ## اسکن پویا
 
 برنامه‌ی هفتگی OWASP ZAP baseline روی پشته‌ی بالاآمده در `.github/workflows/zap.yml` اجرا می‌شود (و دستی هم قابل‌اجراست). فقط صفحه‌های عمومی را پیمایش می‌کند (بدون ورود). **یافته‌ی «بالا» یعنی کار باز** و باید در ۷ روز یا بسته شود یا با تاریخ و دلیل به همین فایل افزوده شود. گزارش کامل هر اجرا در artifact همان اجرا ذخیره می‌شود. برای پذیرفتن یک یافته‌ی «بالا» با دلیل و تاریخ، شناسه‌ی افزونه‌ی ZAP را به‌شکل `ZAP-<شناسه>` در جدول «استثناهای ثبت‌شده» بالا بنویسید؛ `scripts/zap-gate.py` همان را می‌شناسد.
+
+### نخستین اجرا (۲۰۲۶-۱۰-۰۴)
+
+۰ یافته‌ی «بالا»، ۲ «متوسط»، ۳ «پایین» (۵۶ بررسی بدون ایراد).
+
+| یافته | نتیجه |
+|---|---|
+| CSP Header Not Set (10038) — پاسخ‌های خود Django (API و پنل پشتیبانی `django-admin`) | **بسته شد**: API سیاست `default-src 'none'` و صفحه‌های django-admin سیاست سخت‌گیرانه‌ی خودشان را می‌گیرند |
+| Cross-Domain Misconfiguration (10098) — فایل‌های ایستا `Access-Control-Allow-Origin: *` داشتند | **بسته شد**: `WHITENOISE_ALLOW_ALL_ORIGINS = False` |
+| Cookie No HttpOnly Flag (10010) `ZAP-10010` | **پذیرفته**: فقط کوکی CSRF است که عمداً باید برای جاوااسکریپت خواندنی باشد (پنل آن را در هدر `X-CSRFToken` می‌فرستد). کوکی **نشست** HttpOnly است. بازبینی: 2027-04-04 |
+| COEP/CORP (90004) `ZAP-90004` | **پذیرفته (پایین)**: `Cross-Origin-Opener-Policy` و `Cross-Origin-Resource-Policy` برقرارند؛ `Cross-Origin-Embedder-Policy` فقط برای صفحه‌هایی لازم است که SharedArrayBuffer یا ساعت دقیق می‌خواهند و این سایت چنین چیزی ندارد. بازبینی: 2027-04-04 |
 
 ## نقص باز
 
