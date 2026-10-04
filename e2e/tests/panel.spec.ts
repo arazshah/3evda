@@ -476,6 +476,50 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await page.getByRole("button", { name: "ذخیره‌ی سقف‌ها" }).click();
   await expect(page.getByText("سقف‌ها ذخیره شد.")).toBeVisible();
 
+  // Galleries: make one, upload a photo (previews are made by the worker), publish, then remove it with its files.
+  await page.goto("/panel/galleries");
+  await expectNoSeriousViolations(page, "galleries list");
+  await page.getByRole("link", { name: "گالری جدید" }).click();
+  await page.getByLabel("عنوان گالری", { exact: true }).fill("گالری آزمایشی");
+  await page.getByLabel("نام مشتری", { exact: true }).fill("مشتری آزمایشی");
+  await page.getByLabel("رمز گالری (اختیاری)").fill("راز-آزمایشی");
+  await page.getByRole("button", { name: "ساخت گالری" }).click();
+  await expect(page).toHaveURL(/\/panel\/galleries\/\d+$/);
+  await expect(page.getByRole("heading", { level: 1, name: "گالری آزمایشی" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "انتشار" })).toBeVisible();
+  await page.getByLabel("انتخاب عکس برای آپلود در گالری").setInputFiles(PHOTO);
+  const galleryPhotos = page.getByRole("list", { name: "عکس‌های گالری" });
+  await expect(galleryPhotos.getByRole("listitem")).toHaveCount(1);
+  // The thumbnail comes from the worker; once it is there it loads through the signed, short-lived address.
+  const thumb = galleryPhotos.getByRole("img");
+  await expect(thumb).toBeVisible({ timeout: 60_000 });
+  const thumbSrc = (await thumb.getAttribute("src")) ?? "";
+  expect(thumbSrc).toMatch(/^\/storage-signed\//);
+  expect((await page.request.get(thumbSrc)).status()).toBe(200);
+  expect((await page.request.get(thumbSrc.split("?")[0]!)).status()).toBeGreaterThanOrEqual(400); // unsigned: refused
+  await page.getByLabel("انتخاب عکس برای آپلود در گالری").setInputFiles(PHOTO); // the same photo again
+  await expect(page.getByText(/قبلاً بارگذاری شده/)).toBeVisible();
+  await expectNoSeriousViolations(page, "gallery detail");
+  await page.getByRole("button", { name: "انتشار" }).click();
+  await expect(page.getByText(/گالری منتشر شد/)).toBeVisible();
+  const galleryLink = await page.getByLabel("لینک گالری برای مشتری", { exact: true }).inputValue();
+  expect(galleryLink).toMatch(/\/g\/[0-9a-f]{32}_[A-Za-z0-9_-]+$/);
+  const galleryToken = galleryLink.split("/g/")[1]!;
+  // The client's API: the link alone shows nothing; the password gives a token; the owner has nothing selected yet.
+  const gallery = await (await page.request.get(`/api/public/galleries/${galleryToken}`)).json();
+  expect(gallery).toMatchObject({ title: "گالری آزمایشی", has_password: true, status: "published" });
+  expect((await page.request.get(`/api/public/galleries/${galleryToken}/photos`)).status()).toBe(401);
+  expect((await page.request.post(`/api/public/galleries/${galleryToken}/unlock`, { data: { password: "اشتباه" } })).status()).toBe(403);
+  await page.goto("/panel/galleries");
+  await expect(page.getByRole("list", { name: "گالری‌ها" }).getByText("منتشرشده")).toBeVisible();
+  await page.getByRole("link", { name: /گالری آزمایشی/ }).click();
+  await expect(page.getByText(/۰ انتخاب از ۱ عکس/)).toBeVisible();
+  acceptNextDialog();
+  await page.getByRole("button", { name: "حذف گالری" }).click();
+  await expect(page).toHaveURL(/\/panel\/galleries$/);
+  await expect(page.getByText("هنوز گالری‌ای نساخته‌اید.")).toBeVisible();
+  expect((await page.request.get(`/api/public/galleries/${galleryToken}`)).status()).toBe(404);
+
   // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
   await page.goto("/panel/articles/new?language=fa");
   await page.getByLabel("عنوان", { exact: true }).fill("مقاله‌ی آزمایشی");
