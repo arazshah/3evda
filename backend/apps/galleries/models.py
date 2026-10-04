@@ -1,12 +1,19 @@
 import uuid
+from datetime import timedelta
 
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from apps.blog.models import Language
 from apps.booking.models import Booking
 from apps.inquiries.models import Inquiry
 from apps.proformas.models import Proforma
+
+
+def default_expiry():  # type: ignore[no-untyped-def]
+    """Thirty days from creation, until the owner can set her own default."""
+    return timezone.now() + timedelta(days=30)
 
 
 class Gallery(models.Model):
@@ -31,7 +38,7 @@ class Gallery(models.Model):
     language = models.CharField(max_length=2, choices=Language.choices, default=Language.FA)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     password_hash = models.CharField(max_length=256, blank=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True, default=default_expiry)
     selection_limit = models.PositiveIntegerField(null=True, blank=True, help_text="Empty: no limit")
     download_level = models.CharField(max_length=20, choices=DownloadLevel.choices, default=DownloadLevel.SELECTED)
     watermark = models.BooleanField(default=True, help_text="Previews carry the watermark")

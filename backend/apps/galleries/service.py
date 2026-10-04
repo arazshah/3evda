@@ -66,6 +66,8 @@ def add_photo(gallery: Gallery, upload: UploadedFile[bytes]) -> GalleryPhoto:
     # The count and the position are read under the gallery's row lock, so parallel uploads cannot pass the limit.
     with transaction.atomic():
         locked = Gallery.objects.select_for_update().get(pk=gallery.pk)
+        if locked.status == Gallery.Status.ARCHIVED:  # archived while the upload was being checked
+            raise GalleryError("archived", "گالری بایگانی‌شده است؛ ابتدا آن را از بایگانی درآورید.")
         photos = GalleryPhoto.objects.filter(gallery=locked)
         if photos.count() >= settings.GALLERY_MAX_PHOTOS:
             raise GalleryError("too_many", f"هر گالری حداکثر {settings.GALLERY_MAX_PHOTOS} عکس دارد.")

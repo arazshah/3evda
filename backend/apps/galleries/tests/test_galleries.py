@@ -219,6 +219,94 @@ def test_a_photo_that_cannot_be_processed_is_marked_failed(owner_client, s3_buck
     assert "RuntimeError" in GalleryPhoto.objects.get().error
 
 
+def test_a_busy_store_is_retried_and_only_the_last_failure_marks_the_photo(owner_client, s3_buckets, monkeypatch):
+    from apps.galleries.tasks import process_photo
+
+    g = make(owner_client)
+    photo = upload(owner_client, g["id"]).data
+    GalleryPhoto.objects.filter(pk=photo["id"]).update(status="processing")
+
+    class Busy:
+        def open(self, key):
+            raise ConnectionError("store busy")
+
+    monkeypatch.setattr("apps.galleries.tasks.private_storage", lambda: Busy())
+    retried = []
+
+    def retry(exc=None, **kw):
+        retried.append(exc)
+        return Retry()
+
+    monkeypatch.setattr(process_photo, "retry", retry)
+    process_photo.push_request(retries=0, called_directly=False, args=(photo["id"],), kwargs={})
+    try:
+        with pytest.raises(Retry):
+            process_photo.run(photo["id"])
+    finally:
+        process_photo.pop_request()
+    assert len(retried) == 1 and isinstance(retried[0], ConnectionError)
+    assert GalleryPhoto.objects.get(pk=photo["id"]).status == "processing"  # not failed for good
+    process_photo.push_request(retries=process_photo.max_retries, called_directly=False, args=(photo["id"],), kwargs={})
+    try:
+        assert process_photo.run(photo["id"]) == "failed"
+    finally:
+        process_photo.pop_request()
+
+
+def test_renditions_fit_the_long_edge_and_carry_no_metadata(owner_client, s3_buckets, settings):
+    g = make(owner_client)
+    blob = image_bytes(color="#445566", size=(1600, 2400))
+    p = upload(owner_client, g["id"], data=blob).data
+    row = GalleryPhoto.objects.get(pk=p["id"])
+    for key, edge in ((row.thumb_key, settings.GALLERY_THUMB_WIDTH), (row.preview_key, settings.GALLERY_PREVIEW_WIDTH)):
+        body = s3_buckets.get_object(Bucket=settings.S3_PRIVATE_BUCKET, Key=key)["Body"].read()
+        img = Image.open(io.BytesIO(body))
+        assert max(img.size) <= edge and img.height > img.width
+        assert not dict(img.getexif()) and b"Exif" not in body[:64]
+
+
+def test_previews_made_for_a_deleted_photo_are_removed(owner_client, s3_buckets, settings, monkeypatch):
+    from apps.galleries import tasks
+
+    g = make(owner_client)
+    photo = upload(owner_client, g["id"]).data
+    pk = photo["id"]
+    real = tasks.fit_long_edge
+
+    def delete_midway(img, edge):
+        GalleryPhoto.objects.filter(pk=pk).delete()  # the owner deletes it while the worker works
+        return real(img, edge)
+
+    row = GalleryPhoto.objects.get(pk=pk)
+    for old in (row.thumb_key, row.preview_key):  # the first, eager run is not what is being tested
+        s3_buckets.delete_object(Bucket=settings.S3_PRIVATE_BUCKET, Key=old)
+    GalleryPhoto.objects.filter(pk=pk).update(status="processing", thumb_key="", preview_key="")
+    monkeypatch.setattr(tasks, "fit_long_edge", delete_midway)
+    assert tasks.process_photo.run(pk) == "gone"
+    assert not [k for k in keys(s3_buckets, settings) if "/previews/" in k]
+
+
+def test_an_upload_that_met_an_archive_during_checks_is_refused(owner_client, s3_buckets, monkeypatch):
+    g = make(owner_client)
+    row = Gallery.objects.get(pk=g["id"])
+    real = service._sha256
+
+    def archive_meanwhile(upload):
+        Gallery.objects.filter(pk=row.pk).update(status="archived")
+        return real(upload)
+
+    monkeypatch.setattr(service, "_sha256", archive_meanwhile)
+    with pytest.raises(service.GalleryError) as e:
+        service.add_photo(row, SimpleUploadedFile("a.jpg", image_bytes(), "image/jpeg"))
+    assert e.value.code == "archived" and GalleryPhoto.objects.count() == 0
+
+
+def test_a_gallery_without_a_date_expires_in_thirty_days(owner_client):
+    g = make(owner_client)
+    left = Gallery.objects.get(pk=g["id"]).expires_at - timezone.now()
+    assert timedelta(days=29, hours=23) < left <= timedelta(days=30)
+
+
 def test_a_photo_deleted_while_waiting_is_simply_skipped(db):
     from apps.galleries.tasks import process_photo
 
