@@ -1544,6 +1544,89 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/public/galleries/{token}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["public_galleries_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/photos": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    get: operations["public_galleries_photos"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/photos/{photo_id}/selection": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    put: operations["public_galleries_selection"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/submit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A view that needs the access token (given by `unlock`) as well as the link. */
+    post: operations["public_galleries_submit"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/public/galleries/{token}/unlock": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["public_galleries_unlock"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/public/inquiries": {
     parameters: {
       query?: never;
@@ -3075,6 +3158,17 @@ export interface components {
       /** @description False shows the line as not included */
       readonly included: boolean;
     };
+    PublicGallery: {
+      title: string;
+      client_name: string;
+      language: string;
+      /** @description published, submitted or expired */
+      status: string;
+      has_password: boolean;
+      selection_limit: number | null;
+      download_level: components["schemas"]["DownloadLevelEnum"];
+      submitted: boolean;
+    };
     PublicGroup: {
       readonly id: number;
       readonly title_fa: string;
@@ -3140,6 +3234,23 @@ export interface components {
     };
     PublicPackages: {
       groups: components["schemas"]["PublicGroup"][];
+    };
+    PublicPhoto: {
+      id: number;
+      name: string;
+      width: number | null;
+      height: number | null;
+      thumb_url: string;
+      preview_url: string;
+      selected: boolean;
+      comment: string;
+      retouch: boolean;
+    };
+    PublicPhotos: {
+      selection_limit: number | null;
+      selected_count: number;
+      submitted: boolean;
+      photos: components["schemas"]["PublicPhoto"][];
     };
     PublicPortfolio: {
       categories: components["schemas"]["PublicCategory"][];
@@ -3348,6 +3459,17 @@ export interface components {
       /** Format: time */
       time: string;
     };
+    Selection: {
+      selected: boolean;
+      comment: string;
+      retouch: boolean;
+      selected_count: number;
+    };
+    SelectionRequest: {
+      selected?: boolean;
+      comment?: string;
+      retouch?: boolean;
+    };
     SessionType: {
       readonly id: number;
       key: string;
@@ -3434,6 +3556,10 @@ export interface components {
      * @enum {string}
      */
     StyleEnum: "low_key" | "high_key" | "natural";
+    SubmitResponse: {
+      submitted: boolean;
+      selected_count: number;
+    };
     TotpSetup: {
       otpauth_uri: string;
       secret: string;
@@ -3444,6 +3570,13 @@ export interface components {
       language: string;
       slug: string;
       status: string;
+    };
+    UnlockRequest: {
+      password?: string;
+    };
+    UnlockResponse: {
+      token: string;
+      expires_in: number;
     };
     WatermarkSetting: {
       enabled?: boolean;
@@ -7287,6 +7420,130 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicBooking"];
+        };
+      };
+    };
+  };
+  public_galleries_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicGallery"];
+        };
+      };
+    };
+  };
+  public_galleries_photos: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicPhotos"];
+        };
+      };
+    };
+  };
+  public_galleries_selection: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        photo_id: number;
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["SelectionRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["SelectionRequest"];
+        "multipart/form-data": components["schemas"]["SelectionRequest"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Selection"];
+        };
+      };
+    };
+  };
+  public_galleries_submit: {
+    parameters: {
+      query?: never;
+      header: {
+        "X-Gallery-Token": string;
+      };
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubmitResponse"];
+        };
+      };
+    };
+  };
+  public_galleries_unlock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UnlockRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["UnlockRequest"];
+        "multipart/form-data": components["schemas"]["UnlockRequest"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UnlockResponse"];
         };
       };
     };
