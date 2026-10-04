@@ -445,6 +445,28 @@ describe("the large view", () => {
     expect(opener).toHaveFocus();
   });
 
+  it("Escape and the arrows work wherever the focus is, even on the page itself", async () => {
+    ready();
+    fireEvent.click(await screen.findByRole("button", { name: "نمایش بزرگ IMG_1.jpg" }));
+    const dialog = screen.getByRole("dialog");
+    (document.activeElement as HTMLElement | null)?.blur();
+    fireEvent.keyDown(document.body, { key: "ArrowLeft" });
+    expect(within(dialog).getByRole("img", { name: "IMG_2.jpg" })).toBeInTheDocument();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("after saving a note the focus returns to the note", async () => {
+    const put = `PUT ${BASE}/photos/1/selection`;
+    ready({ [put]: { body: { selected: false, comment: "گرم‌تر", retouch: false, selected_count: 0 } } });
+    fireEvent.click(await screen.findByRole("button", { name: "نمایش بزرگ IMG_1.jpg" }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText(FA.comment), { target: { value: "گرم‌تر" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: FA.saveComment }));
+    await within(dialog).findByText(FA.commentSaved);
+    expect(within(dialog).getByLabelText(FA.comment)).toHaveFocus();
+  });
+
   it("in English the right arrow is forward", async () => {
     ready({}, { locale: "en", labels: EN });
     fireEvent.click(await screen.findByRole("button", { name: "View IMG_1.jpg large" }));

@@ -70,32 +70,40 @@ export function Lightbox({
     }
   }, [photos, index]);
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    const target = event.target as HTMLElement;
-    const typing = target.tagName === "TEXTAREA" || target.tagName === "INPUT";
-    if (event.key === "Escape") {
-      event.preventDefault();
-      onClose();
-    } else if (!typing && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
-      // The reading direction decides which way is «forward».
-      const forward = (event.key === "ArrowRight") !== rtl;
-      event.preventDefault();
-      go(forward ? 1 : -1);
-    } else if (event.key === "Tab") {
-      // Keep the focus inside the dialog.
-      const items = dialog.current?.querySelectorAll<HTMLElement>(
-        "button:not([disabled]), textarea, input:not([disabled])",
-      );
-      if (!items || items.length === 0) return;
-      const first = items[0]!;
-      const last = items[items.length - 1]!;
-      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) {
+  // Keys work wherever the focus happens to be: pressing «save» disables that button and the focus falls to the page.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typing = target?.tagName === "TEXTAREA" || target?.tagName === "INPUT";
+      if (event.key === "Escape") {
         event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+        onClose();
+      } else if (!typing && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
+        // The reading direction decides which way is «forward».
+        const forward = (event.key === "ArrowRight") !== rtl;
         event.preventDefault();
-        first.focus();
+        onIndex(Math.min(photos.length - 1, Math.max(0, index + (forward ? 1 : -1))));
       }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [index, photos.length, rtl, onClose, onIndex]);
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key !== "Tab") return;
+    // Keep the focus inside the dialog.
+    const items = dialog.current?.querySelectorAll<HTMLElement>(
+      "button:not([disabled]), textarea, input:not([disabled])",
+    );
+    if (!items || items.length === 0) return;
+    const first = items[0]!;
+    const last = items[items.length - 1]!;
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
     }
   };
 
@@ -112,6 +120,8 @@ export function Lightbox({
   const save = async () => {
     setSaved(false);
     setSaved(await onSaveNote(photo, note));
+    // The button that was pressed is now disabled; the focus goes back to the note, not to the page.
+    document.getElementById("photo-note")?.focus();
   };
 
   return (
