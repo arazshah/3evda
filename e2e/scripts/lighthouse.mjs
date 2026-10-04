@@ -15,6 +15,9 @@ const ROUTES = ["/", "/portfolio", "/services", "/packages", "/about", "/contact
 // Every public page in both languages (Persian is unprefixed, English lives under /en).
 const PAGES = ROUTES.flatMap((route) => [route, route === "/" ? "/en" : `/en${route}`]);
 const CATEGORIES = ["performance", "accessibility", "best-practices", "seo"];
+// On the real site there may be no sample article yet: with this set, a page that does not exist is skipped
+// (and said so), instead of failing the gate. Every page that does exist is still held to the same scores.
+const SKIP_MISSING = process.env.LIGHTHOUSE_SKIP_MISSING === "true";
 
 const outDir = mkdtempSync(join(tmpdir(), "lighthouse-"));
 const chromePath = process.env.PW_CHROMIUM_PATH || chromium.executablePath();
@@ -22,7 +25,11 @@ const failures = [];
 
 for (const [index, path] of PAGES.entries()) {
   // Warm the page first: the first request after start-up renders cold and skews the lab numbers.
-  await fetch(BASE + path);
+  const warm = await fetch(BASE + path);
+  if (SKIP_MISSING && warm.status === 404) {
+    console.log(path.padEnd(16), "skipped (no such page on this site yet)");
+    continue;
+  }
   const file = join(outDir, `${index}.json`);
   execFileSync(
     "pnpm",

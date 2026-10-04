@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from apps.booking.models import BookingSettings, SessionType, WorkingHours
+from apps.core.demo import require_demo_allowed
 
 # Python weekdays: Monday 0 … Saturday 5, Sunday 6. Saturday to Thursday, 10:00–18:00.
 WORKING_DAYS = [5, 6, 0, 1, 2, 3]
@@ -16,6 +17,7 @@ class Command(BaseCommand):
     help = "Sample session types and weekly hours (only when none exist), so the booking flow can be tried and tested."
 
     def handle(self, *args: object, **options: object) -> None:
+        require_demo_allowed("seed_booking_demo")
         BookingSettings.load()
         created = 0
         if not SessionType.objects.exists():
