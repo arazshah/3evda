@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { directionOf } from "@/i18n/config";
 import { routing } from "@/i18n/routing";
@@ -44,6 +45,8 @@ export async function generateMetadata({ params }: Omit<Props, "children">): Pro
 }
 
 export default async function LocaleLayout({ children, params }: Props) {
+  // The page's scripts carry a nonce made for this request (see proxy.ts), so no page can be built ahead of time.
+  await connection();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);

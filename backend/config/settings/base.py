@@ -9,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 env = environ.Env()
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
+# Old keys, still accepted for what they signed (sessions, the links given to customers) after a key change.
+SECRET_KEY_FALLBACKS = env.list("DJANGO_SECRET_KEY_FALLBACKS", default=[])
 DEBUG = False
 # Internal names are always allowed: container health checks and service-to-service calls.
 ALLOWED_HOSTS = [*env.list("DJANGO_ALLOWED_HOSTS", default=[]), "127.0.0.1", "localhost", "api"]
@@ -65,6 +67,7 @@ OTP_TOTP_ISSUER = "3evda.com"
 MIDDLEWARE = [
     "apps.core.middleware.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "apps.core.middleware.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
