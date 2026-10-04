@@ -20,6 +20,7 @@ from .serializers import (
     GallerySerializer,
     PhotoOrderSerializer,
     PhotoUploadSerializer,
+    SelectionsSerializer,
 )
 
 
@@ -185,3 +186,13 @@ class GalleryViewSet(
         service.delete_final(found)
         record("galleries.final.delete", request=request._request, target=gallery)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        parameters=[OpenApiParameter("only", str, description="selected, retouch or commented")],
+        responses=SelectionsSerializer,
+    )
+    @action(detail=True, methods=["get"], url_path="selections")
+    def selections(self, request: Request, pk: str | None = None) -> Response:
+        gallery = self.get_object()
+        only = request.query_params.get("only", "")
+        return Response(SelectionsSerializer(service.selections_overview(gallery, only)).data)

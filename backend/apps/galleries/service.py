@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
-from django.db.models import QuerySet, Sum
+from django.db.models import Q, QuerySet, Sum
 from django.utils import timezone
 
 from apps.core.signed import signed_path
@@ -358,3 +358,39 @@ def final_download(gallery: Gallery, final_id: int, ip_hash: str) -> tuple[str, 
         raise GalleryError("not_found", "فایل پیدا نشد.", 404)
     log_download(gallery, DownloadLog.Kind.FINAL, 1, True, ip_hash)
     return signed_path(final.key, expire=DOWNLOAD_TTL, filename=final.filename), final.filename
+
+
+def selections_overview(gallery: Gallery, only: str = "") -> dict[str, object]:
+    """What the client chose, for the owner: counts, the rows (optionally filtered) and the names for Lightroom."""
+    rows = list(
+        Selection.objects.filter(photo__gallery=gallery)
+        .filter(Q(selected=True) | Q(retouch=True) | ~Q(comment=""))
+        .select_related("photo")
+        .order_by("photo__position", "photo__id")
+    )
+    chosen = [r for r in rows if r.selected]
+    shown = {
+        "selected": chosen,
+        "retouch": [r for r in rows if r.retouch],
+        "commented": [r for r in rows if r.comment],
+    }.get(only, rows)
+    return {
+        "photo_count": gallery.photos.count(),
+        "selected_count": len(chosen),
+        "retouch_count": sum(1 for r in rows if r.retouch),
+        "comment_count": sum(1 for r in rows if r.comment),
+        "submitted_at": gallery.submitted_at,
+        # Lightroom's text filter takes names without the extension, separated by commas.
+        "filenames": ", ".join(r.photo.original_filename.rsplit(".", 1)[0] for r in chosen),
+        "items": [
+            {
+                "photo": r.photo_id,
+                "filename": r.photo.original_filename,
+                "thumb_url": signed_path(r.photo.thumb_key, expire=300) if r.photo.thumb_key else None,
+                "selected": r.selected,
+                "comment": r.comment,
+                "retouch": r.retouch,
+            }
+            for r in shown
+        ],
+    }

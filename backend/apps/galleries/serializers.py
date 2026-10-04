@@ -120,3 +120,22 @@ class DownloadLogSerializer(serializers.ModelSerializer):  # type: ignore[type-a
         model = DownloadLog
         fields = ["id", "kind", "files", "originals", "created_at"]
         read_only_fields = fields
+
+
+class SelectionItemSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    photo = serializers.IntegerField()
+    filename = serializers.CharField()
+    thumb_url = serializers.CharField(allow_null=True)
+    selected = serializers.BooleanField()
+    comment = serializers.CharField()
+    retouch = serializers.BooleanField()
+
+
+class SelectionsSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    photo_count = serializers.IntegerField()
+    selected_count = serializers.IntegerField()
+    retouch_count = serializers.IntegerField()
+    comment_count = serializers.IntegerField()
+    submitted_at = serializers.DateTimeField(allow_null=True)
+    filenames = serializers.CharField(help_text="Chosen photos' names without extension, ready for Lightroom's search")
+    items = SelectionItemSerializer(many=True)

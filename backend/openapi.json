@@ -3601,6 +3601,50 @@
                 }
             }
         },
+        "/api/admin/galleries/{id}/selections/": {
+            "get": {
+                "operationId": "admin_galleries_selections_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "یک مقداد عدد یکتا که این gallery را شناسایی میکند.",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "only",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "selected, retouch or commented"
+                    }
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Selections"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/galleries/{id}/unarchive/": {
             "post": {
                 "operationId": "admin_galleries_unarchive_create",
@@ -14697,6 +14741,38 @@
                     "selected_count"
                 ]
             },
+            "SelectionItem": {
+                "type": "object",
+                "properties": {
+                    "photo": {
+                        "type": "integer"
+                    },
+                    "filename": {
+                        "type": "string"
+                    },
+                    "thumb_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "selected": {
+                        "type": "boolean"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "retouch": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "comment",
+                    "filename",
+                    "photo",
+                    "retouch",
+                    "selected",
+                    "thumb_url"
+                ]
+            },
             "SelectionRequest": {
                 "type": "object",
                 "properties": {
@@ -14711,6 +14787,47 @@
                         "type": "boolean"
                     }
                 }
+            },
+            "Selections": {
+                "type": "object",
+                "properties": {
+                    "photo_count": {
+                        "type": "integer"
+                    },
+                    "selected_count": {
+                        "type": "integer"
+                    },
+                    "retouch_count": {
+                        "type": "integer"
+                    },
+                    "comment_count": {
+                        "type": "integer"
+                    },
+                    "submitted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "filenames": {
+                        "type": "string",
+                        "description": "Chosen photos' names without extension, ready for Lightroom's search"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SelectionItem"
+                        }
+                    }
+                },
+                "required": [
+                    "comment_count",
+                    "filenames",
+                    "items",
+                    "photo_count",
+                    "retouch_count",
+                    "selected_count",
+                    "submitted_at"
+                ]
             },
             "SessionType": {
                 "type": "object",
