@@ -306,3 +306,21 @@ def test_the_next_run_is_at_three_in_the_morning_tehran():
 
 def test_retention_is_seven_daily_and_four_weekly():
     assert backup.retention_args() == ["--keep-daily", "7", "--keep-weekly", "4", "--prune"]
+
+
+def test_the_heartbeat_file_is_touched_for_the_health_check(tmp_path, monkeypatch):
+    from apps.core.management.commands import run_backup
+
+    beat = tmp_path / "beat"
+    monkeypatch.setattr(run_backup, "HEARTBEAT", beat)
+
+    class Stop(Exception):
+        pass
+
+    def stop(_: float) -> None:
+        raise Stop
+
+    monkeypatch.setattr(run_backup.time, "sleep", stop)
+    with pytest.raises(Stop):
+        run_backup.heartbeat_forever()
+    assert beat.exists()

@@ -1,12 +1,24 @@
 import logging
 import os
+import threading
 import time
+from pathlib import Path
 
 from django.core.management.base import BaseCommand
 
 from apps.core import backup
 
 logger = logging.getLogger(__name__)
+
+HEARTBEAT = Path(os.environ.get("BACKUP_HEARTBEAT", "/tmp/backup-heartbeat"))  # noqa: S108 — container-local
+
+
+def heartbeat_forever(interval: float = 30.0) -> None:
+    """The container's health check looks at this file. It is touched from its own thread, so a long backup
+    does not look like a hang, while a dead process stops touching it."""
+    while True:
+        HEARTBEAT.touch()
+        time.sleep(interval)
 
 
 class Command(BaseCommand):
@@ -25,6 +37,7 @@ class Command(BaseCommand):
         backup.restic_env()  # no password: refuse to start, loudly
         hour = int(os.environ.get("BACKUP_HOUR", "3"))
         logger.info("backup service started; next run at %02d:00 Tehran", hour)
+        threading.Thread(target=heartbeat_forever, daemon=True).start()
         while True:
             time.sleep(backup.seconds_until(hour))
             status = backup.run_backup()

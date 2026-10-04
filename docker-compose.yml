@@ -124,6 +124,13 @@ services:
       BACKUP_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}
       BACKUP_HOUR: ${BACKUP_HOUR:-3}
       BACKUP_WORKDIR: /backups/work
+    healthcheck:
+      # The scheduler loop touches this file every minute; a stuck or dead loop lets it go stale.
+      test: ["CMD-SHELL", "test $$(( $$(date +%s) - $$(stat -c %Y /tmp/backup-heartbeat) )) -lt 180"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
     volumes:
       - backups:/backups
     depends_on:

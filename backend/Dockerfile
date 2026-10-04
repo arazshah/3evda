@@ -76,4 +76,5 @@ RUN mkdir -p /backups && chown 10001:10001 /backups && chmod +x /app/scripts/res
  && ln -s /app/scripts/restore.sh /usr/local/bin/restore
 USER 10001:10001
 VOLUME ["/backups"]
+# The default health check probes the web server; this service has none (compose defines its own).
 HEALTHCHECK NONE
