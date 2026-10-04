@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.inquiries",
     "apps.proformas",
     "apps.booking",
+    "apps.galleries",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -159,6 +160,9 @@ MEDIA_MAX_IMAGE_BYTES = env.int("MEDIA_MAX_IMAGE_BYTES", default=50 * 1024 * 102
 MEDIA_MAX_VIDEO_BYTES = env.int("MEDIA_MAX_VIDEO_BYTES", default=100 * 1024 * 1024)
 MEDIA_MAX_PIXELS = env.int("MEDIA_MAX_PIXELS", default=150_000_000)
 MEDIA_IMAGE_WIDTHS = [480, 960, 1600, 2400]
+GALLERY_MAX_PHOTOS = env.int("GALLERY_MAX_PHOTOS", default=1000)
+GALLERY_PREVIEW_WIDTH = 2000
+GALLERY_THUMB_WIDTH = 600
 MEDIA_ARTIST = env("MEDIA_ARTIST", default="Sevda Rahimpour")
 MEDIA_COPYRIGHT = env("MEDIA_COPYRIGHT", default="(c) Sevda Rahimpour - 3evda.com")
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # larger request bodies are streamed to temporary files
@@ -203,6 +207,9 @@ SPECTACULAR_SETTINGS = {
         "InquiryStatusEnum": "apps.inquiries.models.Inquiry.Status",
         "ProformaStatusEnum": "apps.proformas.models.Proforma.Status",
         "BookingStatusEnum": "apps.booking.models.Booking.Status",
+        "GalleryStatusEnum": "apps.galleries.models.Gallery.Status",
+        "DownloadLevelEnum": "apps.galleries.models.Gallery.DownloadLevel",
+        "GalleryPhotoStatusEnum": "apps.galleries.models.GalleryPhoto.Status",
     },
 }
 
