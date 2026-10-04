@@ -69,6 +69,7 @@ def run(tmp_path, recorder=None, worker=None, **kw):  # type: ignore[no-untyped-
         "pause": worker.pause,
         "resume": worker.resume,
         "idle": worker.idle,
+        "writes": lambda: worker.events.append("writes-drained"),
         "status_writer": written.append,
         **kw,
     }
@@ -82,7 +83,7 @@ def run(tmp_path, recorder=None, worker=None, **kw):  # type: ignore[no-untyped-
 def test_the_window_key_has_its_own_expiry(fake_redis):
     backup_window.open_window()
     _, ttl = fake_redis.store[backup_window.WINDOW_KEY]
-    assert ttl == backup_window.WINDOW_TTL_SECONDS == 1800  # a backup that dies cannot lock the site for long
+    assert ttl == backup_window.WINDOW_TTL_SECONDS == 300  # a backup that dies cannot lock the site for long
     assert backup_window.is_open()
     backup_window.close_window()
     assert not backup_window.is_open()
@@ -145,7 +146,7 @@ def test_a_good_run_in_the_right_order(tmp_path):
     assert forget[forget.index("--keep-weekly") + 1] == "4"
     assert "--prune" in forget
     # the worker was stopped inside the window and let go after the copy, and the window ended with it
-    assert worker.events == ["pause window=True", "idle", "resume window=True"]
+    assert worker.events == ["pause window=True", "writes-drained", "idle", "resume window=True"]
     assert not backup_window.is_open()
     assert written == [status]
     assert status.steps[-1] == "snapshot"
@@ -324,3 +325,252 @@ def test_the_heartbeat_file_is_touched_for_the_health_check(tmp_path, monkeypatc
     with pytest.raises(Stop):
         run_backup.heartbeat_forever()
     assert beat.exists()
+
+
+# ---- writes already inside the API ----------------------------------------------------------------------
+
+
+def test_a_write_is_counted_while_it_runs_and_released_after(monkeypatch):
+    seen = []
+
+    def view(request):
+        seen.append(backup_window.writes_in_flight())
+        from django.http import HttpResponse
+
+        return HttpResponse("ok")
+
+    from django.test import RequestFactory
+
+    from apps.core.middleware import BackupWindowMiddleware
+
+    response = BackupWindowMiddleware(view)(RequestFactory().post("/x"))
+    assert response.status_code == 200
+    assert seen == [1] and backup_window.writes_in_flight() == 0
+
+
+def test_the_count_is_released_even_if_the_view_fails():
+    from django.test import RequestFactory
+
+    from apps.core.middleware import BackupWindowMiddleware
+
+    def view(request):
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError):
+        BackupWindowMiddleware(view)(RequestFactory().post("/x"))
+    assert backup_window.writes_in_flight() == 0
+
+
+def test_a_refused_write_is_not_left_counted():
+    backup_window.open_window()
+    assert APIClient().post("/api/public/inquiries", {}, format="json").status_code == 503
+    assert backup_window.writes_in_flight() == 0
+
+
+def test_reads_are_not_counted():
+    from django.http import HttpResponse
+    from django.test import RequestFactory
+
+    from apps.core.middleware import BackupWindowMiddleware
+
+    seen = []
+
+    def view(request):
+        seen.append(backup_window.writes_in_flight())
+        return HttpResponse("ok")
+
+    BackupWindowMiddleware(view)(RequestFactory().get("/x"))
+    assert seen == [0]
+
+
+def test_the_backup_waits_for_writes_that_were_already_inside():
+    counts = iter([2, 1, 0])
+    naps: list[float] = []
+    assert backup_window.wait_for_writes(60, count=lambda: next(counts), sleep=naps.append, clock=lambda: 0.0) is True
+    assert len(naps) == 2
+
+
+def test_writes_that_never_finish_fail_the_backup_and_release_everything(tmp_path):
+    def stuck() -> None:
+        raise backup.BackupError("درخواست‌های در حال ثبت تمام نشدند")
+
+    worker = Worker()
+    status, rec, _, _ = run(tmp_path, worker=worker, writes=stuck)
+    assert not status.ok
+    assert rec.calls == []  # nothing was copied
+    assert worker.events[-1].startswith("resume")
+    assert not backup_window.is_open()
+
+
+def test_wait_for_writes_gives_up_after_the_timeout():
+    now = [0.0]
+
+    def clock() -> float:
+        now[0] += 400
+        return now[0]
+
+    assert backup_window.wait_for_writes(600, count=lambda: 1, sleep=lambda s: None, clock=clock) is False
+
+
+def test_a_stale_negative_count_is_clamped(fake_redis):
+    backup_window.leave_write()
+    assert backup_window.writes_in_flight() == 0
+    assert fake_redis.store[backup_window.INFLIGHT_KEY][0] == 0
+
+
+def test_a_redis_that_is_down_lets_writes_through_uncounted(monkeypatch):
+    import redis
+
+    def broken():
+        raise redis.ConnectionError("down")
+
+    monkeypatch.setattr(backup_window, "_client", broken)
+    assert backup_window.enter_write() is backup_window.Admission.UNCOUNTED
+
+
+# ---- a long copy keeps its protection --------------------------------------------------------------------
+
+
+def test_the_window_is_renewed_while_the_copy_runs(fake_redis):
+    import time
+
+    backup_window.open_window()
+    fake_redis.store[backup_window.WINDOW_KEY] = ("1", 1)  # nearly expired
+    with backup_window.keepalive(interval=0.01):
+        for _ in range(100):
+            if fake_redis.store[backup_window.WINDOW_KEY][1] == backup_window.WINDOW_TTL_SECONDS:
+                break
+            time.sleep(0.01)
+    assert fake_redis.store[backup_window.WINDOW_KEY][1] == backup_window.WINDOW_TTL_SECONDS
+
+
+def test_the_keepalive_stops_with_the_copy(fake_redis):
+    import threading
+
+    before = threading.active_count()
+    with backup_window.keepalive(interval=0.01):
+        pass
+    assert threading.active_count() == before
+
+
+# ---- a killed backup is undone at the next start --------------------------------------------------------
+
+
+def test_startup_resumes_the_worker_and_clears_a_stale_window(monkeypatch):
+    calls = []
+    monkeypatch.setattr(backup, "resume_worker", lambda: calls.append("resume"))
+    backup_window.open_window()
+    backup.recover()
+    assert calls == ["resume"] and not backup_window.is_open()
+
+
+def test_startup_survives_a_worker_that_is_not_there_yet(monkeypatch):
+    def broken():
+        raise OSError("broker down")
+
+    monkeypatch.setattr(backup, "resume_worker", broken)
+    backup.recover()  # must not raise
+
+
+# ---- an off-server repository ----------------------------------------------------------------------------
+
+
+def test_s3_credentials_reach_restic_under_its_own_names():
+    env = backup.restic_env(
+        {
+            "RESTIC_PASSWORD": "x",
+            "BACKUP_S3_ACCESS_KEY": "AK",
+            "BACKUP_S3_SECRET_KEY": "SK",
+            "BACKUP_S3_REGION": "eu-1",
+        }
+    )
+    assert (env["AWS_ACCESS_KEY_ID"], env["AWS_SECRET_ACCESS_KEY"], env["AWS_DEFAULT_REGION"]) == ("AK", "SK", "eu-1")
+
+
+def test_no_ssh_key_means_nothing_is_written(tmp_path):
+    assert backup.prepare_ssh({"HOME": str(tmp_path)}) is False
+    assert not (tmp_path / ".ssh").exists()
+
+
+def test_the_ssh_key_and_host_fingerprint_are_written_privately(tmp_path):
+    env = {
+        "HOME": str(tmp_path),
+        "BACKUP_SSH_KEY": "-----BEGIN KEY-----\\nabc\\n-----END KEY-----",
+        "BACKUP_SSH_KNOWN_HOSTS": "host ssh-ed25519 AAAA",
+    }
+    assert backup.prepare_ssh(env) is True
+    ssh = tmp_path / ".ssh"
+    assert (ssh / "id_backup").read_text() == "-----BEGIN KEY-----\nabc\n-----END KEY-----\n"
+    assert oct((ssh / "id_backup").stat().st_mode & 0o777) == "0o600"
+    assert (ssh / "known_hosts").read_text() == "host ssh-ed25519 AAAA\n"
+    config = (ssh / "config").read_text()
+    assert "StrictHostKeyChecking yes" in config and "BatchMode yes" in config
+
+
+def test_an_ssh_key_without_the_host_fingerprint_is_refused(tmp_path):
+    with pytest.raises(backup.BackupConfigError):
+        backup.prepare_ssh({"HOME": str(tmp_path), "BACKUP_SSH_KEY": "k"})
+
+
+# ---- the queue is rebuilt after a restore ---------------------------------------------------------------
+
+
+def test_requeue_pending_sends_unfinished_work_back_to_the_worker(monkeypatch, s3_buckets):
+    from apps.core.management.commands import requeue_pending
+    from apps.galleries.models import Gallery, GalleryPhoto, ZipJob
+    from apps.media.models import MediaAsset
+
+    sent = []
+    for name, task in (
+        ("media", requeue_pending.process_asset),
+        ("photo", requeue_pending.process_photo),
+        ("zip", requeue_pending.build_zip),
+    ):
+        monkeypatch.setattr(task, "apply_async", lambda args=None, queue=None, _n=name: sent.append((_n, args, queue)))
+
+    gallery = Gallery.objects.create(title="g", status="published")
+    pending = GalleryPhoto.objects.create(
+        gallery=gallery, original_key="a", original_filename="a", mime="image/jpeg", size_bytes=1, sha256="1" * 64
+    )
+    GalleryPhoto.objects.create(
+        gallery=gallery,
+        original_key="b",
+        original_filename="b",
+        mime="image/jpeg",
+        size_bytes=1,
+        sha256="2" * 64,
+        status="ready",
+    )
+    queued = ZipJob.objects.create(gallery=gallery, status=ZipJob.Status.QUEUED)
+    ZipJob.objects.create(gallery=gallery, status=ZipJob.Status.READY)
+    MediaAsset.objects.create(
+        kind="image",
+        sha256="a" * 64,
+        status=MediaAsset.Status.PENDING,
+        original_key="m",
+        original_filename="m",
+        mime="image/jpeg",
+        size_bytes=1,
+    )
+    MediaAsset.objects.create(
+        kind="image",
+        sha256="b" * 64,
+        status=MediaAsset.Status.READY,
+        original_key="n",
+        original_filename="n",
+        mime="image/jpeg",
+        size_bytes=1,
+    )
+
+    counts = requeue_pending.requeue()
+    assert counts == {"media": 1, "photos": 1, "zips": 1}
+    assert ("photo", [pending.pk], "galleries") in sent
+    assert ("zip", [queued.pk], "galleries") in sent
+    assert sum(1 for n, *_ in sent if n == "media") == 1
+
+
+def test_requeue_pending_command_reports_what_it_did(capsys):
+    from django.core.management import call_command
+
+    call_command("requeue_pending")
+    assert "re-queued: 0 media, 0 photos, 0 archives" in capsys.readouterr().out

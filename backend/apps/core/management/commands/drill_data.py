@@ -14,6 +14,7 @@ from typing import Any
 
 from django.apps import apps as django_apps
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand, CommandError
 from django.test import Client
@@ -137,7 +138,27 @@ class Command(BaseCommand):
                 raise CommandError("the worker did not finish the previews in time")
             time.sleep(2)
 
+        # A photo whose previews were never made (as if the job was still in the queue when the backup ran).
+        # The queue is not part of a backup, so `restore` has to re-queue it from the database.
+        from apps.media.storage import private_storage
+
+        stored = private_storage().save(
+            f"galleries/{gallery.public_id.hex}/originals/pending-drill.jpg", ContentFile(sample_jpeg((200, 60, 60)))
+        )
+        pending = GalleryPhoto.objects.create(
+            gallery=gallery,
+            original_key=stored,
+            original_filename="pending-drill.jpg",
+            mime="image/jpeg",
+            size_bytes=len(sample_jpeg((200, 60, 60))),
+            sha256="0" * 64,
+            width=1200,
+            height=800,
+            position=PHOTO_COUNT,
+        )
+
         manifest = {
+            "pending_photo": pending.pk,
             "tables": table_counts(),
             "objects": object_fingerprints(),
             "gallery_token": links.make_token(gallery),
@@ -151,6 +172,18 @@ class Command(BaseCommand):
         manifest = json.load(sys.stdin)
         problems: list[str] = []
 
+        from apps.galleries.models import GalleryPhoto
+
+        pending = GalleryPhoto.objects.filter(pk=manifest["pending_photo"]).first()
+        deadline = time.monotonic() + READY_TIMEOUT_SECONDS
+        while pending is not None and pending.status != "ready" and time.monotonic() < deadline:
+            time.sleep(2)
+            pending.refresh_from_db()
+        if pending is None or pending.status != "ready":
+            problems.append("the photo that was waiting for its previews was not re-queued by the restore")
+        prefix = f"{backup.buckets()[0]}/galleries/"
+        late = {pending.preview_key, pending.thumb_key} if pending is not None else set()
+
         now_tables = table_counts()
         for label, expected in manifest["tables"].items():
             if now_tables.get(label) != expected:
@@ -163,6 +196,8 @@ class Command(BaseCommand):
             elif now_objects[key] != digest:
                 problems.append(f"file changed {key}")
         for key in now_objects.keys() - manifest["objects"].keys():
+            if key.startswith(prefix) and key[len(backup.buckets()[0]) + 1 :] in late:
+                continue  # the previews the re-queued job made after the restore
             problems.append(f"unexpected file {key}")
 
         response = Client().get(f"/api/public/galleries/{manifest['gallery_token']}", HTTP_HOST="localhost")

@@ -124,6 +124,12 @@ services:
       BACKUP_REPOSITORY: ${BACKUP_REPOSITORY:-/backups/repo}
       BACKUP_HOUR: ${BACKUP_HOUR:-3}
       BACKUP_WORKDIR: /backups/work
+      # Only for a repository outside the server (see docs/runbooks/backup-restore.md).
+      BACKUP_S3_ACCESS_KEY: ${BACKUP_S3_ACCESS_KEY:-}
+      BACKUP_S3_SECRET_KEY: ${BACKUP_S3_SECRET_KEY:-}
+      BACKUP_S3_REGION: ${BACKUP_S3_REGION:-}
+      BACKUP_SSH_KEY: ${BACKUP_SSH_KEY:-}
+      BACKUP_SSH_KNOWN_HOSTS: ${BACKUP_SSH_KNOWN_HOSTS:-}
     healthcheck:
       # The scheduler loop touches this file every minute; a stuck or dead loop lets it go stale.
       test: ["CMD-SHELL", "test $$(( $$(date +%s) - $$(stat -c %Y /tmp/backup-heartbeat) )) -lt 180"]

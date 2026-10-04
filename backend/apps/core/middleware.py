@@ -61,14 +61,18 @@ BACKUP_RETRY_AFTER_SECONDS = 300
 class BackupWindowMiddleware:
     """While the nightly backup copies the data, anything that writes is told to come back in a few minutes.
 
-    Reading, health checks and public pages keep working. See `backup_window` for the other half.
+    Writes that are let in are counted until they finish, so the backup can wait for them. Reading, health
+    checks and public pages keep working. See `backup_window` for the other half.
     """
 
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        if request.method not in SAFE_METHODS and backup_window.is_open():
+        if request.method in SAFE_METHODS:
+            return self.get_response(request)
+        admission = backup_window.enter_write()
+        if admission is backup_window.Admission.REFUSED:
             response = JsonResponse(
                 {
                     "code": "backup_in_progress",
@@ -79,4 +83,8 @@ class BackupWindowMiddleware:
             response["Retry-After"] = str(BACKUP_RETRY_AFTER_SECONDS)
             response["Cache-Control"] = "no-store"
             return response
-        return self.get_response(request)
+        try:
+            return self.get_response(request)
+        finally:
+            if admission is backup_window.Admission.COUNTED:
+                backup_window.leave_write()

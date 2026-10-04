@@ -2,8 +2,9 @@
 
 Order matters (see docs/superpowers/plans/2026-10-04-phase-7-hardening-release.md):
 
-1. open the backup window (the API refuses writes) and stop the worker taking jobs;
-2. wait for jobs already running to finish;
+1. open the backup window (the API refuses writes; the running backup keeps renewing it) and stop the worker
+   taking jobs;
+2. wait for requests and jobs already running to finish;
 3. dump the database first, then copy the files (a file with no row is harmless, a row with no file is not);
 4. whatever happened, close the window and let the worker go on;
 5. only then encrypt the copy into the restic repository and apply the retention policy.
@@ -72,7 +73,43 @@ def restic_env(environ: Mapping[str, str] | None = None) -> dict[str, str]:
     if not env.get("RESTIC_PASSWORD"):
         raise BackupConfigError("RESTIC_PASSWORD تنظیم نشده است؛ پشتیبان‌گیری بدون آن شروع نمی‌شود.")
     env.setdefault("RESTIC_REPOSITORY", env.get("BACKUP_REPOSITORY") or DEFAULT_REPOSITORY)
+    # Credentials for an off-server repository, under names that are easy to recognise in Coolify.
+    for ours, theirs in (
+        ("BACKUP_S3_ACCESS_KEY", "AWS_ACCESS_KEY_ID"),
+        ("BACKUP_S3_SECRET_KEY", "AWS_SECRET_ACCESS_KEY"),
+        ("BACKUP_S3_REGION", "AWS_DEFAULT_REGION"),
+    ):
+        if env.get(ours):
+            env[theirs] = env[ours]
     return env
+
+
+def prepare_ssh(environ: Mapping[str, str] | None = None) -> bool:
+    """For an `sftp:` repository: writes the private key and the server's fingerprint where ssh looks.
+
+    The key arrives as an environment variable (Coolify has no file upload), with `\n` standing for line breaks.
+    The host key is mandatory: nothing is ever sent to a server that was not recognised.
+    """
+    env = os.environ if environ is None else environ
+    key = env.get("BACKUP_SSH_KEY", "")
+    if not key:
+        return False
+    hosts = env.get("BACKUP_SSH_KNOWN_HOSTS", "")
+    if not hosts:
+        raise BackupConfigError("BACKUP_SSH_KNOWN_HOSTS تنظیم نشده است؛ بدون اثر انگشت سرور اتصال برقرار نمی‌شود.")
+    ssh = Path(env.get("HOME") or "/tmp") / ".ssh"  # noqa: S108 — the container's home
+    ssh.mkdir(mode=0o700, parents=True, exist_ok=True)
+    (ssh / "id_backup").write_text(key.replace("\\n", "\n").strip() + "\n")
+    (ssh / "id_backup").chmod(0o600)
+    (ssh / "known_hosts").write_text(hosts.replace("\\n", "\n").strip() + "\n")
+    (ssh / "config").write_text(
+        "Host *\n"
+        f"  IdentityFile {ssh / 'id_backup'}\n"
+        f"  UserKnownHostsFile {ssh / 'known_hosts'}\n"
+        "  StrictHostKeyChecking yes\n"
+        "  BatchMode yes\n"
+    )
+    return True
 
 
 def rclone_env(base: Mapping[str, str]) -> dict[str, str]:
@@ -135,6 +172,24 @@ def busy_jobs() -> int:
         for tasks in (report or {}).values():
             total += len(tasks)
     return total
+
+
+def wait_for_writes(timeout: float = backup_window.WRITES_TIMEOUT_SECONDS) -> None:
+    if not backup_window.wait_for_writes(timeout):
+        raise BackupError("درخواست‌های در حال ثبت تمام نشدند؛ پشتیبان‌گیری امشب انجام نشد.")
+
+
+def recover() -> None:
+    """On start-up: whatever a previous run left behind (a worker told to stop, a window key) is undone.
+
+    A backup process that was killed never reached its clean-up, and the worker would otherwise stay deaf
+    until the next night.
+    """
+    backup_window.close_window()
+    try:
+        resume_worker()
+    except Exception:
+        logger.warning("could not resume the worker at start-up (it may not be running yet)")
 
 
 def wait_for_idle(
@@ -245,6 +300,7 @@ def run_backup(
     pause: Callable[[], None] = pause_worker,
     resume: Callable[[], None] = resume_worker,
     idle: Callable[[], None] = wait_for_idle,
+    writes: Callable[[], None] = wait_for_writes,
     status_writer: Callable[[BackupStatus], None] = write_status,
     workdir: Path | None = None,
 ) -> BackupStatus:
@@ -259,12 +315,15 @@ def run_backup(
         backup_window.open_window()
         steps.append("window-opened")
         try:
-            pause()
-            steps.append("worker-paused")
-            idle()
-            steps.append("worker-idle")
-            copy_data(work, env, runner)
-            steps.append("copied")
+            with backup_window.keepalive():
+                pause()
+                steps.append("worker-paused")
+                writes()
+                steps.append("writes-drained")
+                idle()
+                steps.append("worker-idle")
+                copy_data(work, env, runner)
+                steps.append("copied")
         finally:
             try:
                 resume()

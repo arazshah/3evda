@@ -25,6 +25,12 @@ export RCLONE_CONFIG_STORE_ENDPOINT="${S3_ENDPOINT_URL:-http://storage:8333}"
 export RCLONE_CONFIG_STORE_ACCESS_KEY_ID="${S3_ACCESS_KEY:?}" RCLONE_CONFIG_STORE_SECRET_ACCESS_KEY="${S3_SECRET_KEY:?}"
 export RCLONE_CONFIG_STORE_REGION="${S3_REGION:-us-east-1}"
 
+# An off-server repository: map the credentials and write the ssh key, exactly as the nightly backup does.
+[ -z "${BACKUP_S3_ACCESS_KEY:-}" ] || export AWS_ACCESS_KEY_ID="$BACKUP_S3_ACCESS_KEY"
+[ -z "${BACKUP_S3_SECRET_KEY:-}" ] || export AWS_SECRET_ACCESS_KEY="$BACKUP_S3_SECRET_KEY"
+[ -z "${BACKUP_S3_REGION:-}" ] || export AWS_DEFAULT_REGION="$BACKUP_S3_REGION"
+python /app/manage.py run_backup --prepare-ssh || die "اتصال به مقصد بکاپ آماده نشد."
+
 restic cat config >/dev/null 2>&1 || die "مخزن پشتیبان در «$RESTIC_REPOSITORY» پیدا نشد یا رمز آن درست نیست. هیچ چیزی تغییر نکرد."
 
 SNAPSHOT="${1:-}"
@@ -74,6 +80,9 @@ for dir in "$SRC"/objects/*; do
   rclone mkdir "store:$bucket"
   rclone sync "$dir" "store:$bucket" --exclude "_system/**"
 done
+
+say "۶) در صف گذاشتن دوباره‌ی کارهای نیمه‌تمام (صف کارها جزو بکاپ نیست)…"
+python /app/manage.py requeue_pending || say "هشدار: صف دوباره ساخته نشد؛ پس از روشن‌شدن worker دستور «python manage.py requeue_pending» را اجرا کنید."
 
 rm -rf "$WORK"
 say ""

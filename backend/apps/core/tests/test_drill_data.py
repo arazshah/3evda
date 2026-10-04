@@ -8,7 +8,7 @@ from django.test import Client
 
 from apps.core.management.commands import drill_data
 from apps.galleries.links import make_token
-from apps.galleries.models import Gallery
+from apps.galleries.models import Gallery, GalleryPhoto
 
 pytestmark = pytest.mark.django_db
 
@@ -23,7 +23,17 @@ def stack(s3_buckets, settings, monkeypatch):
     s3_buckets.put_object(Bucket=settings.S3_PRIVATE_BUCKET, Key="galleries/a.jpg", Body=b"private-bytes")
     s3_buckets.put_object(Bucket=settings.S3_PUBLIC_BUCKET, Key="media/b.webp", Body=b"public-bytes")
     monkeypatch.setattr(drill_data, "s3_client", lambda: s3_buckets)
+    photo = GalleryPhoto.objects.create(
+        gallery=gallery,
+        original_key="galleries/a.jpg",
+        original_filename="a.jpg",
+        mime="image/jpeg",
+        size_bytes=1,
+        sha256="1" * 64,
+        status="ready",
+    )
     manifest = {
+        "pending_photo": photo.pk,
         "tables": drill_data.table_counts(),
         "objects": drill_data.object_fingerprints(),
         "gallery_token": make_token(gallery),
@@ -83,3 +93,11 @@ def test_the_gallery_link_check_uses_the_real_endpoint(stack):
     manifest, _ = stack
     r = Client().get(f"/api/public/galleries/{manifest['gallery_token']}", HTTP_HOST="localhost")
     assert r.status_code == 200 and r.json()["title"] == manifest["gallery_title"]
+
+
+def test_a_photo_that_was_never_re_queued_fails_the_drill(stack, monkeypatch):
+    manifest, _ = stack
+    monkeypatch.setattr(drill_data, "READY_TIMEOUT_SECONDS", 0)
+    GalleryPhoto.objects.filter(pk=manifest["pending_photo"]).update(status="pending")
+    with pytest.raises(CommandError):
+        verify(manifest, monkeypatch)

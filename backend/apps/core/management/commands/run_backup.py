@@ -26,8 +26,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):  # type: ignore[no-untyped-def]
         parser.add_argument("--once", action="store_true", help="Take one backup and exit (non-zero if it failed).")
+        parser.add_argument(
+            "--prepare-ssh", action="store_true", help="Write the ssh key for an sftp repository, then exit."
+        )
 
     def handle(self, *args, **options):  # type: ignore[no-untyped-def]
+        backup.prepare_ssh()
+        if options["prepare_ssh"]:
+            return
         if options["once"]:
             status = backup.run_backup()
             self.stdout.write(f"{'OK' if status.ok else 'FAILED'}: {status.message}")
@@ -37,6 +43,7 @@ class Command(BaseCommand):
         backup.restic_env()  # no password: refuse to start, loudly
         hour = int(os.environ.get("BACKUP_HOUR", "3"))
         logger.info("backup service started; next run at %02d:00 Tehran", hour)
+        backup.recover()
         threading.Thread(target=heartbeat_forever, daemon=True).start()
         while True:
             time.sleep(backup.seconds_until(hour))
