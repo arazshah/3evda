@@ -47,15 +47,33 @@ def _keys(gallery: Gallery, visitor: str) -> tuple[str, str]:
     return f"gallery-fail:{gallery.pk}:{visitor}", f"gallery-fail-all:{gallery.pk}"
 
 
-def guessing_blocked(gallery: Gallery, visitor: str) -> bool:
+def _bump(key: str, window: int, step: int) -> int:
+    cache.add(key, 0, timeout=window)
+    try:
+        value = int(cache.incr(key, step))
+    except ValueError:  # expired between the two calls
+        value = step
+    if value < 0:
+        value = 0
+    if value != cache.get(key):
+        cache.set(key, value, timeout=window)
+    return value
+
+
+def reserve_attempt(gallery: Gallery, visitor: str) -> bool:
+    """Take one password try *before* checking the password, atomically (the counters only go up in one step).
+
+    A burst of parallel requests therefore cannot test more passwords than the ceilings allow.
+    Returns False when a ceiling is already used up.
+    """
     mine, everyone = _keys(gallery, visitor)
-    return bool(cache.get(mine, 0) >= PER_VISITOR[0] or cache.get(everyone, 0) >= PER_GALLERY[0])
+    used_mine = _bump(mine, PER_VISITOR[1], 1)
+    used_all = _bump(everyone, PER_GALLERY[1], 1)
+    return used_mine <= PER_VISITOR[0] and used_all <= PER_GALLERY[0]
 
 
-def note_wrong_password(gallery: Gallery, visitor: str) -> None:
-    for key, (_, window) in zip(_keys(gallery, visitor), (PER_VISITOR, PER_GALLERY), strict=True):
-        cache.add(key, 0, timeout=window)
-        try:
-            cache.incr(key)
-        except ValueError:  # expired between the two calls
-            cache.set(key, 1, timeout=window)
+def release_attempt(gallery: Gallery, visitor: str) -> None:
+    """The password was right: that try does not count against anyone."""
+    mine, everyone = _keys(gallery, visitor)
+    _bump(mine, PER_VISITOR[1], -1)
+    _bump(everyone, PER_GALLERY[1], -1)

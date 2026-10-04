@@ -118,11 +118,11 @@ class PublicUnlockView(_Public):
             return _problem("expired", "مهلت این گالری تمام شده است.", 410)
         visitor = ip_digest(request._request, "gallery")
         if gallery.has_password:
-            if access.guessing_blocked(gallery, visitor):
+            if not access.reserve_attempt(gallery, visitor):
                 return _problem("too_many", "تلاش‌های زیاد؛ کمی بعد دوباره امتحان کنید.", 429)
             if not raw or not check_password(raw, gallery.password_hash):
-                access.note_wrong_password(gallery, visitor)
                 return refused
+            access.release_attempt(gallery, visitor)
         return _reply({"token": access.make_access_token(gallery), "expires_in": access.TOKEN_TTL})
 
 

@@ -328,3 +328,18 @@ def test_parallel_picks_cannot_pass_the_limit(s3_buckets, monkeypatch):
         t.join()
     assert outcomes.count("ok") == 2 and outcomes.count("limit_reached") == 4
     assert Selection.objects.filter(selected=True).count() == 2
+
+
+def test_a_burst_of_guesses_cannot_pass_the_ceiling(s3_buckets):
+    """Each try is taken before the password is checked, so parallel requests cannot all slip under the limit."""
+    gallery = Gallery.objects.create(title="g", status="published")
+    taken = [access.reserve_attempt(gallery, "same") for _ in range(access.PER_VISITOR[0] + 3)]
+    assert taken.count(True) == access.PER_VISITOR[0]
+    access.release_attempt(gallery, "other")  # a right password gives its try back, never below zero
+    assert access.reserve_attempt(gallery, "other") is True
+
+
+def test_a_comment_keeps_its_spaces(client, s3_buckets):
+    gallery, photos = make_gallery(s3_buckets, count=1)
+    h = authed(client, gallery)
+    assert put(client, gallery, photos[0], h, comment="  سلام  ").data["comment"] == "  سلام  "

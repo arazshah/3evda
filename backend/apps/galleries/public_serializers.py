@@ -46,7 +46,9 @@ class PublicPhotosSerializer(serializers.Serializer):  # type: ignore[type-arg]
 
 class SelectionRequestSerializer(serializers.Serializer):  # type: ignore[type-arg]
     selected = serializers.BooleanField(required=False)
-    comment = serializers.CharField(required=False, allow_blank=True, max_length=Selection.COMMENT_MAX)
+    comment = serializers.CharField(
+        required=False, allow_blank=True, max_length=Selection.COMMENT_MAX, trim_whitespace=False
+    )
     retouch = serializers.BooleanField(required=False)
 
 
