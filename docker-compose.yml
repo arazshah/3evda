@@ -9,6 +9,7 @@ x-build-args: &build-args
 
 x-backend-env: &backend-env
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?}
+  DJANGO_SECRET_KEY_FALLBACKS: ${DJANGO_SECRET_KEY_FALLBACKS:-}
   DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-3evda.com,www.3evda.com}
   PUBLIC_URL: ${PUBLIC_URL:-https://3evda.com}
   DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.prod}
@@ -58,6 +59,7 @@ services:
     restart: unless-stopped
     environment:
       INTERNAL_API_URL: http://api:8000
+      CSP_REPORT_ONLY: ${CSP_REPORT_ONLY:-false}
       PUBLIC_URL: ${PUBLIC_URL:-https://3evda.com}
 
   api:

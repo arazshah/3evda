@@ -35,9 +35,16 @@ export const test = base.extend<{ page: Page }>({
     const violations = await watchCsp(page);
     page.on("console", (msg) => {
       // Resource errors are reported with their URL by the response listener below.
+      const refusal = msg.text().startsWith("Refused to");
+      const expectsViolation =
+        refusal &&
+        base
+          .info()
+          .annotations.some((a) => a.type === "expected-csp-violation");
       if (
         msg.type() === "error" &&
-        !msg.text().startsWith("Failed to load resource")
+        !msg.text().startsWith("Failed to load resource") &&
+        !expectsViolation
       ) {
         problems.push(`console: ${msg.text()}`);
       }
@@ -64,7 +71,11 @@ export const test = base.extend<{ page: Page }>({
         problems.push(`request failed: ${req.url()}`);
     });
     await use(page);
-    problems.push(...(await violations()).map((v) => `CSP violation: ${v}`));
+    const expectsViolation = base
+      .info()
+      .annotations.some((a) => a.type === "expected-csp-violation");
+    if (!expectsViolation)
+      problems.push(...(await violations()).map((v) => `CSP violation: ${v}`));
     expect(problems, problems.join("\n")).toEqual([]);
   },
 });
