@@ -59,16 +59,17 @@ def check_worker() -> Check:
 
 
 def oldest_waiting(now: datetime | None = None) -> timedelta | None:
-    """How long the longest-waiting unfinished job has been waiting, from what the database says is pending."""
+    """How long the oldest unfinished job has been around, from what the database says is pending or running."""
     from apps.galleries.models import GalleryPhoto, ZipJob
     from apps.media.models import MediaAsset
 
     now = now or timezone.now()
     times = []
     for qs in (
-        MediaAsset.objects.filter(status=MediaAsset.Status.PENDING),
+        MediaAsset.objects.filter(status__in=[MediaAsset.Status.PENDING, MediaAsset.Status.PROCESSING]),
         GalleryPhoto.objects.filter(status=GalleryPhoto.Status.PENDING),
-        ZipJob.objects.filter(status=ZipJob.Status.QUEUED),
+        # A job that was taken but never finished (a hung archive) is as unfinished as one still waiting.
+        ZipJob.objects.filter(status__in=[ZipJob.Status.QUEUED, ZipJob.Status.RUNNING]),
     ):
         first = qs.order_by("created_at").values_list("created_at", flat=True).first()
         if first is not None:
@@ -103,6 +104,12 @@ def _parse(value: Any) -> datetime | None:
     return parsed if parsed.tzinfo else timezone.make_aware(parsed)
 
 
+def last_good_time(status: dict[str, Any]) -> datetime | None:
+    """When the last good backup was made. A record written before `last_ok_at` existed only has `at`,
+    which is the last good time exactly when that run succeeded."""
+    return _parse(status.get("last_ok_at")) or (_parse(status.get("at")) if status.get("ok") is True else None)
+
+
 def check_backup(status: dict[str, Any] | None, now: datetime | None = None) -> Check:
     now = now or timezone.now()
     label = "آخرین پشتیبان"
@@ -110,7 +117,7 @@ def check_backup(status: dict[str, Any] | None, now: datetime | None = None) -> 
         return Check(
             "backup", label, "warning", "هنوز پشتیبانی گرفته نشده است (نخستین نسخه ساعت ۰۳:۰۰ شب ساخته می‌شود)."
         )
-    last_ok = _parse(status.get("last_ok_at"))
+    last_ok = last_good_time(status)
     if status.get("ok") is False:
         when = f"آخرین نسخه‌ی سالم {_ago(last_ok, now)} بود" if last_ok else "هنوز نسخه‌ی سالمی وجود ندارد"
         return Check("backup", label, "error", f"آخرین اجرا ناموفق بود: {status.get('message', '')} ({when}).")

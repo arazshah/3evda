@@ -282,8 +282,11 @@ def write_status(status: BackupStatus, client: Any = None) -> None:
     if status.ok:
         status.last_ok_at = status.at
     elif not status.last_ok_at:
-        previous = read_status(client)
-        status.last_ok_at = str((previous or {}).get("last_ok_at") or "")
+        previous = read_status(client) or {}
+        # A record from before `last_ok_at` existed has only `at`, which is the last good time if that run succeeded.
+        status.last_ok_at = str(
+            previous.get("last_ok_at") or (previous.get("at") if previous.get("ok") is True else "") or ""
+        )
     client.put_object(
         Bucket=settings.S3_PRIVATE_BUCKET,
         Key=STATUS_KEY,

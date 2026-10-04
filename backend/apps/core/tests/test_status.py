@@ -257,3 +257,48 @@ def test_the_endpoint_reads_the_status_file_the_backup_wrote(owner_client, healt
     assert by_key(body)["backup"]["level"] == "ok"
     assert by_key(body)["backup_disk"]["level"] == "error" and body["level"] == "error"
     json.dumps(body)  # serialisable
+
+
+# ---- records written before `last_ok_at` existed -----------------------------------------------------
+
+
+def test_an_old_good_record_counts_its_own_time_as_the_last_good_one(healthy):
+    at = (timezone.now() - timedelta(hours=2)).isoformat()
+    old = {"ok": True, "at": at, "message": "ok"}  # no last_ok_at
+    assert by_key(status.collect(backup_status=old))["backup"]["level"] == "ok"
+    assert status.last_good_time(old) is not None
+
+
+def test_an_old_failed_record_has_no_last_good_time():
+    assert status.last_good_time({"ok": False, "at": timezone.now().isoformat()}) is None
+
+
+def test_a_failure_after_an_old_good_record_keeps_its_time(s3_buckets, settings):
+    legacy = {"ok": True, "at": "2026-10-03T03:00:00+03:30", "message": "ok", "snapshot": "x"}
+    s3_buckets.put_object(Bucket=settings.S3_PRIVATE_BUCKET, Key=backup.STATUS_KEY, Body=json.dumps(legacy).encode())
+    backup.write_status(backup.BackupStatus(False, "2026-10-04T03:00:00+03:30", "broke"), s3_buckets)
+    assert backup.read_status(s3_buckets)["last_ok_at"] == "2026-10-03T03:00:00+03:30"
+
+
+# ---- unfinished work that was already taken -------------------------------------------------------------
+
+
+def test_an_archive_that_hangs_while_running_is_counted():
+    gallery = Gallery.objects.create(title="g", status="published")
+    job = ZipJob.objects.create(gallery=gallery, status=ZipJob.Status.RUNNING)
+    ZipJob.objects.filter(pk=job.pk).update(created_at=timezone.now() - timedelta(hours=2))
+    assert status.check_queue().level == "error"
+
+
+def test_a_media_file_stuck_in_processing_is_counted():
+    asset = MediaAsset.objects.create(
+        kind="image",
+        sha256="c" * 64,
+        original_key="m",
+        original_filename="m",
+        mime="image/jpeg",
+        size_bytes=1,
+        status=MediaAsset.Status.PROCESSING,
+    )
+    MediaAsset.objects.filter(pk=asset.pk).update(created_at=timezone.now() - timedelta(hours=2))
+    assert status.check_queue().level == "error"
