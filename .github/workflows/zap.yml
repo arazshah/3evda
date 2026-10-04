@@ -45,9 +45,9 @@ jobs:
         run: docker compose -f docker-compose.yml -f compose.dev.yml up --build --wait --wait-timeout 300 -d
       - name: Seed sample pages so there is something to crawl
         run: |
-          docker compose exec -T api python manage.py seed_blog_demo
-          docker compose exec -T api python manage.py seed_quote_demo
-          docker compose exec -T api python manage.py seed_booking_demo
+          docker compose exec -T -e ALLOW_DEMO_DATA=true api python manage.py seed_blog_demo
+          docker compose exec -T -e ALLOW_DEMO_DATA=true api python manage.py seed_quote_demo
+          docker compose exec -T -e ALLOW_DEMO_DATA=true api python manage.py seed_booking_demo
       - name: ZAP baseline scan
         run: |
           mkdir -p zap && chmod 777 zap

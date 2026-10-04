@@ -26,7 +26,13 @@ jobs:
     env:
       PUBLIC_URL: ${{ vars.PUBLIC_URL || 'https://3evda.com' }}
       EXPECTED_VERSION: ${{ github.event.workflow_run.head_sha }}
+    # The address the environment resolved to, for the jobs that follow (they do not read environment variables).
+    outputs:
+      public_url: ${{ steps.address.outputs.url }}
     steps:
+      - id: address
+        run: echo "url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+
       - name: Trigger Coolify deployment
         env:
           COOLIFY_DEPLOY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
@@ -63,3 +69,37 @@ jobs:
           check /en 200
           check /api/health/ready 200
           check /healthz 200
+
+  # The scores that count are the ones on the real address, after the deploy. A page that fails here is open
+  # work, not a rollback by itself (the site is already live and healthy). Note that the numbers are measured from
+  # a GitHub runner, so the distance to the server in Iran adds to the loading time.
+  lighthouse:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PUBLIC_URL: ${{ needs.deploy.outputs.public_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: "10.28.0"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: e2e/pnpm-lock.yaml
+      - name: Install the test tools
+        working-directory: e2e
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+      - name: Lighthouse on the live site (every public page at least 90)
+        working-directory: e2e
+        env:
+          E2E_BASE_URL: ${{ env.PUBLIC_URL }}
+          LIGHTHOUSE_ARTICLE: auto
+        run: pnpm lighthouse

@@ -237,6 +237,10 @@ SPECTACULAR_SETTINGS = {
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 X_FRAME_OPTIONS = "DENY"
+# The sample-data commands (seed_*_demo) only run where this is true: development and tests, or a CI stack that
+# says so explicitly. A real site never has it, so nobody can fill it with sample pages by accident.
+ALLOW_DEMO_DATA = env.bool("ALLOW_DEMO_DATA", default=False)
+
 # WhiteNoise would otherwise add "Access-Control-Allow-Origin: *" to every static file (ZAP 10098); nothing here
 # is meant to be read cross-origin.
 WHITENOISE_ALLOW_ALL_ORIGINS = False

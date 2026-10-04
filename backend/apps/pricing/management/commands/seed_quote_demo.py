@@ -3,6 +3,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand
 
+from apps.core.demo import require_demo_allowed
 from apps.pricing.models import QuoteRule
 
 SAMPLE: list[dict[str, Any]] = [
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     help = "Create a few sample price rules (for CI and local checks; safe to repeat; never run in production)."
 
     def handle(self, *args: Any, **options: Any) -> None:
+        require_demo_allowed("seed_quote_demo")
         created = 0
         for position, row in enumerate(SAMPLE):
             _, new = QuoteRule.objects.get_or_create(key=row["key"], defaults={**row, "position": position})

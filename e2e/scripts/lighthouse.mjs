@@ -11,9 +11,29 @@ const LIGHTHOUSE = "lighthouse@13.5.0";
 const MIN_SCORE = 0.9;
 const MIN_SEO_ARTICLE = 0.95;
 const BASE = (process.env.E2E_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
-const ROUTES = ["/", "/portfolio", "/services", "/packages", "/about", "/contact", "/quote", "/blog", "/blog/sample-article"];
+// Pages every site has. A missing one is a failure, never skipped.
+const ROUTES = ["/", "/portfolio", "/services", "/packages", "/about", "/contact", "/quote", "/blog"];
 // Every public page in both languages (Persian is unprefixed, English lives under /en).
 const PAGES = ROUTES.flatMap((route) => [route, route === "/" ? "/en" : `/en${route}`]);
+
+// The article page: CI and local runs have the sample article ("/blog/sample-article"); on the real site set
+// LIGHTHOUSE_ARTICLE=auto to audit the first published article of each language instead. Having no published
+// article yet is said out loud and skips only the article pages, nothing else.
+const ARTICLE = process.env.LIGHTHOUSE_ARTICLE ?? "/blog/sample-article";
+const ARTICLE_PATHS = [];
+if (ARTICLE === "auto") {
+  const listing = await (await fetch(`${BASE}/api/public/blog/articles`)).json();
+  const articles = Array.isArray(listing) ? listing : (listing.results ?? []);
+  for (const language of ["fa", "en"]) {
+    const found = articles.find((a) => a.language === language);
+    if (found) ARTICLE_PATHS.push(language === "fa" ? `/blog/${found.slug}` : `/en/blog/${found.slug}`);
+  }
+  if (ARTICLE_PATHS.length === 0) console.log("No published article yet: the article pages are not audited.");
+} else {
+  ARTICLE_PATHS.push(ARTICLE, `/en${ARTICLE}`);
+}
+PAGES.push(...ARTICLE_PATHS);
+const isArticle = (path) => ARTICLE_PATHS.includes(path);
 const CATEGORIES = ["performance", "accessibility", "best-practices", "seo"];
 
 const outDir = mkdtempSync(join(tmpdir(), "lighthouse-"));
@@ -42,7 +62,7 @@ for (const [index, path] of PAGES.entries()) {
   const scores = Object.fromEntries(CATEGORIES.map((c) => [c, report.categories[c].score]));
   console.log(path.padEnd(16), CATEGORIES.map((c) => `${c} ${Math.round(scores[c] * 100)}`).join("  "));
   for (const category of CATEGORIES) {
-    const min = category === "seo" && path.endsWith("/blog/sample-article") ? MIN_SEO_ARTICLE : MIN_SCORE;
+    const min = category === "seo" && isArticle(path) ? MIN_SEO_ARTICLE : MIN_SCORE;
     if (scores[category] < min) {
       const audits = report.categories[category].auditRefs
         .map((ref) => report.audits[ref.id])

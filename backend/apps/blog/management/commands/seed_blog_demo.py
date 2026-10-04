@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.blog.models import Article, Category, Tag
+from apps.core.demo import require_demo_allowed
 
 PARAGRAPH = {
     "fa": "این یک مقاله‌ی نمونه است که فقط برای آزمایش خودکار ساخته شده. آن را از پنل حذف کنید.",
@@ -26,6 +27,7 @@ class Command(BaseCommand):
     help = "Create one published sample article in each language (for CI and local checks; safe to repeat)."
 
     def handle(self, *args: Any, **options: Any) -> None:
+        require_demo_allowed("seed_blog_demo")
         category, _ = Category.objects.get_or_create(
             slug="sample", defaults={"title_fa": "نمونه", "title_en": "Sample"}
         )
