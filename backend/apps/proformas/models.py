@@ -101,6 +101,9 @@ class Proforma(models.Model):
     response_ip_hash = models.CharField(max_length=64, blank=True)
     response_user_agent = models.CharField(max_length=200, blank=True)
     rejection_reason = models.CharField(max_length=500, blank=True)
+    anonymized_at = models.DateTimeField(
+        null=True, blank=True, db_index=True, help_text="Customer personal details were removed"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -6803,6 +6803,145 @@
                 }
             }
         },
+        "/api/admin/retention/preview/": {
+            "get": {
+                "operationId": "retention_preview",
+                "description": "What a run would remove right now. Reads only; nothing personal is in the answer.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Preview"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/retention/run/": {
+            "post": {
+                "operationId": "retention_run",
+                "description": "Applies the rules now. Irreversible, so it needs an explicit `confirm: true`.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunResult"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/retention/settings/": {
+            "get": {
+                "operationId": "admin_retention_settings_retrieve",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RetentionSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "admin_retention_settings_partial_update",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRetentionSettings"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRetentionSettings"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRetentionSettings"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RetentionSettings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/settings/watermark": {
             "get": {
                 "operationId": "admin_settings_watermark_retrieve",
@@ -8459,6 +8598,14 @@
     },
     "components": {
         "schemas": {
+            "ActionEnum": {
+                "enum": [
+                    "anonymise",
+                    "delete"
+                ],
+                "type": "string",
+                "description": "* `anonymise` - anonymise\n* `delete` - delete"
+            },
             "AdminBookingCreate": {
                 "type": "object",
                 "properties": {
@@ -12278,6 +12425,53 @@
                     }
                 }
             },
+            "PatchedRetentionSettings": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean",
+                        "description": "Off: nothing is ever anonymised or deleted"
+                    },
+                    "inquiry_months": {
+                        "type": "integer",
+                        "maximum": 120,
+                        "minimum": 3,
+                        "description": "Enquiries, then anonymised"
+                    },
+                    "booking_months": {
+                        "type": "integer",
+                        "maximum": 120,
+                        "minimum": 3,
+                        "description": "Months after the session, then anonymised"
+                    },
+                    "gallery_days": {
+                        "type": "integer",
+                        "maximum": 730,
+                        "minimum": 7,
+                        "description": "Days after a gallery expired or was archived, then deleted with all its files"
+                    },
+                    "proforma_months": {
+                        "type": "integer",
+                        "maximum": 240,
+                        "minimum": 12,
+                        "description": "Months after issue; only the customer's personal details are anonymised"
+                    },
+                    "last_run_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "last_run": {
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
             "PatchedSessionType": {
                 "type": "object",
                 "properties": {
@@ -12457,6 +12651,24 @@
                 "type": "string",
                 "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط"
             },
+            "Preview": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "rows": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PreviewRow"
+                        }
+                    }
+                },
+                "required": [
+                    "enabled",
+                    "rows"
+                ]
+            },
             "PreviewLink": {
                 "type": "object",
                 "properties": {
@@ -12470,6 +12682,35 @@
                 "required": [
                     "expires_in",
                     "token"
+                ]
+            },
+            "PreviewRow": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "action": {
+                        "$ref": "#/components/schemas/ActionEnum"
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "oldest": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "action",
+                    "count",
+                    "key",
+                    "label",
+                    "oldest"
                 ]
             },
             "PriceModeEnum": {
@@ -14775,6 +15016,91 @@
                 "required": [
                     "date",
                     "time"
+                ]
+            },
+            "RetentionSettings": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean",
+                        "description": "Off: nothing is ever anonymised or deleted"
+                    },
+                    "inquiry_months": {
+                        "type": "integer",
+                        "maximum": 120,
+                        "minimum": 3,
+                        "description": "Enquiries, then anonymised"
+                    },
+                    "booking_months": {
+                        "type": "integer",
+                        "maximum": 120,
+                        "minimum": 3,
+                        "description": "Months after the session, then anonymised"
+                    },
+                    "gallery_days": {
+                        "type": "integer",
+                        "maximum": 730,
+                        "minimum": 7,
+                        "description": "Days after a gallery expired or was archived, then deleted with all its files"
+                    },
+                    "proforma_months": {
+                        "type": "integer",
+                        "maximum": 240,
+                        "minimum": 12,
+                        "description": "Months after issue; only the customer's personal details are anonymised"
+                    },
+                    "last_run_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "last_run": {
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "last_run",
+                    "last_run_at",
+                    "updated_at"
+                ]
+            },
+            "RunRequest": {
+                "type": "object",
+                "properties": {
+                    "confirm": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "confirm"
+                ]
+            },
+            "RunResult": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "trigger": {
+                        "type": "string"
+                    },
+                    "counts": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "counts",
+                    "enabled",
+                    "trigger"
                 ]
             },
             "Selection": {

@@ -1303,6 +1303,56 @@ export interface paths {
     patch: operations["admin_proformas_settings_partial_update"];
     trace?: never;
   };
+  "/api/admin/retention/preview/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description What a run would remove right now. Reads only; nothing personal is in the answer. */
+    get: operations["retention_preview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/retention/run/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Applies the rules now. Irreversible, so it needs an explicit `confirm: true`. */
+    post: operations["retention_run"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/retention/settings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_retention_settings_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["admin_retention_settings_partial_update"];
+    trace?: never;
+  };
   "/api/admin/settings/watermark": {
     parameters: {
       query?: never;
@@ -2012,6 +2062,12 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /**
+     * @description * `anonymise` - anonymise
+     *     * `delete` - delete
+     * @enum {string}
+     */
+    ActionEnum: "anonymise" | "delete";
     AdminBookingCreate: {
       session_type: number;
       /** Format: date */
@@ -3086,6 +3142,23 @@ export interface components {
       min_quantity?: number;
       max_quantity?: number;
     };
+    PatchedRetentionSettings: {
+      /** @description Off: nothing is ever anonymised or deleted */
+      enabled?: boolean;
+      /** @description Enquiries, then anonymised */
+      inquiry_months?: number;
+      /** @description Months after the session, then anonymised */
+      booking_months?: number;
+      /** @description Days after a gallery expired or was archived, then deleted with all its files */
+      gallery_days?: number;
+      /** @description Months after issue; only the customer's personal details are anonymised */
+      proforma_months?: number;
+      /** Format: date-time */
+      readonly last_run_at?: string | null;
+      readonly last_run?: unknown;
+      /** Format: date-time */
+      readonly updated_at?: string;
+    };
     PatchedSessionType: {
       readonly id?: number;
       key?: string;
@@ -3136,9 +3209,21 @@ export interface components {
      * @enum {string}
      */
     PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    Preview: {
+      enabled: boolean;
+      rows: components["schemas"]["PreviewRow"][];
+    };
     PreviewLink: {
       token: string;
       expires_in: number;
+    };
+    PreviewRow: {
+      key: string;
+      label: string;
+      action: components["schemas"]["ActionEnum"];
+      count: number;
+      /** Format: date-time */
+      oldest: string | null;
     };
     /**
      * @description * `from` - از … شروع می‌شود
@@ -3675,6 +3760,33 @@ export interface components {
       date: string;
       /** Format: time */
       time: string;
+    };
+    RetentionSettings: {
+      /** @description Off: nothing is ever anonymised or deleted */
+      enabled?: boolean;
+      /** @description Enquiries, then anonymised */
+      inquiry_months?: number;
+      /** @description Months after the session, then anonymised */
+      booking_months?: number;
+      /** @description Days after a gallery expired or was archived, then deleted with all its files */
+      gallery_days?: number;
+      /** @description Months after issue; only the customer's personal details are anonymised */
+      proforma_months?: number;
+      /** Format: date-time */
+      readonly last_run_at: string | null;
+      readonly last_run: unknown;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    RunRequest: {
+      confirm: boolean;
+    };
+    RunResult: {
+      enabled: boolean;
+      trigger: string;
+      counts: {
+        [key: string]: number;
+      };
     };
     Selection: {
       selected: boolean;
@@ -7306,6 +7418,94 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ProformaSettings"];
+        };
+      };
+    };
+  };
+  retention_preview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Preview"];
+        };
+      };
+    };
+  };
+  retention_run: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RunRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["RunRequest"];
+        "multipart/form-data": components["schemas"]["RunRequest"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RunResult"];
+        };
+      };
+    };
+  };
+  admin_retention_settings_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RetentionSettings"];
+        };
+      };
+    };
+  };
+  admin_retention_settings_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedRetentionSettings"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedRetentionSettings"];
+        "multipart/form-data": components["schemas"]["PatchedRetentionSettings"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RetentionSettings"];
         };
       };
     };

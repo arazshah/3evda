@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import environ
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     "apps.proformas",
     "apps.booking",
     "apps.galleries",
+    "apps.retention",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -182,6 +184,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.galleries.tasks.cleanup_zips",
         "schedule": 3600.0,
         "options": {"queue": "galleries"},
+    },
+    # After the nightly backup (03:00), so that what is about to be removed has been backed up once more.
+    "retention-run": {
+        "task": "apps.retention.tasks.run_retention",
+        "schedule": crontab(hour=4, minute=15),
     },
 }
 
