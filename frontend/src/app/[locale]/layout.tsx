@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
@@ -50,10 +51,13 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  // The gateway's id for this request: if the page fails, the visitor can quote it ("tracking code").
+  const requestId = (await headers()).get("x-request-id") ?? "";
 
   return (
     <html lang={locale} dir={directionOf(locale)}>
       <head>
+        {/^[A-Za-z0-9_-]{1,64}$/.test(requestId) ? <meta name="request-id" content={requestId} /> : null}
         {locale === "fa"
           ? PERSIAN_FONTS.map((url) => (
               <link

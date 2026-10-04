@@ -6870,6 +6870,32 @@
                 }
             }
         },
+        "/api/admin/system/status": {
+            "get": {
+                "operationId": "system_status",
+                "description": "Only the signed-in owner (default permission). Never cached, never contains a secret.",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SystemStatus"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/auth/csrf": {
             "get": {
                 "operationId": "auth_csrf_retrieve",
@@ -9507,6 +9533,39 @@
                     "project_count",
                     "title_fa"
                 ]
+            },
+            "Check": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/CheckLevelEnum"
+                    },
+                    "detail": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "detail",
+                    "key",
+                    "label",
+                    "level"
+                ]
+            },
+            "CheckLevelEnum": {
+                "enum": [
+                    "ok",
+                    "warning",
+                    "error",
+                    "unknown"
+                ],
+                "type": "string",
+                "description": "* `ok` - ok\n* `warning` - warning\n* `error` - error\n* `unknown` - unknown"
             },
             "ClosedPeriod": {
                 "type": "object",
@@ -15149,6 +15208,42 @@
                     "selected_count",
                     "submitted"
                 ]
+            },
+            "SystemStatus": {
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "$ref": "#/components/schemas/SystemStatusLevelEnum"
+                    },
+                    "checked_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "version": {
+                        "type": "string"
+                    },
+                    "checks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Check"
+                        }
+                    }
+                },
+                "required": [
+                    "checked_at",
+                    "checks",
+                    "level",
+                    "version"
+                ]
+            },
+            "SystemStatusLevelEnum": {
+                "enum": [
+                    "ok",
+                    "warning",
+                    "error"
+                ],
+                "type": "string",
+                "description": "* `ok` - ok\n* `warning` - warning\n* `error` - error"
             },
             "TotpSetup": {
                 "type": "object",

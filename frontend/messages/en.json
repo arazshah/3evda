@@ -8,6 +8,14 @@
     "home": "Back to home",
     "homeHref": "/en"
   },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "Sorry, the page did not load properly. Please try again in a moment. If it keeps happening, send us this tracking code.",
+    "code": "Tracking code",
+    "retry": "Try again",
+    "home": "Back to home",
+    "homeHref": "/en"
+  },
   "site": {
     "nav": {
       "home": "Home",
