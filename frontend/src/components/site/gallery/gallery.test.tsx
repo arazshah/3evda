@@ -198,7 +198,7 @@ describe("choosing", () => {
     const put = `PUT ${BASE}/photos/1/selection`;
     const s = open(
       {
-        [PHOTOS]: { body: photos([photo(1), photo(2)]) },
+        [PHOTOS]: { body: photos([photo(1), photo(2)], { selection_limit: 3 }) },
         [put]: { body: { selected: true, comment: "", retouch: false, selected_count: 1 } },
       },
       { initial: gallery({ selection_limit: 3 }) },
@@ -221,7 +221,7 @@ describe("choosing", () => {
     const put = `PUT ${BASE}/photos/2/selection`;
     open(
       {
-        [PHOTOS]: { body: photos([photo(1, { selected: true }), photo(2)]) },
+        [PHOTOS]: { body: photos([photo(1, { selected: true }), photo(2)], { selection_limit: 1 }) },
         [put]: { status: 409, body: { code: "limit_reached" } },
       },
       { initial: gallery({ selection_limit: 1 }) },
@@ -252,8 +252,9 @@ describe("choosing", () => {
     await screen.findByRole("list", { name: FA.photos });
     vi.mocked(window.confirm).mockReturnValueOnce(false);
     fireEvent.click(screen.getByRole("button", { name: FA.submit }));
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledTimes(1));
     expect(s.calls.some((c) => c.path.endsWith("/submit"))).toBe(false); // declined
-    fireEvent.click(screen.getByRole("button", { name: FA.submit }));
+    fireEvent.click(await screen.findByRole("button", { name: FA.submit }));
     expect(await screen.findByText(FA.submittedTitle)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: FA.submit })).not.toBeInTheDocument();
     for (const b of screen
@@ -291,6 +292,133 @@ describe("choosing", () => {
     await screen.findByRole("list", { name: FA.photos });
     fireEvent.click(screen.getByRole("button", { name: "انتخاب IMG_1.jpg" }));
     expect(await screen.findByText(FA.submittedTitle)).toBeInTheDocument();
+  });
+});
+
+describe("changes in flight", () => {
+  const open = (routes: Record<string, Reply | Reply[]>, props = {}) =>
+    show({ [UNLOCK]: token(), ...routes }, props);
+
+  it("sending waits for a choice that is still on its way, so the order on the server is choice, then send", async () => {
+    const put = `PUT ${BASE}/photos/1/selection`;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const s = server({
+      [UNLOCK]: token(),
+      [FINALS]: { body: { finals: [] } },
+      [PHOTOS]: { body: photos([photo(1), photo(2)]) },
+      [`POST ${BASE}/submit`]: { body: { submitted: true, selected_count: 1 } },
+    });
+    // the choice is answered late
+    const slow = s.fetchImpl.getMockImplementation()!;
+    s.fetchImpl.mockImplementation(async (input, init) => {
+      if (`${init?.method ?? "GET"} ${String(input)}` === put) {
+        await gate;
+        s.calls.push({ method: "PUT", path: put, token: "tok1", body: { selected: true } });
+        return new Response(
+          JSON.stringify({ selected: true, comment: "", retouch: false, selected_count: 1 }),
+          {
+            status: 200,
+          },
+        );
+      }
+      return slow(input, init);
+    });
+    vi.stubGlobal("fetch", s.fetchImpl);
+    render(<GalleryClient initial={gallery()} linkToken={LINK} locale="fa" labels={FA} pollMs={0} />);
+    await screen.findByRole("list", { name: FA.photos });
+    fireEvent.click(screen.getByRole("button", { name: "انتخاب IMG_1.jpg" }));
+    fireEvent.click(screen.getByRole("button", { name: FA.submit })); // straight away, before the answer
+    await Promise.resolve();
+    expect(s.calls.some((c) => c.path.endsWith("/submit"))).toBe(false); // it waits
+    expect(window.confirm).not.toHaveBeenCalled();
+    release();
+    expect(await screen.findByText(FA.submittedTitle)).toBeInTheDocument();
+    const order = s.calls
+      .filter((c) => c.method !== "GET" && !c.path.endsWith("/unlock"))
+      .map((c) => `${c.method} ${c.path.split("/").slice(-2).join("/")}`);
+    expect(order).toEqual(["PUT 1/selection", "POST abc_def/submit"]);
+    expect(vi.mocked(window.confirm).mock.calls[0]![0]).toContain("۱ عکس");
+  });
+
+  it("the counter follows the photos on the screen, not the number a late answer carries", async () => {
+    open({
+      [PHOTOS]: { body: photos([photo(1), photo(2)]) },
+      [`PUT ${BASE}/photos/1/selection`]: {
+        body: { selected: true, comment: "", retouch: false, selected_count: 2 },
+      },
+      [`PUT ${BASE}/photos/2/selection`]: {
+        body: { selected: true, comment: "", retouch: false, selected_count: 1 },
+      },
+    });
+    await screen.findByRole("list", { name: FA.photos });
+    fireEvent.click(screen.getByRole("button", { name: "انتخاب IMG_1.jpg" }));
+    fireEvent.click(screen.getByRole("button", { name: "انتخاب IMG_2.jpg" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "برداشتن انتخاب IMG_2.jpg" })).toBeEnabled(),
+    );
+    expect(screen.getByText("۲ عکس انتخاب شده")).toBeInTheDocument();
+  });
+
+  it("when the owner changes the limit, the counter shows the limit the server now enforces", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] });
+    open(
+      {
+        [PHOTOS]: [
+          { body: photos([photo(1)], { selection_limit: 1 }) },
+          { body: photos([photo(1)], { selection_limit: 5 }) },
+        ],
+      },
+      { initial: gallery({ selection_limit: 1 }) },
+    );
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    expect(screen.getByText("۰ از ۱ انتخاب شده")).toBeInTheDocument();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(21 * 60 * 1000);
+    });
+    expect(screen.getByText("۰ از ۵ انتخاب شده")).toBeInTheDocument();
+  });
+
+  it("a refresh does not undo a choice that is still on its way", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] });
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const s = server({
+      [UNLOCK]: token(),
+      [FINALS]: { body: { finals: [] } },
+      [PHOTOS]: [{ body: photos([photo(1)]) }, { body: photos([photo(1)]) }], // the server has not seen the choice yet
+    });
+    const plain = s.fetchImpl.getMockImplementation()!;
+    s.fetchImpl.mockImplementation(async (input, init) => {
+      if (init?.method === "PUT") {
+        await gate;
+        return new Response(
+          JSON.stringify({ selected: true, comment: "", retouch: false, selected_count: 1 }),
+          { status: 200 },
+        );
+      }
+      return plain(input, init);
+    });
+    vi.stubGlobal("fetch", s.fetchImpl);
+    render(<GalleryClient initial={gallery()} linkToken={LINK} locale="fa" labels={FA} pollMs={0} />);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "انتخاب IMG_1.jpg" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(21 * 60 * 1000); // a refresh arrives meanwhile
+    });
+    expect(screen.getByRole("button", { name: "برداشتن انتخاب IMG_1.jpg" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    release();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    expect(screen.getByRole("button", { name: "برداشتن انتخاب IMG_1.jpg" })).toBeEnabled();
   });
 });
 
@@ -529,6 +657,24 @@ describe("downloading", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(FA.zipNothing));
   });
 
+  it("says when the finished files could not be loaded and loads them on a second try", async () => {
+    show(
+      {
+        [UNLOCK]: token(),
+        [PHOTOS]: { body: photos([photo(1)]) },
+        [FINALS]: [
+          { status: 500, body: {} },
+          { body: { finals: [{ id: 9, filename: "final.jpg", size_bytes: 1000 }] } },
+        ],
+      },
+      { initial: gallery({ download_level: "none" }) },
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(FA.finalsFailed);
+    fireEvent.click(screen.getByRole("button", { name: FA.retry }));
+    expect(await screen.findByRole("list", { name: FA.finalsTitle })).toBeInTheDocument();
+    expect(screen.queryByText(FA.finalsFailed)).not.toBeInTheDocument();
+  });
+
   it("lists the finished files, which can always be taken", async () => {
     show(
       {
@@ -600,6 +746,28 @@ describe("keeping the previews fresh", () => {
     fireEvent.error(screen.getByAltText("IMG_1.jpg"));
     await Promise.resolve();
     expect(count()).toBe(2);
+  });
+
+  it("many thumbnails failing together make one request, not one each", async () => {
+    const s = show({
+      [UNLOCK]: token(),
+      [PHOTOS]: [
+        { body: photos([photo(1), photo(2), photo(3), photo(4), photo(5)]) },
+        {
+          body: photos(
+            [photo(1), photo(2), photo(3), photo(4), photo(5)].map((p) => ({
+              ...p,
+              thumb_url: `/new${p.id}`,
+            })),
+          ),
+        },
+      ],
+    });
+    const images = await screen.findAllByRole("img");
+    const count = () => s.calls.filter((c) => c.path.endsWith("/photos")).length;
+    for (const img of images) fireEvent.error(img);
+    await waitFor(() => expect(screen.getAllByRole("img")[0]).toHaveAttribute("src", "/new1"));
+    expect(count()).toBe(2); // the first list and one renewal
   });
 
   it("a session that ended asks for the password again", async () => {

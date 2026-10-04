@@ -54,6 +54,7 @@ export const GALLERY_LABEL_KEYS = [
   "zipReady",
   "finalsTitle",
   "finalsHint",
+  "finalsFailed",
   "downloadFinal",
 ] as const;
 

@@ -288,7 +288,8 @@
       "zipReady": "The ZIP is ready; the download has started.",
       "finalsTitle": "Your final photos",
       "finalsHint": "These files are ready for delivery.",
-      "downloadFinal": "Download {name}"
+      "downloadFinal": "Download {name}",
+      "finalsFailed": "The list of final photos could not be loaded; please try again."
     }
   }
 }

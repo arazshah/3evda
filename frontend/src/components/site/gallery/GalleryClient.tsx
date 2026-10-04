@@ -42,6 +42,12 @@ export function GalleryClient({
   const access = useRef<string | null>(null);
   const [phase, setPhase] = useState<Phase>(initial.status === "expired" ? "expired" : "checking");
   const [data, setData] = useState<GalleryPhotos | null>(null);
+  // The latest list, readable straight after a change (state is only visible on the next render).
+  const dataRef = useRef<GalleryPhotos | null>(null);
+  const put = useCallback((photos: GalleryPhotos | null) => {
+    dataRef.current = photos;
+    setData(photos);
+  }, []);
   const [submitted, setSubmitted] = useState(initial.submitted);
   const [gateError, setGateError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -50,7 +56,19 @@ export function GalleryClient({
   const [open, setOpen] = useState<number | null>(null);
   const [zip, setZip] = useState<Zip>(null);
   const [finals, setFinals] = useState<GalleryFinal[]>([]);
+  const [finalsError, setFinalsError] = useState(false);
   const retried = useRef(new Set<number>());
+  const pendingIds = useRef(new Set<number>());
+  const inflight = useRef<Promise<void> | null>(null);
+  const renewedAt = useRef(0);
+  // Everything the visitor changes reaches the server one change at a time, in the order it was made: a send
+  // can then never overtake a choice, and answers cannot arrive out of order.
+  const tail = useRef<Promise<unknown>>(Promise.resolve());
+  const enqueue = useCallback(<T,>(job: () => Promise<T>): Promise<T> => {
+    const run = tail.current.then(job, job);
+    tail.current = run.catch(() => undefined);
+    return run;
+  }, []);
   const rtl = locale === "fa";
   const level = initial.download_level;
 
@@ -62,12 +80,24 @@ export function GalleryClient({
     (text?: string) => {
       access.current = null;
       keepAccess(linkToken, null);
-      setData(null);
+      put(null);
       setOpen(null);
       setPhase("gate");
       if (text) setGateError(text);
     },
-    [linkToken],
+    [linkToken, put],
+  );
+
+  const loadFinals = useCallback(
+    async (token: string) => {
+      try {
+        setFinals((await api.finals(token)).finals);
+        setFinalsError(false);
+      } catch {
+        setFinalsError(true); // said out loud, with a way to try again; not an empty list
+      }
+    },
+    [api],
   );
 
   const load = useCallback(
@@ -75,15 +105,12 @@ export function GalleryClient({
       const photos = await api.photos(token);
       access.current = token;
       keepAccess(linkToken, token);
-      setData(photos);
+      put(photos);
       setSubmitted(photos.submitted);
       setPhase("ready");
-      api
-        .finals(token)
-        .then((r) => setFinals(r.finals))
-        .catch(() => undefined);
+      void loadFinals(token);
     },
-    [api, linkToken],
+    [api, linkToken, put, loadFinals],
   );
 
   /** A gallery without a password is opened with a token too, so the same checks guard every request. */
@@ -135,25 +162,44 @@ export function GalleryClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
   }, []);
 
-  /** Fresh list: renews the preview addresses (signed for an hour) and shows the owner's changes, e.g. a reopening. */
+  /**
+   * Fresh list: renews the preview addresses (signed for an hour) and shows the owner's changes, e.g. a reopening.
+   * Asked for by several things at once (thumbnails failing together, the timer, the tab) it is one request.
+   */
   const refresh = useCallback(
-    async (scheduled: boolean) => {
+    (scheduled: boolean): Promise<void> => {
       const token = access.current;
-      if (!token) return;
+      if (!token) return Promise.resolve();
       if (scheduled) retried.current.clear();
-      try {
-        const photos = await api.photos(token);
-        setData(photos);
-        setSubmitted(photos.submitted);
-      } catch (error) {
-        if (error instanceof GalleryApiError && error.status === 401) {
-          if (initial.has_password) toGate(labels.sessionEnded);
-          else void open_();
-        } else if (error instanceof GalleryApiError && error.status === 410) setPhase("expired");
-      }
+      if (inflight.current) return inflight.current;
+      const run = (async () => {
+        try {
+          const photos = await api.photos(token);
+          const mine = dataRef.current?.photos ?? [];
+          // A photo whose change is still on its way keeps what the visitor sees until the server has caught up.
+          put({
+            ...photos,
+            photos: photos.photos.map((p) =>
+              pendingIds.current.has(p.id) ? (mine.find((q) => q.id === p.id) ?? p) : p,
+            ),
+          });
+          setSubmitted(photos.submitted);
+          void loadFinals(token);
+        } catch (error) {
+          if (error instanceof GalleryApiError && error.status === 401) {
+            if (initial.has_password) toGate(labels.sessionEnded);
+            else void open_();
+          } else if (error instanceof GalleryApiError && error.status === 410) setPhase("expired");
+        }
+      })().finally(() => {
+        inflight.current = null;
+        renewedAt.current = Date.now();
+      });
+      inflight.current = run;
+      return run;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- labels do not change while the page is open
-    [api, toGate, open_],
+    [api, toGate, open_, put, loadFinals],
   );
 
   useEffect(() => {
@@ -169,30 +215,30 @@ export function GalleryClient({
     };
   }, [phase, refresh]);
 
-  /** A preview that fails to load (its address expired) is asked for again, once. */
+  /** A preview that fails to load (its address expired) is asked for again, once; many failing together are one request. */
   const onImageError = useCallback(
     (photo: GalleryPhoto) => {
       if (retried.current.has(photo.id)) return;
       retried.current.add(photo.id);
+      // Addresses renewed a moment ago that still fail are not mended by asking again.
+      if (!inflight.current && Date.now() - renewedAt.current < 10_000) return;
       void refresh(false);
     },
     [refresh],
   );
 
-  const patchPhoto = (id: number, change: Partial<GalleryPhoto>) =>
-    setData((current) =>
-      current
-        ? { ...current, photos: current.photos.map((p) => (p.id === id ? { ...p, ...change } : p)) }
-        : current,
-    );
+  const patchPhoto = (id: number, change: Partial<GalleryPhoto>) => {
+    const current = dataRef.current;
+    if (current) {
+      put({ ...current, photos: current.photos.map((p) => (p.id === id ? { ...p, ...change } : p)) });
+    }
+  };
 
-  const mark = (id: number, on: boolean) =>
-    setPending((set) => {
-      const next = new Set(set);
-      if (on) next.add(id);
-      else next.delete(id);
-      return next;
-    });
+  const mark = (id: number, on: boolean) => {
+    if (on) pendingIds.current.add(id);
+    else pendingIds.current.delete(id);
+    setPending(new Set(pendingIds.current));
+  };
 
   const onSelectError = (error: unknown) => {
     if (error instanceof GalleryApiError && error.status === 401) {
@@ -212,14 +258,11 @@ export function GalleryClient({
     const want = !photo.selected;
     mark(photo.id, true);
     patchPhoto(photo.id, { selected: want });
-    setData((d) => (d ? { ...d, selected_count: d.selected_count + (want ? 1 : -1) } : d));
     try {
-      const done = await api.select(token, photo.id, { selected: want });
+      const done = await enqueue(() => api.select(token, photo.id, { selected: want }));
       patchPhoto(photo.id, { selected: done.selected });
-      setData((d) => (d ? { ...d, selected_count: done.selected_count } : d));
     } catch (error) {
       patchPhoto(photo.id, { selected: photo.selected });
-      setData((d) => (d ? { ...d, selected_count: d.selected_count + (want ? -1 : 1) } : d));
       onSelectError(error);
     } finally {
       mark(photo.id, false);
@@ -231,7 +274,7 @@ export function GalleryClient({
     if (!token || submitted) return;
     patchPhoto(photo.id, { retouch: on });
     try {
-      await api.select(token, photo.id, { retouch: on });
+      await enqueue(() => api.select(token, photo.id, { retouch: on }));
     } catch (error) {
       patchPhoto(photo.id, { retouch: photo.retouch });
       onSelectError(error);
@@ -242,7 +285,7 @@ export function GalleryClient({
     const token = access.current;
     if (!token || submitted) return false;
     try {
-      const done = await api.select(token, photo.id, { comment });
+      const done = await enqueue(() => api.select(token, photo.id, { comment }));
       patchPhoto(photo.id, { comment: done.comment });
       return true;
     } catch (error) {
@@ -251,15 +294,20 @@ export function GalleryClient({
     }
   };
 
+  const countSelected = () => (dataRef.current?.photos ?? []).filter((p) => p.selected).length;
+
   const send = async () => {
     const token = access.current;
-    if (!token || !data) return;
-    if (data.selected_count === 0) return say(labels.nothingSelected);
-    if (!window.confirm(fill(labels.submitConfirm, { n: formatNumber(data.selected_count, locale) }))) return;
+    if (!token || !dataRef.current) return;
     setBusy(true);
     setMessage(null);
     try {
-      await api.submit(token);
+      // Choices still on their way are settled first, so what is sent is what the visitor sees.
+      await tail.current;
+      const count = countSelected();
+      if (count === 0) return say(labels.nothingSelected);
+      if (!window.confirm(fill(labels.submitConfirm, { n: formatNumber(count, locale) }))) return;
+      await enqueue(() => api.submit(token));
       setSubmitted(true);
     } catch (error) {
       if (error instanceof GalleryApiError && error.code === "nothing_selected") say(labels.nothingSelected);
@@ -375,13 +423,13 @@ export function GalleryClient({
   }
 
   const photos = data?.photos ?? [];
+  // The count follows what is on the screen, and the limit follows what the server enforces now.
+  const chosen = photos.filter((p) => p.selected).length;
+  const limit = data ? data.selection_limit : initial.selection_limit;
   const counter =
-    initial.selection_limit !== null
-      ? fill(labels.counterLimit, {
-          n: formatNumber(data?.selected_count ?? 0, locale),
-          max: formatNumber(initial.selection_limit, locale),
-        })
-      : fill(labels.counterFree, { n: formatNumber(data?.selected_count ?? 0, locale) });
+    limit !== null
+      ? fill(labels.counterLimit, { n: formatNumber(chosen, locale), max: formatNumber(limit, locale) })
+      : fill(labels.counterFree, { n: formatNumber(chosen, locale) });
 
   return (
     <div className="space-y-6">
@@ -476,6 +524,16 @@ export function GalleryClient({
         </ul>
       )}
 
+      {finalsError && (
+        <section className="space-y-3">
+          <p role="alert" className="rounded-brand border border-accent-2 px-4 py-3 text-sm">
+            {labels.finalsFailed}
+          </p>
+          <Button variant="secondary" onClick={() => access.current && void loadFinals(access.current)}>
+            {labels.retry}
+          </Button>
+        </section>
+      )}
       {finals.length > 0 && (
         <section className="space-y-3">
           <h2 className="font-display text-2xl font-bold">{labels.finalsTitle}</h2>
