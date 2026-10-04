@@ -125,6 +125,9 @@ class Booking(models.Model):
     cancelled_by = models.CharField(max_length=10, choices=CancelledBy.choices, blank=True)
     cancel_reason = models.CharField(max_length=300, blank=True)
     created_by_admin = models.BooleanField(default=False)
+    anonymized_at = models.DateTimeField(
+        null=True, blank=True, db_index=True, help_text="Personal details were removed"
+    )
     ip_hash = models.CharField(max_length=64, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

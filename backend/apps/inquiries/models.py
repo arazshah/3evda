@@ -32,6 +32,9 @@ class Inquiry(models.Model):
     internal_note = models.TextField(blank=True)
     ip_hash = models.CharField(max_length=64, blank=True)
     seen_at = models.DateTimeField(null=True, blank=True, help_text="First time the owner opened it")
+    anonymized_at = models.DateTimeField(
+        null=True, blank=True, db_index=True, help_text="Personal details were removed"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

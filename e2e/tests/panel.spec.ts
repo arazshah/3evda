@@ -97,6 +97,37 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   expect(JSON.stringify(status)).not.toMatch(/PASSWORD|SECRET|RESTIC/i);
   await expectNoSeriousViolations(page, "dashboard with the status card");
 
+  // Data retention: defaults, a saved change that survives a reload, and a preview that changes nothing.
+  await page.getByRole("link", { name: "نگهداری اطلاعات" }).click();
+  await expect(
+    page.getByRole("heading", { name: "نگهداری اطلاعات" }),
+  ).toBeVisible();
+  await expect(page.getByLabel(/استعلام‌ها: پس از چند ماه/)).toHaveValue("24");
+  await expect(page.getByLabel(/گالری‌ها: چند روز/)).toHaveValue("90");
+  await expect(page.getByLabel(/مشتری روی پیش‌فاکتور/)).toHaveValue("60");
+  const retention = page.getByRole("table", {
+    name: "آنچه در اجرای بعدی پاک می‌شود",
+  });
+  await expect(retention.getByRole("row")).toHaveCount(5); // header + inquiries, bookings, galleries, proformas
+  await expect(
+    page.getByRole("button", { name: "اجرا همین حالا" }),
+  ).toBeDisabled(); // a fresh stack has nothing old
+  await expect(page.getByText(/هرگز حذف نمی‌شود/)).toBeVisible();
+  await expectNoSeriousViolations(page, "retention settings");
+  await page.getByLabel(/گالری‌ها: چند روز/).fill("45");
+  await page.getByRole("button", { name: "ذخیره‌ی مدت‌ها" }).click();
+  await expect(page.getByText("مدت‌ها ذخیره شد.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel(/گالری‌ها: چند روز/)).toHaveValue("45");
+  await page.getByLabel(/گالری‌ها: چند روز/).fill("90");
+  await page.getByRole("button", { name: "ذخیره‌ی مدت‌ها" }).click();
+  await expect(page.getByText("مدت‌ها ذخیره شد.")).toBeVisible();
+  const asked = await page.request.get("/api/admin/retention/preview/");
+  expect(asked.status()).toBe(200);
+  expect(JSON.stringify(await asked.json())).not.toMatch(
+    /phone|email|message/i,
+  ); // counts and dates only
+
   // Upload through the library.
   await page.getByRole("link", { name: "کتابخانه رسانه" }).click();
   await page.getByLabel("انتخاب فایل برای آپلود").setInputFiles(PHOTO);
@@ -536,13 +567,11 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   );
 
   // Bookings: a visitor books, the owner is told, confirms; a manual booking from the enquiry; the visitor cancels.
-  test
-    .info()
-    .annotations.push({
-      type: "expected-http-error",
-      description:
-        "the second manual booking at the same time is refused with 409",
-    });
+  test.info().annotations.push({
+    type: "expected-http-error",
+    description:
+      "the second manual booking at the same time is refused with 409",
+  });
   const bookedName = `Booking E2E ${Date.now()}`;
   const from = new Date();
   const until = new Date(from.getTime() + 40 * 86_400_000);

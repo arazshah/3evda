@@ -27,6 +27,7 @@ const NAV = [
   { href: "/panel/settings", label: "تنظیمات سایت" },
   { href: "/panel/media", label: "کتابخانه رسانه" },
   { href: "/panel/watermark", label: "واترمارک" },
+  { href: "/panel/retention", label: "نگهداری اطلاعات" },
   { href: "/panel/security", label: "امنیت" },
 ];
 
