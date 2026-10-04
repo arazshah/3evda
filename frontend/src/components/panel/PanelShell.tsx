@@ -19,6 +19,7 @@ const NAV = [
   { href: "/panel/categories", label: "دسته‌ها" },
   { href: "/panel/packages", label: "پکیج‌ها و قیمت‌ها" },
   { href: "/panel/pricing", label: "قواعد قیمت" },
+  { href: "/panel/booking/settings", label: "تنظیمات رزرو" },
   { href: "/panel/articles", label: "مقاله‌های مجله" },
   { href: "/panel/settings", label: "تنظیمات سایت" },
   { href: "/panel/media", label: "کتابخانه رسانه" },

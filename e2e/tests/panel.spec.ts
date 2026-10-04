@@ -370,6 +370,30 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   await expect(page.getByText("استعلامی با این فیلترها پیدا نشد.")).toBeVisible();
   expect((await page.request.get(signed)).status()).toBeGreaterThanOrEqual(400);
 
+  // Booking settings: the sample week is there; the owner closes a few days and changes the daily limit.
+  await page.goto("/panel/booking/settings");
+  await expect(page.getByRole("heading", { level: 1, name: "تنظیمات رزرو" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "انواع جلسه" }).getByRole("listitem").first()).toBeVisible();
+  await expect(page.getByLabel("از (شنبه)", { exact: true }).first()).toHaveValue("10:00");
+  await expect(page.getByText("تعطیل", { exact: true })).toHaveCount(1); // Friday only
+  await page.getByLabel("از تاریخ — ماه", { exact: true }).selectOption("12");
+  await page.getByLabel("دلیل (فقط برای خودتان)", { exact: true }).fill("مسافرت آزمایشی");
+  await page.getByRole("button", { name: "افزودن", exact: true }).click();
+  await expect(page.getByText("روز بسته اضافه شد.")).toBeVisible();
+  await expect(page.getByRole("list", { name: "روزهای بسته" })).toContainText("مسافرت آزمایشی");
+  await page.reload();
+  const closedRow = page.getByRole("list", { name: "روزهای بسته" }).getByRole("listitem").filter({ hasText: "مسافرت آزمایشی" });
+  await expect(closedRow).toHaveCount(1);
+  acceptNextDialog();
+  await closedRow.getByRole("button", { name: /حذف روز بسته/ }).click();
+  await expect(closedRow).toHaveCount(0);
+  await page.getByLabel("حداکثر رزرو در یک روز", { exact: true }).fill("4");
+  await page.getByRole("button", { name: "ذخیره‌ی سقف‌ها" }).click();
+  await expect(page.getByText("سقف‌ها ذخیره شد.")).toBeVisible();
+  await page.getByLabel("حداکثر رزرو در یک روز", { exact: true }).fill("3");
+  await page.getByRole("button", { name: "ذخیره‌ی سقف‌ها" }).click();
+  await expect(page.getByText("سقف‌ها ذخیره شد.")).toBeVisible();
+
   // Journal: write an article in the rich-text editor, prove it was saved, preview it, translate it, remove it.
   await page.goto("/panel/articles/new?language=fa");
   await page.getByLabel("عنوان", { exact: true }).fill("مقاله‌ی آزمایشی");
@@ -432,7 +456,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({ page, request
   }
 
   // The panel itself meets the same accessibility bar as the public site.
-  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/proformas", "/panel/proformas/new", "/panel/proformas/settings", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
+  for (const path of ["/panel", "/panel/content", "/panel/items", "/panel/projects", "/panel/categories", "/panel/packages", "/panel/pricing", "/panel/inquiries", "/panel/proformas", "/panel/proformas/new", "/panel/proformas/settings", "/panel/booking/settings", "/panel/articles", "/panel/articles/new", "/panel/blog-taxonomy", "/panel/settings", "/panel/media"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expectNoSeriousViolations(page, path);
