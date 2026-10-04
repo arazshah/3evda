@@ -48,3 +48,32 @@ def s3_buckets(settings):  # type: ignore[no-untyped-def]
     with mock_aws():
         ensure_buckets()
         yield boto3.client("s3", region_name=settings.S3_REGION)
+
+
+class FakeRedis:
+    """Just enough of redis.Redis for the backup window: set with expiry, exists, delete."""
+
+    store: dict[str, tuple[str, int | None]] = {}
+
+    def set(self, key, value, ex=None):  # type: ignore[no-untyped-def]
+        self.store[key] = (value, ex)
+
+    def exists(self, key):  # type: ignore[no-untyped-def]
+        return int(key in self.store)
+
+    def delete(self, key):  # type: ignore[no-untyped-def]
+        self.store.pop(key, None)
+
+    def close(self):  # type: ignore[no-untyped-def]
+        pass
+
+
+@pytest.fixture(autouse=True)
+def fake_redis(monkeypatch):  # type: ignore[no-untyped-def]
+    """The backup window key lives in Redis; tests use an in-memory stand-in (no server needed)."""
+    from apps.core import backup_window
+
+    FakeRedis.store = {}
+    monkeypatch.setattr(backup_window, "_client", lambda: FakeRedis())
+    yield FakeRedis
+    FakeRedis.store = {}
