@@ -98,3 +98,18 @@ class GalleryPhoto(models.Model):
 
     def __str__(self) -> str:
         return self.original_filename
+
+
+class Selection(models.Model):
+    """What the client chose for one photo: picked, a note for the photographer, and a retouch request."""
+
+    COMMENT_MAX = 500
+
+    photo = models.OneToOneField(GalleryPhoto, on_delete=models.CASCADE, related_name="selection")
+    selected = models.BooleanField(default=False)
+    comment = models.CharField(max_length=COMMENT_MAX, blank=True)
+    retouch = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.photo_id}: {'selected' if self.selected else '-'}"

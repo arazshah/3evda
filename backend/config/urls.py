@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/public/", include("apps.inquiries.public_urls")),
     path("api/public/", include("apps.proformas.public_urls")),
     path("api/public/", include("apps.booking.public_urls")),
+    path("api/public/", include("apps.galleries.public_urls")),
     path("api/", include("apps.core.urls")),
     path("django-admin/", admin.site.urls),
 ]
