@@ -384,3 +384,27 @@ def test_a_job_given_up_on_does_not_become_ready_again(s3_buckets, settings, mon
     assert ZipJob.objects.get(pk=job.pk).status == "failed"
     left = s3_buckets.list_objects_v2(Bucket=settings.S3_PRIVATE_BUCKET).get("Contents", [])
     assert not [o for o in left if "/zips/" in o["Key"]]  # the archive it had just built is deleted
+
+
+def test_the_owner_sees_the_choices_notes_and_names_for_lightroom(owner_client, client, s3_buckets):
+    gallery, photos = make_gallery(s3_buckets, download_level="selected", count=4)
+    h = authed(client, gallery)
+    choose(client, gallery, photos, h, 0, 2)
+    put(client, gallery, photos[2], h, comment="روشن‌تر", retouch=True)
+    put(client, gallery, photos[3], h, comment="فقط نظر")
+    r = owner_client.get(f"{ADMIN}{gallery.pk}/selections/")
+    assert r.status_code == 200
+    assert (r.data["photo_count"], r.data["selected_count"], r.data["retouch_count"], r.data["comment_count"]) == (
+        4,
+        2,
+        1,
+        2,
+    )
+    assert r.data["filenames"] == "IMG_0, IMG_2"  # without extension, commas, in gallery order
+    assert [i["photo"] for i in r.data["items"]] == [photos[0].pk, photos[2].pk, photos[3].pk]
+    assert all("/storage-signed/" in i["thumb_url"] for i in r.data["items"])
+    only = lambda q: [i["photo"] for i in owner_client.get(f"{ADMIN}{gallery.pk}/selections/?only={q}").data["items"]]  # noqa: E731
+    assert only("selected") == [photos[0].pk, photos[2].pk]
+    assert only("retouch") == [photos[2].pk]
+    assert only("commented") == [photos[2].pk, photos[3].pk]
+    assert client.get(f"{ADMIN}{gallery.pk}/selections/").status_code in (401, 403)

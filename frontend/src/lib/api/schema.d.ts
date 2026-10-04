@@ -671,6 +671,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/galleries/{id}/selections/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["admin_galleries_selections_retrieve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/galleries/{id}/unarchive/": {
     parameters: {
       query?: never;
@@ -3635,10 +3651,29 @@ export interface components {
       retouch: boolean;
       selected_count: number;
     };
+    SelectionItem: {
+      photo: number;
+      filename: string;
+      thumb_url: string | null;
+      selected: boolean;
+      comment: string;
+      retouch: boolean;
+    };
     SelectionRequest: {
       selected?: boolean;
       comment?: string;
       retouch?: boolean;
+    };
+    Selections: {
+      photo_count: number;
+      selected_count: number;
+      retouch_count: number;
+      comment_count: number;
+      /** Format: date-time */
+      submitted_at: string | null;
+      /** @description Chosen photos' names without extension, ready for Lightroom's search */
+      filenames: string;
+      items: components["schemas"]["SelectionItem"][];
     };
     SessionType: {
       readonly id: number;
@@ -5632,6 +5667,31 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Gallery"];
+        };
+      };
+    };
+  };
+  admin_galleries_selections_retrieve: {
+    parameters: {
+      query?: {
+        /** @description selected, retouch or commented */
+        only?: string;
+      };
+      header?: never;
+      path: {
+        /** @description یک مقداد عدد یکتا که این gallery را شناسایی میکند. */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Selections"];
         };
       };
     };
