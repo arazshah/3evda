@@ -16,7 +16,7 @@ from django.utils import timezone
 from apps.media.storage import private_storage
 from apps.media.validation import UploadRejected, inspect_upload
 
-from .models import Gallery, GalleryPhoto
+from .models import Gallery, GalleryPhoto, Selection
 
 EXPIRED = "expired"  # shown, never stored: it follows from the date
 
@@ -173,3 +173,56 @@ def new_link(gallery: Gallery) -> Gallery:
     gallery.link_version += 1
     gallery.save(update_fields=["link_version", "updated_at"])
     return gallery
+
+
+# ---- the client's side -----------------------------------------------------------------------------
+
+
+def client_can_see(gallery: Gallery) -> bool:
+    """Drafts and archived galleries do not exist for the client."""
+    return gallery.status in (Gallery.Status.PUBLISHED, Gallery.Status.SUBMITTED)
+
+
+def set_selection(
+    gallery: Gallery, photo_id: int, *, selected: bool | None, comment: str | None, retouch: bool | None
+) -> Selection:
+    """Change one photo's choice; the limit is counted under the gallery's row lock (no parallel overshoot)."""
+    with transaction.atomic():
+        locked = Gallery.objects.select_for_update().get(pk=gallery.pk)
+        if locked.status == Gallery.Status.SUBMITTED:
+            raise GalleryError("submitted", "انتخاب‌ها نهایی شده و دیگر تغییر نمی‌کند.")
+        if locked.status != Gallery.Status.PUBLISHED or (locked.expires_at and locked.expires_at <= timezone.now()):
+            raise GalleryError("unavailable", "این گالری در دسترس نیست.", 410)
+        photo = GalleryPhoto.objects.filter(pk=photo_id, gallery=locked, status=GalleryPhoto.Status.READY).first()
+        if photo is None:
+            raise GalleryError("not_found", "عکس پیدا نشد.", 404)
+        row, _ = Selection.objects.get_or_create(photo=photo)
+        if selected and not row.selected and locked.selection_limit is not None:
+            chosen = Selection.objects.filter(photo__gallery=locked, selected=True).count()
+            if chosen >= locked.selection_limit:
+                raise GalleryError("limit_reached", f"حداکثر {locked.selection_limit} عکس را می‌توان انتخاب کرد.")
+        if selected is not None:
+            row.selected = selected
+        if comment is not None:
+            row.comment = comment
+        if retouch is not None:
+            row.retouch = retouch
+        row.save()
+        return row
+
+
+def submit(gallery: Gallery, ip_hash: str) -> Gallery:
+    """Lock the choices. Sending again changes nothing."""
+    with transaction.atomic():
+        locked = Gallery.objects.select_for_update().get(pk=gallery.pk)
+        if locked.status == Gallery.Status.SUBMITTED:
+            return locked
+        if locked.status != Gallery.Status.PUBLISHED or (locked.expires_at and locked.expires_at <= timezone.now()):
+            raise GalleryError("unavailable", "این گالری در دسترس نیست.", 410)
+        if not Selection.objects.filter(photo__gallery=locked, selected=True).exists():
+            raise GalleryError("nothing_selected", "دست‌کم یک عکس را انتخاب کنید.")
+        locked.status = Gallery.Status.SUBMITTED
+        locked.submitted_at = timezone.now()
+        locked.submitted_ip_hash = ip_hash
+        locked.save(update_fields=["status", "submitted_at", "submitted_ip_hash", "updated_at"])
+        return locked

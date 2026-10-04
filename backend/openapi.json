@@ -7364,6 +7364,229 @@
                 }
             }
         },
+        "/api/public/galleries/{token}": {
+            "get": {
+                "operationId": "public_galleries_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicGallery"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/photos": {
+            "get": {
+                "operationId": "public_galleries_photos",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicPhotos"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/photos/{photo_id}/selection": {
+            "put": {
+                "operationId": "public_galleries_selection",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "photo_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelectionRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelectionRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelectionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Selection"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/submit": {
+            "post": {
+                "operationId": "public_galleries_submit",
+                "description": "A view that needs the access token (given by `unlock`) as well as the link.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Gallery-Token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubmitResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/public/galleries/{token}/unlock": {
+            "post": {
+                "operationId": "public_galleries_unlock",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "public"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnlockRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnlockRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnlockRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnlockResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/public/inquiries": {
             "post": {
                 "operationId": "public_inquiries_create",
@@ -12654,6 +12877,47 @@
                     "text_fa"
                 ]
             },
+            "PublicGallery": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "client_name": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "published, submitted or expired"
+                    },
+                    "has_password": {
+                        "type": "boolean"
+                    },
+                    "selection_limit": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "download_level": {
+                        "$ref": "#/components/schemas/DownloadLevelEnum"
+                    },
+                    "submitted": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "client_name",
+                    "download_level",
+                    "has_password",
+                    "language",
+                    "selection_limit",
+                    "status",
+                    "submitted",
+                    "title"
+                ]
+            },
             "PublicGroup": {
                 "type": "object",
                 "properties": {
@@ -12961,6 +13225,78 @@
                 },
                 "required": [
                     "groups"
+                ]
+            },
+            "PublicPhoto": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "height": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "thumb_url": {
+                        "type": "string"
+                    },
+                    "preview_url": {
+                        "type": "string"
+                    },
+                    "selected": {
+                        "type": "boolean"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "retouch": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "comment",
+                    "height",
+                    "id",
+                    "name",
+                    "preview_url",
+                    "retouch",
+                    "selected",
+                    "thumb_url",
+                    "width"
+                ]
+            },
+            "PublicPhotos": {
+                "type": "object",
+                "properties": {
+                    "selection_limit": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "selected_count": {
+                        "type": "integer"
+                    },
+                    "submitted": {
+                        "type": "boolean"
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicPhoto"
+                        }
+                    }
+                },
+                "required": [
+                    "photos",
+                    "selected_count",
+                    "selection_limit",
+                    "submitted"
                 ]
             },
             "PublicPortfolio": {
@@ -13822,6 +14158,44 @@
                     "time"
                 ]
             },
+            "Selection": {
+                "type": "object",
+                "properties": {
+                    "selected": {
+                        "type": "boolean"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "retouch": {
+                        "type": "boolean"
+                    },
+                    "selected_count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "comment",
+                    "retouch",
+                    "selected",
+                    "selected_count"
+                ]
+            },
+            "SelectionRequest": {
+                "type": "object",
+                "properties": {
+                    "selected": {
+                        "type": "boolean"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "retouch": {
+                        "type": "boolean"
+                    }
+                }
+            },
             "SessionType": {
                 "type": "object",
                 "properties": {
@@ -14128,6 +14502,21 @@
                 "type": "string",
                 "description": "* `low_key` - Low-key\n* `high_key` - High-key\n* `natural` - نور طبیعی"
             },
+            "SubmitResponse": {
+                "type": "object",
+                "properties": {
+                    "submitted": {
+                        "type": "boolean"
+                    },
+                    "selected_count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "selected_count",
+                    "submitted"
+                ]
+            },
             "TotpSetup": {
                 "type": "object",
                 "properties": {
@@ -14168,6 +14557,30 @@
                     "language",
                     "slug",
                     "status"
+                ]
+            },
+            "UnlockRequest": {
+                "type": "object",
+                "properties": {
+                    "password": {
+                        "type": "string",
+                        "maxLength": 128
+                    }
+                }
+            },
+            "UnlockResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "expires_in",
+                    "token"
                 ]
             },
             "WatermarkSetting": {
