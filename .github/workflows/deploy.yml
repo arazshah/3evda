@@ -26,7 +26,13 @@ jobs:
     env:
       PUBLIC_URL: ${{ vars.PUBLIC_URL || 'https://3evda.com' }}
       EXPECTED_VERSION: ${{ github.event.workflow_run.head_sha }}
+    # The address the environment resolved to, for the jobs that follow (they do not read environment variables).
+    outputs:
+      public_url: ${{ steps.address.outputs.url }}
     steps:
+      - id: address
+        run: echo "url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+
       - name: Trigger Coolify deployment
         env:
           COOLIFY_DEPLOY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
@@ -72,7 +78,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      PUBLIC_URL: ${{ vars.PUBLIC_URL || 'https://3evda.com' }}
+      PUBLIC_URL: ${{ needs.deploy.outputs.public_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -95,5 +101,5 @@ jobs:
         working-directory: e2e
         env:
           E2E_BASE_URL: ${{ env.PUBLIC_URL }}
-          LIGHTHOUSE_SKIP_MISSING: "true"
+          LIGHTHOUSE_ARTICLE: auto
         run: pnpm lighthouse
