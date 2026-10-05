@@ -23,6 +23,16 @@ const PERSIAN_FONTS = [
   ),
 ];
 
+// The same for the English faces: Manrope (body) and Bodoni Moda (headings) differ in metrics from the fallback,
+// so letting them arrive late shifts the first screen.
+const LATIN_FONTS = [
+  new URL("../../../node_modules/@fontsource/manrope/files/manrope-latin-400-normal.woff2", import.meta.url),
+  new URL(
+    "../../../node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-normal.woff2",
+    import.meta.url,
+  ),
+];
+
 type Props = { children: ReactNode; params: Promise<{ locale: string }> };
 
 export function generateStaticParams() {
@@ -56,18 +66,16 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} dir={directionOf(locale)} data-theme={theme}>
       <head>
         {/^[A-Za-z0-9_-]{1,64}$/.test(requestId) ? <meta name="request-id" content={requestId} /> : null}
-        {locale === "fa"
-          ? PERSIAN_FONTS.map((url) => (
-              <link
-                key={url.pathname}
-                rel="preload"
-                href={url.pathname}
-                as="font"
-                type="font/woff2"
-                crossOrigin="anonymous"
-              />
-            ))
-          : null}
+        {(locale === "fa" ? PERSIAN_FONTS : LATIN_FONTS).map((url) => (
+          <link
+            key={url.pathname}
+            rel="preload"
+            href={url.pathname}
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+        ))}
       </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
