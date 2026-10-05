@@ -48,7 +48,7 @@ export function ArticlesManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">مقاله‌های مجله</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">مقاله‌های مجله</h1>
       <div className="flex flex-wrap gap-3">
         <Link href="/panel/articles/new?language=fa" className={NEW_LINK}>
           مقاله‌ی جدید (فارسی)

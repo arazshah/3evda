@@ -14,7 +14,7 @@ export function NewGalleryPage() {
       <Link href="/panel/galleries" className="inline-flex min-h-11 items-center text-accent hover:underline">
         ← همه‌ی گالری‌ها
       </Link>
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">گالری جدید</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">گالری جدید</h1>
       <Card>
         <GalleryForm
           submitLabel="ساخت گالری"

@@ -25,7 +25,7 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">داشبورد</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">داشبورد</h1>
       <SystemStatusCard />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="همه‌ی فایل‌ها" value={all.data?.count} href="/panel/media" />

@@ -9,7 +9,7 @@ import { Alert, Button, Card, Field } from "./ui";
 export function SecuritySettings() {
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">امنیت</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">امنیت</h1>
       <div className="grid gap-6 lg:grid-cols-2">
         <PasswordChange />
         <RegenerateCodes />

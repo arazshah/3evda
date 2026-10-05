@@ -34,7 +34,7 @@ export function ContentBlocks() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">متن‌ها و تصاویر صفحات</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">متن‌ها و تصاویر صفحات</h1>
       <div role="group" aria-label="بخش‌ها" className="flex flex-wrap gap-2">
         {groups.map((g) => (
           <button

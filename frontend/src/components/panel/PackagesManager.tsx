@@ -49,7 +49,7 @@ export function PackagesManager() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4" aria-labelledby="groups-title">
-        <h1 id="groups-title" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
+        <h1 id="groups-title" className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">
           پکیج‌ها و قیمت‌ها
         </h1>
         <p className="text-sm text-muted">

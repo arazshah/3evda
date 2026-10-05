@@ -105,7 +105,7 @@ export function HeroSlides({
       <div className="mx-auto w-full max-w-[96rem] px-[clamp(1rem,4vw,3.5rem)] pb-[clamp(1.75rem,4vw,3.5rem)] pt-40">
         <div key={index} className="hero-in grid gap-5">
           <p className="eyebrow text-accent-on-ink">{eyebrow}</p>
-          <h1 className="font-display max-w-[16ch] text-[clamp(3rem,10.5vw,9.5rem)] leading-[0.92]">
+          <h1 className="font-display max-w-[22ch] text-[clamp(2.25rem,5.6vw,5rem)] leading-[1.15]">
             {slide.title}
           </h1>
           {slide.subtitle ? <p className="max-w-[52ch] text-lg text-on-ink/85">{slide.subtitle}</p> : null}

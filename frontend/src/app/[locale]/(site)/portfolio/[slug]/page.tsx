@@ -81,7 +81,7 @@ export default async function ProjectPage({ params }: Props) {
             className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/85 via-ink/10 to-ink/50"
           />
           <div className={`${WIDE} hero-in pb-[clamp(1.75rem,4vw,3.5rem)] pt-40`}>
-            <h1 className="font-display max-w-[18ch] text-[clamp(2.75rem,9vw,8rem)] leading-[0.95]">
+            <h1 className="font-display max-w-[18ch] text-[clamp(2.25rem,5.6vw,5rem)] leading-[0.95]">
               {title}
             </h1>
             {summary ? <p className="mt-5 max-w-[56ch] text-lg text-on-ink/85">{summary}</p> : null}
@@ -131,7 +131,7 @@ export default async function ProjectPage({ params }: Props) {
       >
         {project.previous ? (
           <a
-            className="font-display group inline-flex min-h-11 items-center gap-3 text-[clamp(1.25rem,3vw,2.25rem)]"
+            className="font-display group inline-flex min-h-11 items-center gap-3 text-[clamp(1.15rem,2.2vw,1.75rem)]"
             href={href(locale, `/portfolio/${project.previous}`)}
           >
             <span
@@ -147,7 +147,7 @@ export default async function ProjectPage({ params }: Props) {
         )}
         {project.next ? (
           <a
-            className="font-display group inline-flex min-h-11 items-center justify-end gap-3 text-[clamp(1.25rem,3vw,2.25rem)]"
+            className="font-display group inline-flex min-h-11 items-center justify-end gap-3 text-[clamp(1.15rem,2.2vw,1.75rem)]"
             href={href(locale, `/portfolio/${project.next}`)}
           >
             {t("portfolio.next")}

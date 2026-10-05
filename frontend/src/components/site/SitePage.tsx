@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
+import { pick } from "@/lib/site/text";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
+import { Splash } from "./Splash";
 import type { SiteData } from "@/lib/site/types";
 
 /** Shared frame of every public page: skip link, header, main landmark and footer. */
@@ -48,6 +50,10 @@ export async function SitePage({
   };
   return (
     <>
+      <Splash
+        brand={pick(locale, site.settings.brand_name_fa, site.settings.brand_name_en)}
+        tagline={pick(locale, site.settings.tagline_fa, site.settings.tagline_en)}
+      />
       <a
         href="#content"
         className="sr-only focus:not-sr-only focus:absolute focus:start-2 focus:top-2 focus:z-50 focus:rounded-brand focus:bg-accent focus:px-4 focus:py-2 focus:text-bg"

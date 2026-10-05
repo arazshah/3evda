@@ -2,7 +2,12 @@ import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
-import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
+import {
+  expect,
+  expectNoHorizontalOverflow,
+  skipSplash,
+  test,
+} from "./fixtures";
 import { OWNER_TOTP_FILE } from "./owner";
 import { totp } from "./totp";
 
@@ -503,6 +508,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   const guest = await browser.newContext({
     baseURL: page.url().split("/panel")[0],
   });
+  await skipSplash(guest, page.url().split("/panel")[0]!);
   const customer = await guest.newPage();
   const seen = customer.waitForResponse(
     (r) => r.url().endsWith("/seen") && r.request().method() === "POST",
@@ -641,6 +647,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   const visitorContext = await browser.newContext({
     baseURL: page.url().split("/panel")[0],
   });
+  await skipSplash(visitorContext, page.url().split("/panel")[0]!);
   const visitorPage = await visitorContext.newPage();
   await visitorPage.goto(bookingLink);
   await expect(visitorPage.getByText("Booking confirmed")).toBeVisible();
@@ -821,6 +828,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
     isMobile: true,
     hasTouch: true,
   });
+  await skipSplash(clientContext, page.url().split("/panel")[0]!);
   const client = await clientContext.newPage();
   await client.goto(new URL(galleryLink).pathname);
   await expect(

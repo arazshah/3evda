@@ -25,7 +25,7 @@ export function BookingsManager() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">رزروها</h1>
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">رزروها</h1>
         <div className="flex flex-wrap gap-2">
           <Link href="/panel/booking/settings" className={LINK}>
             تنظیمات رزرو

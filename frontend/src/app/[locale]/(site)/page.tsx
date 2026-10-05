@@ -78,7 +78,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       overlay
       footerTop={
         <section id="cta" aria-labelledby="cta-title" className={`${WIDE} py-[clamp(4rem,9vw,8rem)]`}>
-          <h2 id="cta-title" className="font-display text-[clamp(2.75rem,9vw,8.5rem)] leading-[0.98]">
+          <h2 id="cta-title" className="font-display text-[clamp(1.75rem,3.6vw,3.25rem)]">
             <a href={ctaHref} className="transition-colors duration-500 hover:text-accent-on-ink">
               {b("home.cta_title")}
             </a>
@@ -111,7 +111,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {statement ? (
         <section className={`${WIDE} pt-[clamp(4rem,9vw,8.5rem)]`}>
-          <p className="reveal font-display max-w-[28ch] text-[clamp(1.75rem,4vw,3.75rem)] leading-[1.25]">
+          <p className="reveal font-display max-w-[28ch] text-[clamp(1.5rem,2.8vw,2.5rem)] leading-[1.25]">
             {statement}
           </p>
         </section>
@@ -150,7 +150,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {featured.length ? (
         <section id="featured" aria-labelledby="featured-title" className="pt-[clamp(4rem,9vw,8.5rem)]">
           <div className={`${WIDE} reveal mb-10 flex flex-wrap items-end justify-between gap-4 md:mb-14`}>
-            <h2 id="featured-title" className="font-display text-[clamp(2.25rem,5.5vw,5rem)] leading-[1.05]">
+            <h2 id="featured-title" className="font-display text-[clamp(1.75rem,3.4vw,3rem)] leading-[1.05]">
               {b("home.featured_title")}
             </h2>
             <ButtonLink href={href(locale, "/portfolio")} variant="secondary" className="rounded-full">
@@ -228,7 +228,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <ul className="grid gap-x-12 gap-y-12 md:grid-cols-2">
             {c.testimonial.map((q) => (
               <li key={q.id} className="reveal border-t border-line pt-6">
-                <blockquote className="font-display text-[clamp(1.4rem,2.4vw,2rem)] leading-[1.4]">
+                <blockquote className="font-display text-[clamp(1.2rem,1.9vw,1.6rem)] leading-[1.4]">
                   {localized(locale, q, "body")}
                 </blockquote>
                 <p className="mt-4 text-sm text-muted">

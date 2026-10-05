@@ -142,7 +142,7 @@ function DraftForm({ initial }: { initial: Proforma | null }) {
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">
           {initial ? "پیش‌نویس پیش‌فاکتور" : "پیش‌فاکتور جدید"}
         </h1>
         {initial?.replaces_number && (
@@ -368,7 +368,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
   return (
     <>
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight" dir="auto">
           پیش‌فاکتور <span dir="ltr">{proforma.number}</span>
         </h1>
         <p className="text-sm text-muted">

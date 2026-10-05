@@ -56,7 +56,7 @@ export function QuoteRulesManager() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4" aria-labelledby="rules-title">
-        <h1 id="rules-title" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
+        <h1 id="rules-title" className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">
           قواعد قیمت
         </h1>
         <p className="text-sm text-muted">
