@@ -17,7 +17,28 @@ export default defineConfig({
     launchOptions: { executablePath },
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
-    { name: "mobile", use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } } },
+    {
+      name: "desktop",
+      testIgnore: /sample\.spec/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+      },
+    },
+    {
+      name: "mobile",
+      testIgnore: /sample\.spec/,
+      use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } },
+    },
+    {
+      // Fills and empties the whole public site, so it must not overlap with any other spec.
+      name: "sample",
+      testMatch: /sample\.spec/,
+      dependencies: ["desktop", "mobile"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+      },
+    },
   ],
 });

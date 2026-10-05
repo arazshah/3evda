@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.booking",
     "apps.galleries",
     "apps.retention",
+    "apps.samplecontent",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

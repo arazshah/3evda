@@ -63,6 +63,7 @@ ignore = ["RUF001", "RUF002", "RUF003", "RUF012"]
 "**/tests/**" = ["S101", "S105", "S106", "S603", "B017"]
 "conftest.py" = ["S106"]
 "apps/cms/blocks.py" = ["E501"]  # long Persian default texts
+"apps/samplecontent/content.py" = ["E501"]  # long sample texts
 
 [tool.mypy]
 python_version = "3.13"

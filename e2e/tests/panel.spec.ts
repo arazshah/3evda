@@ -1,8 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
+import { OWNER_TOTP_FILE } from "./owner";
 import { totp } from "./totp";
 
 const USERNAME = process.env.E2E_ADMIN_USER ?? "e2e-admin";
@@ -56,6 +57,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
 
   // First sign-in: enrol the authenticator.
   const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
+  // The sample-content spec runs after everything else (see playwright.config.ts) and signs in with this secret.
+  writeFileSync(OWNER_TOTP_FILE, secret);
   await expect(
     page.getByRole("img", { name: "کد QR برای اپ احراز هویت" }),
   ).toBeVisible();
@@ -1009,6 +1012,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
     "/panel/blog-taxonomy",
     "/panel/settings",
     "/panel/media",
+    "/panel/sample-content",
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();

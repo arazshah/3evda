@@ -1353,6 +1353,55 @@ export interface paths {
     patch: operations["admin_retention_settings_partial_update"];
     trace?: never;
   };
+  "/api/admin/sample-content/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["sample_content_state"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/sample-content/load/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Starts loading in the background (202); the panel polls the state. */
+    post: operations["sample_content_load"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/sample-content/unload/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["sample_content_unload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/settings/watermark": {
     parameters: {
       query?: never;
@@ -2380,6 +2429,9 @@ export interface components {
       | "behind_scenes"
       | "faq"
       | "nav_link";
+    Confirm: {
+      confirm: boolean;
+    };
     ContentBlock: {
       readonly key: string;
       readonly display_name: string;
@@ -3788,6 +3840,27 @@ export interface components {
         [key: string]: number;
       };
     };
+    SampleState: {
+      status: components["schemas"]["SampleStateStatusEnum"];
+      message: string;
+      counts: {
+        [key: string]: number;
+      };
+      result: {
+        [key: string]: number;
+      };
+      /** Format: date-time */
+      updated_at: string;
+    };
+    /**
+     * @description * `empty` - empty
+     *     * `loading` - loading
+     *     * `loaded` - loaded
+     *     * `unloading` - unloading
+     *     * `failed` - failed
+     * @enum {string}
+     */
+    SampleStateStatusEnum: "empty" | "loading" | "loaded" | "unloading" | "failed";
     Selection: {
       selected: boolean;
       comment: string;
@@ -7506,6 +7579,75 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RetentionSettings"];
+        };
+      };
+    };
+  };
+  sample_content_state: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SampleState"];
+        };
+      };
+    };
+  };
+  sample_content_load: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Confirm"];
+        "application/x-www-form-urlencoded": components["schemas"]["Confirm"];
+        "multipart/form-data": components["schemas"]["Confirm"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SampleState"];
+        };
+      };
+    };
+  };
+  sample_content_unload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Confirm"];
+        "application/x-www-form-urlencoded": components["schemas"]["Confirm"];
+        "multipart/form-data": components["schemas"]["Confirm"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SampleState"];
         };
       };
     };

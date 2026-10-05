@@ -50,8 +50,11 @@ def _sha256(upload: UploadedFile[bytes]) -> str:
     return digest.hexdigest()
 
 
-def add_photo(gallery: Gallery, upload: UploadedFile[bytes]) -> GalleryPhoto:
-    """Check and store one photo, then queue its previews. Raises `GalleryError` for anything refusable."""
+def add_photo(gallery: Gallery, upload: UploadedFile[bytes], *, queue: bool = True) -> GalleryPhoto:
+    """Check and store one photo, then queue its previews (`queue=False`: the caller makes them).
+
+    Raises `GalleryError` for anything refusable.
+    """
     from .tasks import process_photo
 
     if gallery.status == Gallery.Status.ARCHIVED:
@@ -91,7 +94,8 @@ def add_photo(gallery: Gallery, upload: UploadedFile[bytes]) -> GalleryPhoto:
         except IntegrityError as error:  # two identical uploads at the same moment
             private_storage().delete(key)
             raise GalleryError("duplicate", "این عکس قبلاً در همین گالری بارگذاری شده است.") from error
-        transaction.on_commit(lambda: process_photo.apply_async(args=[photo.pk], queue="galleries"))
+        if queue:
+            transaction.on_commit(lambda: process_photo.apply_async(args=[photo.pk], queue="galleries"))
     return photo
 
 
