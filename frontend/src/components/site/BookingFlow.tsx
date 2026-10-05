@@ -180,7 +180,7 @@ export function BookingFlow({
     return (
       <Card className="max-w-2xl space-y-4">
         <div ref={thanksRef} tabIndex={-1} role="status" className="space-y-3 outline-none">
-          <h2 className="font-display text-2xl font-extrabold">{labels.thanksTitle}</h2>
+          <h2 className="font-display text-3xl">{labels.thanksTitle}</h2>
           {when && (
             <p>
               {done.session_label ? `${done.session_label} · ` : ""}
@@ -254,7 +254,7 @@ export function BookingFlow({
       )}
 
       <Card className="grid gap-5">
-        <h2 className="font-display text-2xl font-extrabold">{labels.pickDay}</h2>
+        <h2 className="font-display text-3xl">{labels.pickDay}</h2>
         <MonthCalendar
           locale={locale}
           value={day}
@@ -303,7 +303,7 @@ export function BookingFlow({
       </Card>
 
       <Card className="grid gap-5">
-        <h2 className="font-display text-2xl font-extrabold">{labels.details}</h2>
+        <h2 className="font-display text-3xl">{labels.details}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <InputField label={labels.name} autoComplete="name" required {...bind("name")} />
           <InputField label={labels.brand} {...bind("brand")} />

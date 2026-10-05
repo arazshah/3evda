@@ -66,7 +66,7 @@ export function BookingStatus({
 
   return (
     <Card className="mx-auto max-w-2xl space-y-5">
-      <h1 className="font-display text-3xl font-extrabold">{labels.statusTitle}</h1>
+      <h1 className="font-display text-4xl">{labels.statusTitle}</h1>
       <section role="status" className={`rounded-brand border p-4 ${banner[2]}`}>
         <h2 className="font-bold">{banner[0]}</h2>
         <p className="text-muted">{banner[1]}</p>

@@ -3,7 +3,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "inverse" | "inverseOutline";
 
 const BASE =
-  "btn-label inline-flex min-h-11 items-center justify-center gap-2 rounded-brand border px-6 transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50";
+  "btn-label inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-6 transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50";
 const VARIANTS: Record<Variant, string> = {
   primary: "border-text bg-text text-bg hover:border-accent hover:bg-accent",
   secondary: "border-text text-text hover:bg-text hover:text-bg",

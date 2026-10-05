@@ -24,7 +24,7 @@ export function PasswordGate({
   };
   return (
     <Card className="mx-auto max-w-md space-y-4">
-      <h1 className="font-display text-2xl font-extrabold">{labels.unlockTitle}</h1>
+      <h1 className="font-display text-3xl">{labels.unlockTitle}</h1>
       <p className="text-muted">{labels.unlockHint}</p>
       <form className="space-y-4" onSubmit={submit}>
         <InputField

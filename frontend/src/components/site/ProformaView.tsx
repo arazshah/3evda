@@ -233,7 +233,7 @@ export function ProformaView({
                 dir="auto"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="rounded-brand border border-line bg-elevated px-3 py-2 text-text outline-none focus:border-accent"
+                className="rounded-none border-0 border-b border-text/60 bg-transparent px-0 py-2 text-text outline-none focus:border-accent"
               />
               <div className="flex flex-wrap gap-3">
                 <button

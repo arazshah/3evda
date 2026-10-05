@@ -217,7 +217,7 @@ export function Lightbox({
               setSaved(false);
             }}
             aria-describedby="photo-note-hint"
-            className="min-h-11 w-full rounded-brand border border-line bg-elevated px-3 py-2 text-text focus-visible:border-accent"
+            className="min-h-11 w-full rounded-none border-0 border-b border-text/60 bg-transparent px-0 py-2 text-text focus-visible:border-accent"
           />
           <p id="photo-note-hint" className="text-sm text-muted">
             {labels.commentHint}
