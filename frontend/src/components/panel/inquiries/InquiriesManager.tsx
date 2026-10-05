@@ -48,7 +48,7 @@ export function InquiriesManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">استعلام‌ها</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">استعلام‌ها</h1>
       <p className="text-sm text-muted">
         استعلام‌هایی که از فرم سایت می‌رسد. تا هر استعلام را باز نکرده‌اید، نشانگر «خوانده‌نشده» دارد.
       </p>

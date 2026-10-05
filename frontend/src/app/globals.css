@@ -114,8 +114,9 @@ html[lang="en"] body {
 }
 html[lang="fa"] .font-display {
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: 0;
+  line-height: 1.22; /* Persian joins and dots need room: the tight Latin leading would collide them */
 }
 
 /* Small capital labels (Latin) / plain small labels (Persian). */
@@ -266,6 +267,88 @@ html[dir="rtl"] .link-line::after {
 }
 .hero-in {
   animation: hero-in 0.9s var(--ease-out-expo) both;
+}
+
+/*
+ * First-visit intro (components/site/Splash.tsx): an ink curtain, the brand name rising out of a mask, a hairline
+ * filling beneath it, then the curtain lifts. Everything moves with transform only (no text fades), so contrast is
+ * constant; it is decorative and skipped under reduced motion. While it plays, the hero waits for its own entrance.
+ */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--c-ink);
+  color: var(--c-on-ink);
+  animation: splash-out 0.95s cubic-bezier(0.76, 0, 0.24, 1) 2.15s forwards;
+}
+.splash-inner {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+.splash-tag {
+  color: var(--c-accent-on-ink);
+}
+.splash-name {
+  overflow: hidden;
+  padding-block: 0.1em;
+  font-size: clamp(2rem, 6.5vw, 4.25rem);
+}
+.splash-name > span {
+  display: block;
+  transform: translateY(115%);
+  animation: splash-rise 1.1s var(--ease-out-expo) 0.3s forwards;
+}
+.splash-line {
+  width: min(18rem, 60vw);
+  height: 1px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c-on-ink) 22%, transparent);
+}
+.splash-line > span {
+  display: block;
+  height: 100%;
+  background: var(--c-accent-on-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: splash-fill 1.5s cubic-bezier(0.65, 0, 0.35, 1) 0.45s forwards;
+}
+html[dir="rtl"] .splash-line > span {
+  transform-origin: right;
+}
+@keyframes splash-rise {
+  to {
+    transform: none;
+  }
+}
+@keyframes splash-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes splash-out {
+  to {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+}
+html[data-splash="on"] .hero-in,
+html[data-splash="on"] .hero-drift {
+  animation-delay: 2.35s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash {
+    display: none;
+  }
+  html[data-splash="on"] .hero-in,
+  html[data-splash="on"] .hero-drift {
+    animation-delay: 0s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

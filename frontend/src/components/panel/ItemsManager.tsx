@@ -69,7 +69,7 @@ export function ItemsManager() {
   const [collection, setCollection] = useState<Collection>("hero_slide");
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">بخش‌های تکرارشونده</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">بخش‌های تکرارشونده</h1>
       <div role="group" aria-label="نوع محتوا" className="flex flex-wrap gap-2">
         {ORDER.map((c) => (
           <button

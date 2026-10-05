@@ -43,7 +43,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             >
               <span className="eyebrow pt-3 text-muted">{number.format(i + 1)}</span>
               <div>
-                <h2 className="font-display text-[clamp(2rem,4.5vw,4rem)] leading-[1.05]">
+                <h2 className="font-display text-[clamp(1.75rem,3.4vw,3rem)] leading-[1.05]">
                   {localized(locale, s, "title")}
                 </h2>
                 {localized(locale, s, "subtitle") ? (

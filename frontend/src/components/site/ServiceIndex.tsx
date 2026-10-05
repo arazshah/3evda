@@ -27,7 +27,7 @@ export function ServiceIndex({ rows, locale }: { rows: ServiceRow[]; locale: Loc
             <span className="pt-2 text-xs tracking-[0.2em] text-muted">{number.format(i + 1)}</span>
             <div>
               <h3
-                className={`font-display text-[clamp(1.75rem,3.6vw,3.25rem)] leading-[1.1] transition-all duration-500 ${
+                className={`font-display text-[clamp(1.4rem,2.6vw,2.25rem)] leading-[1.1] transition-all duration-500 ${
                   i === active ? "ps-3 text-text" : "text-muted"
                 }`}
               >

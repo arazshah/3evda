@@ -1,4 +1,19 @@
-import { test as base, expect, type Page } from "@playwright/test";
+import {
+  test as base,
+  expect,
+  type BrowserContext,
+  type Page,
+} from "@playwright/test";
+
+/**
+ * The first-visit intro covers the page for about three seconds. Every context starts with the "already seen"
+ * cookie, so clicks and accessibility scans never land in the middle of it; splash.spec.ts opts out.
+ */
+export async function skipSplash(context: BrowserContext, baseURL: string) {
+  await context.addCookies([
+    { name: "threevda_splash", value: "1", url: baseURL },
+  ]);
+}
 
 /**
  * Collects what the browser itself reports when the Content-Security-Policy refuses something (script, style,
@@ -32,6 +47,10 @@ export async function watchCsp(page: Page): Promise<() => Promise<string[]>> {
 export const test = base.extend<{ page: Page }>({
   page: async ({ page, baseURL }, use) => {
     const problems: string[] = [];
+    const wantsSplash = base
+      .info()
+      .annotations.some((a) => a.type === "show-splash");
+    if (baseURL && !wantsSplash) await skipSplash(page.context(), baseURL);
     const violations = await watchCsp(page);
     page.on("console", (msg) => {
       // Resource errors are reported with their URL by the response listener below.

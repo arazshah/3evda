@@ -50,7 +50,7 @@ export function ProjectsManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">نمونه‌کارها</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">نمونه‌کارها</h1>
       {error && <Alert>{error}</Alert>}
       {projects.isError && <Alert>بارگذاری فهرست ناموفق بود.</Alert>}
       <div>

@@ -25,7 +25,7 @@ export function RetentionManager() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">نگهداری اطلاعات</h1>
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">نگهداری اطلاعات</h1>
         <p className="mt-1 max-w-prose text-sm text-muted">
           اطلاعات شخصی مشتری‌ها تا ابد نگه داشته نمی‌شود. هر شب پس از پشتیبان‌گیری، موارد قدیمی‌تر از مدت‌های
           زیر ناشناس یا حذف می‌شوند. <strong>پیش‌فاکتورِ صادرشده هرگز حذف نمی‌شود</strong> و شماره، اقلام،

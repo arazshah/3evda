@@ -33,7 +33,7 @@ export function NewBookingPage({
       <Link href="/panel/booking" className="inline-flex min-h-11 items-center text-accent hover:underline">
         ← همه‌ی رزروها
       </Link>
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">رزرو دستی</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">رزرو دستی</h1>
       {types.isError && <Alert>{errorMessage(types.error)}</Alert>}
       {inquiryId !== null && inquiry.isError && <Alert>{errorMessage(inquiry.error)}</Alert>}
       {waiting && <p className="text-muted">در حال بارگذاری…</p>}

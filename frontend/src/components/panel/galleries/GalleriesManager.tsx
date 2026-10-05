@@ -13,7 +13,7 @@ export function GalleriesManager() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">گالری‌های مشتری</h1>
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">گالری‌های مشتری</h1>
         <Link
           href="/panel/galleries/new"
           className="inline-flex min-h-11 items-center rounded-brand bg-accent px-5 font-semibold text-bg hover:opacity-90"

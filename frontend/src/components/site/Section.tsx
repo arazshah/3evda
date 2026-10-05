@@ -27,7 +27,7 @@ export function Section({
       {title ? (
         <div className="reveal mb-10 flex flex-wrap items-end justify-between gap-4 md:mb-14">
           <div className="max-w-prose">
-            <h2 id={headingId} className="font-display text-[clamp(2.25rem,5.5vw,5rem)] leading-[1.05]">
+            <h2 id={headingId} className="font-display text-[clamp(1.75rem,3.4vw,3rem)] leading-[1.05]">
               {title}
             </h2>
             {intro ? <p className="mt-3 text-muted">{intro}</p> : null}
@@ -43,7 +43,7 @@ export function Section({
 export function PageTitle({ title, intro }: { title: string; intro?: string }) {
   return (
     <div className={`${WIDE} pt-[clamp(3rem,7vw,6rem)]`}>
-      <h1 className="font-display text-[clamp(2.75rem,7vw,6.5rem)] leading-[1]">{title}</h1>
+      <h1 className="font-display text-[clamp(2rem,4.4vw,3.75rem)] leading-[1]">{title}</h1>
       {intro ? <p className="mt-5 max-w-prose text-lg text-muted">{intro}</p> : null}
     </div>
   );

@@ -174,7 +174,7 @@ function ArticleForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">
           {article ? "ویرایش مقاله" : "مقاله‌ی جدید"}{" "}
           <span className="text-base text-muted">({LANGUAGE_NAMES[language]})</span>
         </h1>

@@ -53,7 +53,7 @@ function WatermarkEditor({ initial }: { initial: Form }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">واترمارک</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">واترمارک</h1>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <form onSubmit={submit} className="flex flex-col gap-4">

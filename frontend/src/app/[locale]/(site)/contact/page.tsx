@@ -48,7 +48,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <dt className="eyebrow text-muted">{t("contact.phone")}</dt>
                 <dd className="mt-2">
                   <a
-                    className="font-display link-line text-[clamp(1.75rem,4vw,3.25rem)] [overflow-wrap:anywhere] hover:text-accent"
+                    className="font-display link-line text-[clamp(1.5rem,3vw,2.5rem)] [overflow-wrap:anywhere] hover:text-accent"
                     dir="ltr"
                     href={telHref(s.phone)}
                   >
@@ -62,7 +62,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <dt className="eyebrow text-muted">{t("contact.email")}</dt>
                 <dd className="mt-2">
                   <a
-                    className="font-display link-line text-[clamp(1.5rem,3.4vw,2.75rem)] [overflow-wrap:anywhere] hover:text-accent"
+                    className="font-display link-line text-[clamp(1.25rem,2.4vw,2rem)] [overflow-wrap:anywhere] hover:text-accent"
                     href={`mailto:${s.email}`}
                   >
                     {s.email}

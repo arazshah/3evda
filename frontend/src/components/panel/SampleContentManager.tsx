@@ -90,7 +90,7 @@ export function SampleContentManager() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">محتوای نمونه</h1>
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">محتوای نمونه</h1>
         <p className="mt-1 max-w-prose text-sm text-muted">
           با یک کلیک همه‌ی سایت با متن و عکس ساختگی پر می‌شود تا ببینید سایت کامل چه شکلی است؛ بعد هر چیزی را
           از بخش‌های همین پنل ویرایش، حذف یا اضافه کنید. هر وقت خواستید با یک کلیک همه‌ی نمونه‌ها پاک می‌شوند.

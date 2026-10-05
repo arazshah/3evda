@@ -43,7 +43,7 @@ export function MediaLibrary() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">کتابخانه رسانه</h1>
+      <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">کتابخانه رسانه</h1>
       <Uploader />
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-48 flex-1 flex-col gap-1 text-sm text-muted">

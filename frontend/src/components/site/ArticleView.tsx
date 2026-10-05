@@ -49,7 +49,7 @@ export function ArticleView({
             {localized(locale, article.category, "title")}
           </a>
         ) : null}
-        <h1 className="font-display text-[clamp(2.5rem,6vw,4.75rem)] leading-[1.05]">{article.title}</h1>
+        <h1 className="font-display text-[clamp(2rem,4vw,3.25rem)] leading-[1.05]">{article.title}</h1>
         <p className="mt-4 text-muted">
           <time dateTime={article.published_at ?? undefined}>{formatDate(article.published_at, locale)}</time>
           <span aria-hidden className="mx-3 inline-block size-1 rounded-full bg-muted align-middle" />

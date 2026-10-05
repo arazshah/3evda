@@ -43,7 +43,7 @@ export function BookingSettingsManager() {
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">تنظیمات رزرو</h1>
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">تنظیمات رزرو</h1>
         <p className="mt-1 text-sm text-muted">
           مشتری فقط ساعت‌هایی را می‌بیند که در ساعت کاری باشد، روز بسته نباشد، سقف روزانه پر نشده باشد و با
           رزرو دیگری هم‌پوشانی نداشته باشد.

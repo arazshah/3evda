@@ -125,7 +125,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
   return (
     <>
       <div>
-        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
+        <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight" dir="auto">
           {inquiry.name}
           {inquiry.brand ? ` · ${inquiry.brand}` : ""}
         </h1>
