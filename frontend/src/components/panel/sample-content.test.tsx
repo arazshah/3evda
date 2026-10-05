@@ -64,6 +64,26 @@ describe("SampleContentManager", () => {
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("در حال پاک‌سازی"));
   });
 
+  it("refreshes the public pages when a run finishes", async () => {
+    const api = fakeApi([
+      { ...GET, body: state("unloading") },
+      { ...GET, body: state("empty") },
+    ]);
+    const refreshed: unknown[] = [];
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (typeof input === "string" && input === "/panel/revalidate") {
+        refreshed.push(JSON.parse(String(init?.body)));
+        return new Response("{}", { status: 200 });
+      }
+      return api.fetchImpl(input, init);
+    });
+    renderWithQuery(<SampleContentManager />);
+    await waitFor(() => expect(refreshed).toEqual([{ tags: ["site", "portfolio", "packages"] }]), {
+      timeout: 5000,
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("بارگذاری نشده");
+  });
+
   it("says in words when a run failed and offers the cleanup", async () => {
     show([{ ...GET, body: state("failed", { message: "بارگذاری ناموفق بود." }) }]);
     expect(await screen.findByText("بارگذاری ناموفق بود.")).toBeInTheDocument();

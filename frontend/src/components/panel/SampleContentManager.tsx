@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { errorMessage } from "@/lib/api/client";
+import { revalidatePublic } from "@/lib/api/revalidate";
 import { useLoadSample, useSampleState, useUnloadSample } from "@/lib/api/sample-queries";
 import { formatNumber } from "@/lib/format";
 import { Alert, Button, Card } from "./ui";
@@ -54,6 +55,17 @@ export function SampleContentManager() {
   const unload = useUnloadSample();
   const [error, setError] = useState<string | null>(null);
   const status = state.data?.status;
+
+  // The public pages keep a short cache: when a load or an unload has just finished, refresh it at once so the
+  // owner sees the site as it is now (and not a page that still points at photos that are gone).
+  const before = useRef(status);
+  useEffect(() => {
+    const was = before.current;
+    before.current = status;
+    if ((was === "loading" || was === "unloading") && status !== "loading" && status !== "unloading") {
+      void revalidatePublic("site", "portfolio", "packages");
+    }
+  }, [status]);
   const busy = status === "loading" || status === "unloading" || load.isPending || unload.isPending;
 
   const start = async (kind: "load" | "unload") => {

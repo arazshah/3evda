@@ -1,8 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import { expect, expectNoHorizontalOverflow, test } from "./fixtures";
+import { OWNER_TOTP_FILE } from "./owner";
 import { totp } from "./totp";
 
 const USERNAME = process.env.E2E_ADMIN_USER ?? "e2e-admin";
@@ -48,9 +49,7 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   request,
   browser,
 }) => {
-  // One long journey: sign-in, media, site content, portfolio, enquiries, proformas, galleries, journal and the sample
-  // content (about 60 pictures are drawn and processed by the worker).
-  test.setTimeout(600_000);
+  test.setTimeout(180_000); // one long journey: sign-in, media, site content, portfolio, enquiries, proformas
   await page.goto("/panel/login");
   await page.getByLabel("نام کاربری").fill(USERNAME);
   await page.getByLabel("رمز عبور").fill(PASSWORD);
@@ -58,6 +57,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
 
   // First sign-in: enrol the authenticator.
   const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
+  // The sample-content spec runs after everything else (see playwright.config.ts) and signs in with this secret.
+  writeFileSync(OWNER_TOTP_FILE, secret);
   await expect(
     page.getByRole("img", { name: "کد QR برای اپ احراز هویت" }),
   ).toBeVisible();
@@ -989,40 +990,6 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
       .click();
     await expect(mine).toHaveCount(remaining - 1);
   }
-
-  // Sample content: one click fills the whole site (worker work, so the page polls), the public site shows it,
-  // and one click takes exactly that away again.
-  await page.goto("/panel/sample-content");
-  await expect(page.getByRole("status").first()).toHaveText("بارگذاری نشده");
-  await page.getByRole("button", { name: "بارگذاری محتوای نمونه" }).click();
-  await expect(page.getByRole("status").first()).toHaveText("بارگذاری‌شده", {
-    timeout: 360_000,
-  });
-  await page.goto("/portfolio");
-  await expect(
-    page.getByRole("link", { name: /منوی کافه‌ی گیلاس/ }),
-  ).toBeVisible();
-  await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "طعم را دیدنی می‌کنیم",
-  );
-  await expectNoSeriousViolations(page, "/ with sample content");
-  await page.goto("/en/blog");
-  await expect(
-    page.getByText("Why window light is a food photo's best friend").first(),
-  ).toBeVisible();
-  await page.goto("/panel/sample-content");
-  acceptNextDialog();
-  await page
-    .getByRole("button", { name: "پاک‌کردن همه‌ی محتوای نمونه" })
-    .click();
-  await expect(page.getByRole("status").first()).toHaveText("بارگذاری نشده", {
-    timeout: 120_000,
-  });
-  await page.goto("/portfolio");
-  await expect(
-    page.getByRole("link", { name: /منوی کافه‌ی گیلاس/ }),
-  ).toHaveCount(0);
 
   // The panel itself meets the same accessibility bar as the public site.
   for (const path of [
