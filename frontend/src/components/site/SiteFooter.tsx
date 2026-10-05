@@ -10,15 +10,20 @@ import {
   whatsappUrl,
 } from "@/lib/site/text";
 import type { SiteData } from "@/lib/site/types";
+import type { ReactNode } from "react";
+import { WIDE } from "./Section";
 
 export function SiteFooter({
   site,
   locale,
   labels,
+  children,
 }: {
   site: SiteData;
   locale: Locale;
   labels: Record<string, string>;
+  /** Shown above the columns (the closing call to action on the home page). */
+  children?: ReactNode;
 }) {
   const s = site.settings;
   const brand = pick(locale, s.brand_name_fa, s.brand_name_en);
@@ -32,23 +37,24 @@ export function SiteFooter({
   ].filter((x) => x.url);
 
   return (
-    <footer className="mt-24 border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
-        <div className="space-y-2">
-          <p className="text-lg font-extrabold">{brand}</p>
-          {about ? <p className="text-muted">{about}</p> : null}
+    <footer className="mt-[clamp(4rem,9vw,8.5rem)] bg-ink text-on-ink">
+      {children}
+      <div className={`${WIDE} grid gap-10 py-14 md:grid-cols-3`}>
+        <div className="space-y-3">
+          <p className="font-display text-3xl">{brand}</p>
+          {about ? <p className="max-w-[40ch] text-on-ink/70">{about}</p> : null}
         </div>
-        <ul className="space-y-1 text-muted">
+        <ul className="space-y-1 text-on-ink/70">
           {s.phone ? (
             <li>
-              <a className="hover:text-text" dir="ltr" href={telHref(s.phone)}>
+              <a className="link-line hover:text-on-ink" dir="ltr" href={telHref(s.phone)}>
                 {s.phone}
               </a>
             </li>
           ) : null}
           {s.email ? (
             <li>
-              <a className="hover:text-text" href={`mailto:${s.email}`}>
+              <a className="link-line hover:text-on-ink" href={`mailto:${s.email}`}>
                 {s.email}
               </a>
             </li>
@@ -56,17 +62,20 @@ export function SiteFooter({
           {address ? <li>{address}</li> : null}
           {/* Not in the header menu: one more item there re-wraps the menu when the web font loads and shifts the page. */}
           <li>
-            <a className="inline-flex min-h-11 items-center hover:text-text" href={href(locale, "/book")}>
+            <a
+              className="link-line inline-flex min-h-11 items-center hover:text-on-ink"
+              href={href(locale, "/book")}
+            >
               {labels.book}
             </a>
           </li>
         </ul>
         {socials.length ? (
-          <ul className="flex flex-wrap gap-4 md:justify-end">
+          <ul className="flex flex-wrap gap-6 md:justify-end">
             {socials.map((x) => (
               <li key={x.label}>
                 <a
-                  className="inline-flex min-h-11 items-center text-muted hover:text-accent"
+                  className="link-line inline-flex min-h-11 items-center text-on-ink/70 hover:text-accent-on-ink"
                   href={x.url}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -78,7 +87,7 @@ export function SiteFooter({
           </ul>
         ) : null}
       </div>
-      <p className="border-t border-line px-4 py-4 text-center text-sm text-muted">
+      <p className="border-t border-on-ink/20 px-4 py-5 text-center text-sm text-on-ink/60">
         {footerText || `© ${new Date().getFullYear()} ${brand}`}
       </p>
     </footer>

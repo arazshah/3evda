@@ -27,6 +27,7 @@
   --c-success: #3b6133;
   --c-ink: #111110;
   --c-on-ink: #ece6dc;
+  --c-accent-on-ink: #d9b878;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
@@ -68,6 +69,7 @@
   --color-success: var(--c-success);
   --color-ink: var(--c-ink);
   --color-on-ink: var(--c-on-ink);
+  --color-accent-on-ink: var(--c-accent-on-ink);
 }
 
 @theme {
@@ -121,7 +123,6 @@ html[lang="fa"] .font-display {
   font-size: 0.75rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--color-muted);
 }
 html[lang="fa"] .eyebrow {
   font-size: 0.85rem;
@@ -187,6 +188,38 @@ html[dir="rtl"] .link-line::after {
     animation-timeline: view();
     animation-range: entry 0% entry 40%;
   }
+}
+
+/* Horizontal reel: a slim scrollbar in the line colour instead of the default one. */
+.reel {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+/* Hero: the active photo drifts slowly; the text block rises in whenever the slide changes. */
+@keyframes hero-drift {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-drift {
+  animation: hero-drift 9s var(--ease-out-expo) both;
+}
+.hero-in {
+  animation: hero-in 0.9s var(--ease-out-expo) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
