@@ -3,6 +3,7 @@ import { Photo } from "./Photo";
 import { href, localized } from "@/lib/site/text";
 import type { Project } from "@/lib/site/types";
 
+/** A project as a portrait tile with its title below (used where projects are mentioned, e.g. under an article). */
 export function ProjectCard({
   project,
   locale,
@@ -13,30 +14,21 @@ export function ProjectCard({
   priority?: boolean;
 }) {
   const title = localized(locale, project, "title");
-  const ratio =
-    project.cover?.width && project.cover?.height ? project.cover.width / project.cover.height : 1.5;
   return (
-    <a
-      href={href(locale, `/portfolio/${project.slug}`)}
-      // Justified rows: each tile grows in proportion to its aspect ratio.
-      style={{ flexGrow: ratio * 100, flexBasis: `${ratio * 14}rem` }}
-      className="group relative block overflow-hidden rounded-brand bg-elevated"
-    >
-      {project.cover ? (
-        <Photo
-          media={project.cover}
-          locale={locale}
-          alt=""
-          priority={priority}
-          sizes="(min-width: 1024px) 33vw, 100vw"
-          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <div className="aspect-[3/2]" />
-      )}
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 to-transparent p-4 pt-10 font-semibold">
-        {title}
+    <a href={href(locale, `/portfolio/${project.slug}`)} className="group block">
+      <span className="relative block aspect-[4/5] overflow-hidden bg-elevated">
+        {project.cover ? (
+          <Photo
+            media={project.cover}
+            locale={locale}
+            alt=""
+            priority={priority}
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            className="size-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+          />
+        ) : null}
       </span>
+      <span className="font-display mt-3 block text-xl leading-tight">{title}</span>
     </a>
   );
 }

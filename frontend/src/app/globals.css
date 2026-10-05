@@ -169,16 +169,15 @@ html[dir="rtl"] .link-line::after {
 }
 
 /*
- * Scroll reveal. The resting state is fully visible: browsers without scroll-driven animations (and anyone
- * who asked for less motion) see the content straight away, nothing is ever parked at opacity 0.
+ * Scroll reveal: blocks rise into place as they enter the viewport. It moves only (no fading), so text keeps its
+ * full contrast at every moment of the animation. The resting state is the final one: browsers without
+ * scroll-driven animations, and anyone who asked for less motion, simply see the content in place.
  */
 @keyframes reveal-up {
   from {
-    opacity: 0;
     transform: translateY(32px);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }
@@ -187,6 +186,39 @@ html[dir="rtl"] .link-line::after {
     animation: reveal-up linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 40%;
+  }
+}
+
+/* Reading progress bar of the article page: fills with the page scroll where scroll-driven animations exist. */
+.read-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .read-progress {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 40;
+    height: 3px;
+    background: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    animation: read-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+  html[dir="rtl"] .read-progress {
+    transform-origin: right;
+  }
+}
+@keyframes read-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .read-progress {
+    animation: none;
+    display: none;
   }
 }
 
@@ -212,7 +244,7 @@ html[dir="rtl"] .link-line::after {
   scrollbar-color: var(--color-line) transparent;
 }
 
-/* Hero: the active photo drifts slowly; the text block rises in whenever the slide changes. */
+/* Hero: the active photo drifts slowly; the text block rises in whenever the slide changes (moves only, never fades, so contrast stays constant). */
 @keyframes hero-drift {
   from {
     transform: scale(1.08);
@@ -223,11 +255,9 @@ html[dir="rtl"] .link-line::after {
 }
 @keyframes hero-in {
   from {
-    opacity: 0;
     transform: translateY(24px);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }

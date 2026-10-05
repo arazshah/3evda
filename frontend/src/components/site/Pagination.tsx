@@ -20,9 +20,10 @@ export function Pagination({
   if (pages <= 1) return null;
   const to = (n: number) => href(locale, n <= 1 ? base : `${base}?page=${n}`);
   const format = new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US");
-  const link = "inline-flex min-h-11 items-center rounded-brand border border-line px-5 hover:border-accent";
+  const link =
+    "btn-label inline-flex min-h-11 items-center rounded-full border border-text px-6 transition-colors hover:bg-text hover:text-bg";
   return (
-    <nav aria-label={labels.navigation} className="mt-10 flex flex-wrap items-center justify-between gap-4">
+    <nav aria-label={labels.navigation} className="mt-14 flex flex-wrap items-center justify-between gap-4">
       {page > 1 ? (
         <a className={link} href={to(page - 1)} rel="prev">
           {labels.previous}

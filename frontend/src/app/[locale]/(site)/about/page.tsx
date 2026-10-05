@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Photo } from "@/components/site/Photo";
-import { PageTitle } from "@/components/site/Section";
+import { PageTitle, WIDE } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
@@ -30,17 +30,26 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   return (
     <SitePage site={site} locale={locale} path="/about">
       <PageTitle title={block(site, locale, "about.title")} />
-      <div className="mx-auto mt-8 grid max-w-6xl items-start gap-10 px-4 md:grid-cols-2">
-        <p className="whitespace-pre-line text-lg leading-loose">{block(site, locale, "about.body")}</p>
+      <div
+        className={`${WIDE} grid items-start gap-10 pt-[clamp(2.5rem,6vw,5rem)] md:grid-cols-[1fr_1.1fr] md:gap-20`}
+      >
         {photo ? (
-          <Photo
-            media={photo}
-            locale={locale}
-            priority
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="w-full rounded-brand object-cover"
-          />
+          // The sticky element is the grid item itself: a sticky <img> would only move inside its own <picture>.
+          <div className="md:sticky md:top-8 md:self-start">
+            <Photo
+              media={photo}
+              locale={locale}
+              priority
+              sizes="(min-width: 768px) 45vw, 100vw"
+              className="w-full object-cover"
+            />
+          </div>
         ) : null}
+        <p
+          className={`reveal max-w-[58ch] whitespace-pre-line text-lg leading-[2] ${photo ? "" : "md:col-span-2"}`}
+        >
+          {block(site, locale, "about.body")}
+        </p>
       </div>
     </SitePage>
   );

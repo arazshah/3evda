@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PackageCard } from "@/components/site/PackageCard";
-import { PageTitle, Section } from "@/components/site/Section";
+import { PageTitle, Section, WIDE } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getPackageGroups, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
@@ -52,9 +52,9 @@ export default async function PackagesPage({ params }: { params: Promise<{ local
             title={localized(locale, g, "title")}
             intro={localized(locale, g, "description")}
           >
-            <ul className="grid gap-4 md:grid-cols-3">
+            <ul className="grid gap-x-6 gap-y-10 md:grid-cols-3">
               {g.packages.map((p) => (
-                <li key={p.id}>
+                <li key={p.id} className="reveal">
                   <PackageCard pkg={p} locale={locale} labels={labels} />
                 </li>
               ))}
@@ -62,7 +62,7 @@ export default async function PackagesPage({ params }: { params: Promise<{ local
           </Section>
         ))
       ) : (
-        <p className="mx-auto max-w-6xl px-4 pt-10 text-muted">{t("common.empty")}</p>
+        <p className={`${WIDE} pt-10 text-muted`}>{t("common.empty")}</p>
       )}
     </SitePage>
   );
