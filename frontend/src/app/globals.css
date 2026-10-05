@@ -351,6 +351,176 @@ html[data-splash="on"] .hero-drift {
   }
 }
 
+/*
+ * Motion kit. Everything here is transform / clip-path only (running text never fades), is driven by scrolling where the
+ * browser can (animation-timeline), and is switched off under reduced motion.
+ */
+
+/* Section titles are unveiled from below a mask as they enter the viewport; page titles do it on load. */
+@keyframes mask-up {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.4em);
+  }
+  to {
+    clip-path: inset(-0.5em -0.3em -0.5em -0.3em);
+    transform: none;
+  }
+}
+.mask-load {
+  animation: mask-up 1s var(--ease-out-expo) both;
+}
+html[data-splash="on"] .mask-load {
+  animation-delay: 2.3s;
+}
+@supports (animation-timeline: view()) {
+  .mask-in {
+    animation: mask-up linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 70%;
+  }
+}
+
+/* The hero photo moves a little slower than the page, and grows a touch, as the hero scrolls away. */
+@keyframes hero-parallax {
+  from {
+    transform: translateY(0) scale(1.12);
+  }
+  to {
+    transform: translateY(9%) scale(1.12);
+  }
+}
+@supports (animation-timeline: scroll()) {
+  .hero-parallax {
+    animation: hero-parallax linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100vh;
+  }
+}
+
+/* A ticker of clients and services under the hero. */
+.marquee {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding-block: 1.1rem;
+  padding-inline: 0 clamp(0.75rem, 2vw, 1.5rem);
+  background: var(--c-bg);
+}
+.marquee-window {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-run 46s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track,
+.marquee[data-paused="true"] .marquee-track {
+  animation-play-state: paused;
+}
+/* A pause control for people who cannot hover (keyboard, touch): moving text must be stoppable. */
+.marquee-toggle {
+  display: inline-flex;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-text);
+  border-radius: 9999px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.marquee-row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.75rem;
+  padding-inline-end: 1.75rem;
+  white-space: nowrap;
+  font-size: clamp(1.25rem, 2.2vw, 1.9rem);
+}
+.marquee-dot {
+  color: var(--c-accent);
+  font-size: 0.7em;
+}
+@keyframes marquee-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+html[dir="rtl"] .marquee-track {
+  animation-name: marquee-run-rtl;
+}
+@keyframes marquee-run-rtl {
+  to {
+    transform: translateX(50%);
+  }
+}
+
+/* The trailing "View" disc over the project tiles (components/site/CursorLabel.tsx). */
+.cursor-ring {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 90;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.cursor-ring::before {
+  content: "";
+  position: absolute;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: -1.125rem 0 0 -1.125rem;
+  border-radius: 9999px;
+  border: 1px solid var(--c-accent);
+  transform: scale(0);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    width 0.35s var(--ease-out-expo),
+    height 0.35s var(--ease-out-expo),
+    margin 0.35s var(--ease-out-expo),
+    background-color 0.35s;
+}
+.cursor-ring[data-on="true"]::before {
+  transform: scale(1);
+}
+.cursor-ring[data-big="true"]::before {
+  width: 5.25rem;
+  height: 5.25rem;
+  margin: -2.625rem 0 0 -2.625rem;
+  background: var(--c-text);
+  border-color: var(--c-text);
+}
+.cursor-ring > span {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: var(--c-bg);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -360,8 +530,26 @@ html[data-splash="on"] .hero-drift {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal {
+  .reveal,
+  .mask-in,
+  .mask-load,
+  .hero-parallax {
     animation: none;
+  }
+  .marquee {
+    padding-block: 0.75rem;
+  }
+  .marquee-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .marquee-row[aria-hidden="true"],
+  .marquee-toggle {
+    display: none;
+  }
+  .cursor-ring {
+    display: none;
   }
 }
 

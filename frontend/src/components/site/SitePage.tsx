@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n/config";
 import { pick } from "@/lib/site/text";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
+import { CursorLabel } from "./CursorLabel";
 import { Splash } from "./Splash";
 import type { SiteData } from "@/lib/site/types";
 
@@ -69,6 +70,7 @@ export async function SitePage({
         switchPath={switchPath}
         overlay={overlay}
       />
+      <CursorLabel />
       <main id="content" className={overlay ? "relative" : ""}>
         {children}
       </main>
