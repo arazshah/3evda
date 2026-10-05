@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { PageTitle } from "@/components/site/Section";
+import { PageTitle, WIDE } from "@/components/site/Section";
 import { PortfolioGrid } from "@/components/site/PortfolioGrid";
 import { SitePage } from "@/components/site/SitePage";
 import { getPortfolio, getSite } from "@/lib/site/api";
@@ -43,7 +43,7 @@ export default async function PortfolioPage({
         title={block(site, locale, "portfolio.title")}
         intro={block(site, locale, "portfolio.intro")}
       />
-      <div className="mx-auto max-w-6xl px-4 pt-10">
+      <div className={`${WIDE} pt-10`}>
         <PortfolioGrid
           projects={portfolio.projects}
           categories={portfolio.categories}
