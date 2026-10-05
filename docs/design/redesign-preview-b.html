@@ -1,0 +1,372 @@
+<title>3evda Redesign Preview B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;300;400;600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: atelier editorial. Giant high-contrast serif over full-bleed photography, a horizontal reel, a services index that swaps the picture on hover, and an inverted ink footer. Bone, ink and one brass accent. */
+:root {
+  --bg: #ece6dc; --surface: #f5f1ea; --ink: #111110; --soft: #ddd5c8; --line: #c9bfae;
+  --fg: #111110; --muted: #6b6358; --accent: #8a6a32; --on-ink: #ece6dc;
+  --good: #46703e; --warn: #a24a1c;
+  --font-fa: "Vazirmatn", system-ui, sans-serif;
+  --font-display: "Bodoni Moda", "Vazirmatn", Georgia, serif;
+  --font-body: "Manrope", "Vazirmatn", system-ui, sans-serif;
+  --ease: cubic-bezier(.16,.84,.24,1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0d; --surface: #151514; --ink: #ece6dc; --soft: #1c1b19; --line: #2d2b27;
+    --fg: #ece6dc; --muted: #9d9487; --accent: #cfa95e; --on-ink: #111110;
+    --good: #9dc08a; --warn: #e58a56; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0e0d; --surface: #151514; --ink: #ece6dc; --soft: #1c1b19; --line: #2d2b27;
+  --fg: #ece6dc; --muted: #9d9487; --accent: #cfa95e; --on-ink: #111110;
+  --good: #9dc08a; --warn: #e58a56; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 300 15px/1.9 var(--font-fa); padding-block: 0 0; padding-inline: 0; overflow-x: hidden; }
+html[dir="ltr"] body { font-family: var(--font-body); line-height: 1.7; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pad { padding-inline: clamp(16px, 4vw, 56px); }
+.eyebrow { font: 500 11px var(--font-body); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
+html[dir="rtl"] .eyebrow { font-family: var(--font-fa); letter-spacing: 0; font-size: 13px; text-transform: none; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 60; display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; padding: 10px clamp(16px, 4vw, 56px); background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar .g { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { min-height: 36px; padding: 0 14px; border: 1px solid var(--line); background: transparent; color: var(--fg); font: 500 11px var(--font-body); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* nav floats over the hero */
+.nav { position: absolute; inset: 0 0 auto 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; padding: 26px clamp(16px, 4vw, 56px); color: #f4efe6; }
+.logo { font-family: var(--font-display); font-size: 24px; letter-spacing: .02em; }
+.logo i { font-style: italic; }
+.links { display: flex; gap: 30px; font: 500 11px var(--font-body); letter-spacing: .22em; text-transform: uppercase; }
+html[dir="rtl"] .links { font-family: var(--font-fa); letter-spacing: 0; font-size: 13px; text-transform: none; font-weight: 400; }
+.links a { position: relative; padding-block: 4px; opacity: .8; transition: opacity .2s; }
+.links a:hover { opacity: 1; }
+.links a::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease); }
+html[dir="rtl"] .links a::after { transform-origin: right; }
+.links a:hover::after { transform: scaleX(1); }
+.pill { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 22px; border: 1px solid currentColor; border-radius: 999px; font: 500 11px var(--font-body); letter-spacing: .2em; text-transform: uppercase; transition: background .35s, color .35s; }
+html[dir="rtl"] .pill { font-family: var(--font-fa); letter-spacing: 0; text-transform: none; font-size: 13px; font-weight: 400; }
+.pill:hover { background: #f4efe6; color: #111110; }
+.pill.dk:hover { background: var(--fg); color: var(--bg); }
+
+/* hero */
+.hero { position: relative; height: min(88vh, 820px); min-height: 520px; overflow: hidden; background: #0c0b0a; color: #f4efe6; isolation: isolate; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; opacity: 0; transform: scale(1.08); transition: opacity 1.6s ease, transform 9s linear; }
+.hero canvas.on { opacity: 1; transform: scale(1); }
+.hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(8,7,6,.78), rgba(8,7,6,0) 55%), linear-gradient(to bottom, rgba(8,7,6,.45), transparent 22%); }
+.hero-b { position: absolute; inset: auto 0 0 0; padding: 0 clamp(16px, 4vw, 56px) clamp(28px, 5vw, 56px); display: grid; gap: 22px; }
+.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(54px, 12.5vw, 188px); line-height: .88; letter-spacing: -.025em; }
+.hero h1 em { font-style: italic; padding-inline-end: .06em; }
+html[dir="rtl"] .hero h1 { font-family: var(--font-fa); font-weight: 200; letter-spacing: -.02em; line-height: 1.12; font-size: clamp(54px, 11vw, 170px); }
+.hero-r { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; border-top: 1px solid rgba(244,239,230,.3); padding-top: 18px; }
+.hero-r p { margin: 0; max-width: 44ch; font-size: 15px; opacity: .88; }
+.count { font: 400 12px var(--font-body); letter-spacing: .2em; display: flex; gap: 14px; align-items: center; direction: ltr; }
+.count b { font-family: var(--font-display); font-size: 28px; font-weight: 400; letter-spacing: 0; }
+.count button { background: none; border: 1px solid rgba(244,239,230,.5); color: inherit; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 18px; transition: background .3s, color .3s; }
+.count button:hover { background: #f4efe6; color: #111; }
+.scroll { position: absolute; inset-inline-start: clamp(16px, 4vw, 56px); top: 50%; font: 500 10px var(--font-body); letter-spacing: .4em; text-transform: uppercase; writing-mode: vertical-rl; opacity: .7; }
+
+/* statement */
+.state { padding-block: clamp(64px, 10vw, 140px); display: grid; grid-template-columns: 1fr 3fr; gap: 32px; align-items: start; }
+.state p.big { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 4.2vw, 62px); line-height: 1.12; letter-spacing: -.01em; text-wrap: balance; }
+html[dir="rtl"] .state p.big { font-family: var(--font-fa); font-weight: 200; line-height: 1.55; letter-spacing: 0; font-size: clamp(26px, 3.6vw, 52px); }
+.state p.big em { font-style: italic; color: var(--accent); }
+.state .more { margin-top: 36px; display: flex; gap: 40px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+.state .more b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 44px; color: var(--fg); line-height: 1.1; font-variant-numeric: lining-nums; }
+
+/* horizontal reel */
+.reel-h { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.reel-h h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(40px, 7vw, 96px); line-height: .95; letter-spacing: -.02em; }
+html[dir="rtl"] .reel-h h2 { font-family: var(--font-fa); font-weight: 200; font-size: clamp(36px, 6vw, 80px); line-height: 1.2; letter-spacing: 0; }
+.reel { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 18px; padding-inline: clamp(16px, 4vw, 56px); scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.card { flex: 0 0 clamp(250px, 30vw, 440px); scroll-snap-align: start; display: grid; gap: 14px; cursor: pointer; }
+.card:nth-child(even) { margin-top: 56px; }
+.card .im { position: relative; overflow: hidden; aspect-ratio: 4 / 5; clip-path: inset(0); }
+.card canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 1.2s var(--ease); }
+.card:hover canvas { transform: scale(1.06); }
+.card .no { position: absolute; inset: 14px auto auto 14px; font: 400 12px var(--font-body); letter-spacing: .2em; color: #f4efe6; mix-blend-mode: difference; direction: ltr; }
+.card h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.15; }
+html[dir="rtl"] .card h3 { font-family: var(--font-fa); font-weight: 300; font-size: 22px; }
+.card small { color: var(--muted); font: 400 11px var(--font-body); letter-spacing: .2em; text-transform: uppercase; }
+html[dir="rtl"] .card small { font-family: var(--font-fa); letter-spacing: 0; font-size: 13px; text-transform: none; }
+
+/* services index */
+.svc { padding-block: clamp(72px, 10vw, 140px); display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(24px, 6vw, 96px); align-items: start; }
+.svc ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.svc li { border-bottom: 1px solid var(--line); }
+.svc a { display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: baseline; padding-block: 26px; transition: padding .5s var(--ease), color .3s; color: var(--muted); }
+.svc a:hover, .svc a.on { color: var(--fg); padding-inline-start: 18px; }
+.svc .n { font: 400 12px var(--font-body); letter-spacing: .2em; direction: ltr; }
+.svc h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 4.2vw, 60px); line-height: 1.05; letter-spacing: -.015em; }
+html[dir="rtl"] .svc h3 { font-family: var(--font-fa); font-weight: 200; font-size: clamp(28px, 3.6vw, 50px); letter-spacing: 0; line-height: 1.3; }
+.svc .pr { font: 400 12px var(--font-body); letter-spacing: .1em; white-space: nowrap; }
+html[dir="rtl"] .svc .pr { font-family: var(--font-fa); letter-spacing: 0; font-size: 14px; }
+.svc .prev { position: sticky; top: 90px; aspect-ratio: 4 / 5; overflow: hidden; background: var(--soft); }
+.svc .prev canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .7s ease, transform 1.4s var(--ease); transform: scale(1.06); }
+.svc .prev canvas.on { opacity: 1; transform: scale(1); }
+.svc .prev span { position: absolute; inset: auto 16px 14px; color: #f4efe6; font: 400 11px var(--font-body); letter-spacing: .22em; text-transform: uppercase; z-index: 2; }
+.svc .prev::after { content: ""; position: absolute; inset: 55% 0 0 0; background: linear-gradient(to top, rgba(0,0,0,.5), transparent); }
+
+/* ink footer */
+.ink { background: var(--ink); color: var(--on-ink); padding-block: clamp(56px, 8vw, 120px) 28px; overflow: hidden; }
+.ink .cta { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(48px, 11vw, 168px); line-height: .92; letter-spacing: -.03em; transition: letter-spacing .6s var(--ease), color .3s; }
+.ink .cta:hover { color: var(--accent); letter-spacing: -.01em; }
+html[dir="rtl"] .ink .cta { font-family: var(--font-fa); font-weight: 200; letter-spacing: 0; line-height: 1.2; font-size: clamp(44px, 9.5vw, 140px); }
+.ink .cta em { font-style: italic; }
+.ink .cols { margin-top: clamp(40px, 6vw, 88px); display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; border-top: 1px solid color-mix(in srgb, var(--on-ink) 25%, transparent); padding-top: 22px; font-size: 14px; }
+.ink .cols div { display: grid; gap: 4px; align-content: start; }
+.ink .cols small { font: 500 10px var(--font-body); letter-spacing: .3em; text-transform: uppercase; opacity: .55; margin-bottom: 4px; }
+html[dir="rtl"] .ink .cols small { font-family: var(--font-fa); letter-spacing: 0; font-size: 12px; text-transform: none; }
+.ink .cols a:hover { color: var(--accent); }
+
+/* cursor follower */
+.cur { position: fixed; z-index: 90; pointer-events: none; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: #f4efe6; color: #111; display: grid; place-items: center; font: 600 10px var(--font-body); letter-spacing: .2em; text-transform: uppercase; scale: 0; transition: scale .35s var(--ease); mix-blend-mode: normal; }
+.cur.on { scale: 1; }
+
+/* panel */
+.panel { display: grid; grid-template-columns: 224px minmax(0, 1fr); margin: 24px clamp(16px, 4vw, 56px); border: 1px solid var(--line); background: var(--surface); min-height: 540px; }
+.side { background: var(--ink); color: var(--on-ink); padding: 26px 14px; display: grid; gap: 2px; align-content: start; font-family: var(--font-fa); }
+html[dir="ltr"] .side { font-family: var(--font-body); }
+.side .logo { padding: 0 12px 26px; font-size: 26px; }
+.side a { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 12px; opacity: .6; font-size: 14px; transition: opacity .2s, background .2s; }
+.side a:hover { opacity: 1; }
+.side a.on { opacity: 1; background: color-mix(in srgb, var(--on-ink) 10%, transparent); box-shadow: inset 2px 0 0 var(--accent); }
+html[dir="rtl"] .side a.on { box-shadow: inset -2px 0 0 var(--accent); }
+.side .n { margin-inline-start: auto; background: var(--accent); color: var(--on-ink); font-size: 11px; font-weight: 600; min-width: 20px; height: 20px; display: grid; place-items: center; border-radius: 10px; }
+.main { padding: 30px; display: grid; gap: 22px; align-content: start; min-width: 0; }
+.main h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 40px; letter-spacing: -.015em; line-height: 1.1; }
+html[dir="rtl"] .main h2 { font-family: var(--font-fa); font-weight: 200; font-size: 34px; letter-spacing: 0; }
+.main .sub { color: var(--muted); font-size: 14px; margin-top: -16px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.kpi { padding: 16px 18px; border: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; background: var(--bg); }
+.kpi span { font-size: 13px; color: var(--muted); }
+.kpi b { font-family: var(--font-display); font-size: 46px; font-weight: 400; line-height: 1.1; font-variant-numeric: lining-nums; }
+.kpi em { font-style: normal; font-size: 12px; color: var(--good); }
+.kpi svg { width: 100%; height: 28px; }
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; }
+.pc { padding: 18px; border: 1px solid var(--line); min-width: 0; background: var(--bg); }
+.pc h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+.list div { display: flex; align-items: center; gap: 12px; padding: 12px 6px; border-bottom: 1px solid var(--line); font-size: 14px; transition: background .2s; }
+.list div:last-child { border-bottom: 0; }
+.list div:hover { background: var(--soft); }
+.av { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; font-size: 13px; flex: none; }
+.list .tx { flex: 1; min-width: 0; }
+.list .tx small { display: block; color: var(--muted); font-size: 12px; }
+.tag { font-size: 12px; padding: 1px 10px; border: 1px solid currentColor; border-radius: 999px; white-space: nowrap; }
+.p-new { color: var(--accent); } .p-ok { color: var(--good); } .p-warn { color: var(--warn); }
+.bars { display: flex; align-items: end; gap: 8px; height: 130px; direction: ltr; }
+.bars i { flex: 1; background: var(--soft); min-width: 0; transition: background .25s; }
+.bars i:hover, .bars i.hi { background: var(--ink); }
+.legend { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 6px; direction: ltr; }
+.health { display: grid; gap: 10px; font-size: 14px; }
+.health div { display: flex; align-items: center; gap: 10px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); }
+
+[hidden] { display: none !important; }
+.note { margin: 24px clamp(16px, 4vw, 56px) 40px; padding: 14px 18px; border: 1px dashed var(--line); color: var(--muted); font-size: 13px; }
+.js .rv { transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.js .rv.pre { opacity: 0; transform: translateY(40px); }
+@media (max-width: 820px) {
+  .links { display: none; }
+  .state, .svc { grid-template-columns: 1fr; }
+  .svc .prev { position: relative; top: 0; order: -1; aspect-ratio: 4 / 3; }
+  .card:nth-child(even) { margin-top: 0; }
+  .panel { grid-template-columns: 1fr; }
+  .side { grid-auto-flow: column; overflow-x: auto; }
+  .side .logo { display: none; }
+  .two { grid-template-columns: 1fr; }
+  .scroll { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; }
+  .hero canvas { transform: none; }
+  .js .rv.pre { opacity: 1; transform: none; }
+}
+</style>
+
+<div class="bar">
+  <div class="g" role="group" aria-label="View">
+    <button class="chip" id="tab-site" aria-pressed="true">Public site</button>
+    <button class="chip" id="tab-panel" aria-pressed="false">Admin panel</button>
+  </div>
+  <div class="g">
+    <button class="chip" id="lang" aria-pressed="false">English / LTR</button>
+    <button class="chip" id="theme" aria-pressed="false">Light / Dark</button>
+  </div>
+</div>
+
+<main id="site">
+  <section class="hero" aria-label="Featured">
+    <canvas class="on"></canvas><canvas></canvas><canvas></canvas>
+    <header class="nav">
+      <a class="logo" href="#"><span data-fa="سودا <i>رحیم‌پور</i>" data-en="Sevda <i>Rahimpour</i>">سودا <i>رحیم‌پور</i></span></a>
+      <nav class="links" aria-label="Main">
+        <a href="#" data-fa="نمونه‌کار" data-en="Work">نمونه‌کار</a>
+        <a href="#" data-fa="خدمات" data-en="Services">خدمات</a>
+        <a href="#" data-fa="مجله" data-en="Journal">مجله</a>
+        <a href="#" data-fa="درباره" data-en="About">درباره</a>
+      </nav>
+      <a class="pill" href="#" data-fa="درخواست قیمت" data-en="Get a quote">درخواست قیمت</a>
+    </header>
+    <div class="scroll" aria-hidden="true">Scroll</div>
+    <div class="hero-b">
+      <h1><span data-fa="طعم را <em>می‌بینیم</em>" data-en="We shoot <em>appetite</em>">طعم را <em>می‌بینیم</em></span></h1>
+      <div class="hero-r">
+        <p data-fa="عکاسی غذا و محصول برای رستوران‌ها و برندها. نور، رنگ و بافت؛ تا پیش از چشیدن، خواسته شود." data-en="Food and product photography for restaurants and brands. Light, colour and texture, so it is wanted before it is tasted.">عکاسی غذا و محصول برای رستوران‌ها و برندها. نور، رنگ و بافت؛ تا پیش از چشیدن، خواسته شود.</p>
+        <div class="count"><button aria-label="Previous" id="prev">←</button><span><b id="cur">01</b> / 03</span><button aria-label="Next" id="next">→</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="state pad rv">
+    <div class="eyebrow" data-fa="درباره‌ی استودیو" data-en="The studio">درباره‌ی استودیو</div>
+    <div>
+      <p class="big" data-fa="هر بشقاب یک داستان دارد. ما آن را با نور <em>و صبر</em> تعریف می‌کنیم؛ تصویری که برند شما را در ذهن مشتری ماندگار کند." data-en="Every plate has a story. We tell it with light <em>and patience</em>, so your brand stays in the customer's mind.">هر بشقاب یک داستان دارد. ما آن را با نور <em>و صبر</em> تعریف می‌کنیم؛ تصویری که برند شما را در ذهن مشتری ماندگار کند.</p>
+      <div class="more">
+        <div><b>120+</b><span data-fa="پروژه‌ی تحویل‌شده" data-en="projects delivered">پروژه‌ی تحویل‌شده</span></div>
+        <div><b>48h</b><span data-fa="پاسخ به استعلام" data-en="enquiry reply">پاسخ به استعلام</span></div>
+        <div><b>5d</b><span data-fa="تحویل منوی کامل" data-en="full menu delivery">تحویل منوی کامل</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rv">
+    <div class="reel-h pad"><h2 data-fa="کارهای <em style='font-style:italic'>برگزیده</em>" data-en="Selected <em style='font-style:italic'>work</em>">کارهای <em style="font-style:italic">برگزیده</em></h2><a class="pill dk" href="#" data-fa="همه‌ی پروژه‌ها" data-en="All projects">همه‌ی پروژه‌ها</a></div>
+    <div class="reel" id="reel" tabindex="0" aria-label="Projects"></div>
+  </section>
+
+  <section class="svc pad rv">
+    <ul id="svc"></ul>
+    <div class="prev" aria-hidden="true"><canvas class="on"></canvas><canvas></canvas><canvas></canvas><canvas></canvas><span id="prevlbl">Menu</span></div>
+  </section>
+
+  <footer class="ink pad">
+    <a class="cta" href="#"><span data-fa="بیایید <em>با هم</em> بسازیم" data-en="Let's make <em>something</em> delicious">بیایید <em>با هم</em> بسازیم</span></a>
+    <div class="cols">
+      <div><small data-fa="تماس" data-en="Contact">تماس</small><a href="#">Instagram · 3evda.r</a><span data-fa="ارومیه، ایران" data-en="Urmia, Iran">ارومیه، ایران</span></div>
+      <div><small data-fa="صفحه‌ها" data-en="Pages">صفحه‌ها</small><a href="#" data-fa="نمونه‌کار" data-en="Work">نمونه‌کار</a><a href="#" data-fa="مجله" data-en="Journal">مجله</a><a href="#" data-fa="رزرو وقت" data-en="Book a shoot">رزرو وقت</a></div>
+      <div><small data-fa="ساعت کاری" data-en="Hours">ساعت کاری</small><span data-fa="شنبه تا چهارشنبه، ۹ تا ۱۷" data-en="Sat to Wed, 9 to 17">شنبه تا چهارشنبه، ۹ تا ۱۷</span></div>
+    </div>
+  </footer>
+</main>
+
+<main id="panel" hidden>
+  <div class="panel">
+    <nav class="side" aria-label="Panel">
+      <div class="logo"><span data-fa="سودا <i>.</i>" data-en="Sevda <i>.</i>">سودا <i>.</i></span></div>
+      <a class="on" href="#" data-fa="داشبورد" data-en="Dashboard">داشبورد</a>
+      <a href="#"><span data-fa="استعلام‌ها" data-en="Enquiries">استعلام‌ها</span><span class="n">3</span></a>
+      <a href="#" data-fa="رزروها" data-en="Bookings">رزروها</a>
+      <a href="#" data-fa="گالری‌ها" data-en="Galleries">گالری‌ها</a>
+      <a href="#" data-fa="پیش‌فاکتورها" data-en="Proformas">پیش‌فاکتورها</a>
+      <a href="#" data-fa="نمونه‌کار" data-en="Portfolio">نمونه‌کار</a>
+      <a href="#" data-fa="رسانه" data-en="Media">رسانه</a>
+      <a href="#" data-fa="تنظیمات" data-en="Settings">تنظیمات</a>
+    </nav>
+    <div class="main">
+      <h2 data-fa="سلام سودا" data-en="Good morning, Sevda">سلام سودا</h2>
+      <div class="sub" data-fa="امروز سه استعلام جدید و یک رزرو در انتظار تأیید دارید." data-en="Three new enquiries and one booking waiting for you.">امروز سه استعلام جدید و یک رزرو در انتظار تأیید دارید.</div>
+      <div class="kpis">
+        <div class="kpi"><span data-fa="استعلام‌های این ماه" data-en="Enquiries this month">استعلام‌های این ماه</span><b>24</b><em>+6</em><svg viewBox="0 0 120 28" preserveAspectRatio="none"><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="0,23 20,19 40,21 60,11 80,13 100,6 120,3"/></svg></div>
+        <div class="kpi"><span data-fa="رزرو تأییدشده" data-en="Confirmed bookings">رزرو تأییدشده</span><b>9</b><em>+2</em><svg viewBox="0 0 120 28" preserveAspectRatio="none"><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="0,17 20,21 40,13 60,15 80,8 100,10 120,5"/></svg></div>
+        <div class="kpi"><span data-fa="پیش‌فاکتور باز" data-en="Open proformas">پیش‌فاکتور باز</span><b>5</b><em>—</em><svg viewBox="0 0 120 28" preserveAspectRatio="none"><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="0,12 20,14 40,10 60,15 80,12 100,14 120,10"/></svg></div>
+      </div>
+      <div class="two">
+        <div class="pc"><h3 data-fa="استعلام‌های تازه" data-en="New enquiries">استعلام‌های تازه</h3>
+          <div class="list">
+            <div><span class="av">ک</span><span class="tx">کافه‌ی نارنج<small data-fa="منوی ۱۲ بشقاب · ۲ ساعت پیش" data-en="12-dish menu · 2h ago">منوی ۱۲ بشقاب · ۲ ساعت پیش</small></span><span class="tag p-new" data-fa="جدید" data-en="New">جدید</span></div>
+            <div><span class="av">ش</span><span class="tx">شیرینی‌سرای ارس<small data-fa="عکس محصول · دیروز" data-en="Product shots · yesterday">عکس محصول · دیروز</small></span><span class="tag p-new" data-fa="جدید" data-en="New">جدید</span></div>
+            <div><span class="av">ز</span><span class="tx">زعفران پارسا<small data-fa="کمپین برند · ۲ روز پیش" data-en="Brand campaign · 2d ago">کمپین برند · ۲ روز پیش</small></span><span class="tag p-ok" data-fa="پیش‌فاکتور شد" data-en="Quoted">پیش‌فاکتور شد</span></div>
+            <div><span class="av">ر</span><span class="tx">رستوران ماهتاب<small data-fa="منو · ۳ روز پیش" data-en="Menu · 3d ago">منو · ۳ روز پیش</small></span><span class="tag p-warn" data-fa="نیاز به پیگیری" data-en="Follow up">نیاز به پیگیری</span></div>
+          </div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="pc"><h3 data-fa="رزرو در ۷ هفته‌ی اخیر" data-en="Bookings, last 7 weeks">رزرو در ۷ هفته‌ی اخیر</h3><div class="bars"><i style="height:35%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:70%"></i><i style="height:58%"></i><i class="hi" style="height:92%"></i><i style="height:64%"></i></div><div class="legend"><span>W1</span><span>W7</span></div></div>
+          <div class="pc"><h3 data-fa="وضعیت سیستم" data-en="System status">وضعیت سیستم</h3><div class="health"><div><span class="dot"></span><span data-fa="همه‌ی سرویس‌ها سالم‌اند" data-en="All services healthy">همه‌ی سرویس‌ها سالم‌اند</span></div><div><span class="dot"></span><span data-fa="آخرین بکاپ: ۳ ساعت پیش" data-en="Last backup: 3h ago">آخرین بکاپ: ۳ ساعت پیش</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<p class="note" data-fa="پیش‌نمایش جهت طراحی است. عکس‌ها نمونه‌ی نقاشی‌شده‌اند؛ در سایت واقعی عکس‌های خود سودا جای آن‌ها می‌نشینند." data-en="Direction preview only. The images are painted placeholders; the real site shows Sevda's own photographs.">پیش‌نمایش جهت طراحی است. عکس‌ها نمونه‌ی نقاشی‌شده‌اند؛ در سایت واقعی عکس‌های خود سودا جای آن‌ها می‌نشینند.</p>
+<div class="cur" id="cursor" aria-hidden="true">View</div>
+
+<script>
+document.documentElement.classList.add('js');
+const root = document.documentElement; root.lang = 'fa'; root.dir = 'rtl';
+const $ = (id) => document.getElementById(id);
+
+function paint(c, seed, w, h, tone) {
+  c.width = w; c.height = h; const g = c.getContext('2d');
+  const r = (n) => { seed = (seed * 9301 + 49297) % 233280; return (seed / 233280) * n; };
+  const T = { pink: ['#e5bdb8', '#b8566b', '#6f8f52', '#f6e7d8'], dark: ['#171310', '#d4a04a', '#9c2f45', '#d9c9b0'], sage: ['#bfc8ab', '#e08a3c', '#5e7340', '#f4efe4'], peach: ['#efc7a1', '#a8412f', '#5a7a3c', '#fff1dc'], slate: ['#343a42', '#e6a03a', '#8cab66', '#ece4d6'] }[tone];
+  g.fillStyle = T[0]; g.fillRect(0, 0, w, h);
+  const lg = g.createLinearGradient(0, 0, w, h); lg.addColorStop(0, 'rgba(255,255,255,.3)'); lg.addColorStop(.55, 'rgba(255,255,255,0)'); lg.addColorStop(1, 'rgba(0,0,0,.28)');
+  g.fillStyle = lg; g.fillRect(0, 0, w, h);
+  const n = 1 + Math.floor(r(2.4));
+  for (let k = 0; k < n; k++) {
+    const R = Math.min(w, h) * (.2 + r(.16)), cx = w * (.28 + r(.46)), cy = h * (.3 + r(.4));
+    g.fillStyle = 'rgba(0,0,0,.26)'; g.beginPath(); g.ellipse(cx + R * .14, cy + R * .22, R * 1.05, R * .98, 0, 0, 7); g.fill();
+    g.fillStyle = T[3]; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(cx, cy, R * .74, 0, 7); g.fill();
+    for (let i = 0; i < 20; i++) { const a = r(6.28), d = r(R * .62), s = R * (.05 + r(.1)); g.fillStyle = [T[1], T[2], T[1], '#2b1a14'][Math.floor(r(4))]; g.beginPath(); g.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d, s, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.ellipse(cx - R * .35, cy - R * .4, R * .12, R * .05, -.6, 0, 7); g.fill();
+  }
+  const vg = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .3, w / 2, h / 2, Math.max(w, h) * .8); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.34)');
+  g.fillStyle = vg; g.fillRect(0, 0, w, h);
+}
+const hc = document.querySelectorAll('.hero canvas');
+['dark', 'slate', 'peach'].forEach((t, i) => paint(hc[i], 31 + i * 17, 1800, 900, t));
+let si = 0; function go(n) { si = (n + 3) % 3; hc.forEach((c, i) => c.classList.toggle('on', i === si)); $('cur').textContent = '0' + (si + 1); }
+$('prev').onclick = () => go(si - 1); $('next').onclick = () => go(si + 1);
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => go(si + 1), 7000);
+
+const works = [['Naranj Café', 'کافه‌ی نارنج', 'Menu', 'منو', 'pink'], ['Parsa Saffron', 'زعفران پارسا', 'Campaign', 'کمپین', 'dark'], ['Aras Sweets', 'شیرینی‌سرای ارس', 'Product', 'محصول', 'peach'], ['Mahtab Kebab', 'کباب ماهتاب', 'Menu', 'منو', 'slate'], ['Mountain Honey', 'عسل کوهستان', 'Product', 'محصول', 'sage'], ['Urmia Pomegranate', 'انار ارومیه', 'Editorial', 'ادیتوریال', 'pink']];
+works.forEach((w, i) => {
+  const a = document.createElement('a'); a.className = 'card'; a.href = '#'; a.dataset.view = '1';
+  a.innerHTML = '<div class="im"><canvas></canvas><span class="no">0' + (i + 1) + '</span></div><div><small data-fa="' + w[3] + '" data-en="' + w[2] + '">' + w[3] + '</small><h3 data-fa="' + w[1] + '" data-en="' + w[0] + '">' + w[1] + '</h3></div>';
+  paint(a.querySelector('canvas'), 7 + i * 41, 700, 875, w[4]); $('reel').appendChild(a);
+});
+
+const svc = [['Restaurant menu', 'منوی رستوران', 'From 4.5M IRT', 'از ۴٬۵۰۰٬۰۰۰ تومان', 'pink'], ['Brand campaign', 'برند و تبلیغات', 'From 12M IRT', 'از ۱۲٬۰۰۰٬۰۰۰ تومان', 'dark'], ['Product e-commerce', 'محصول فروشگاهی', 'From 2.8M IRT', 'از ۲٬۸۰۰٬۰۰۰ تومان', 'sage'], ['Editorial & styling', 'ادیتوریال و استایلینگ', 'On request', 'طبق توافق', 'peach']];
+const pc = document.querySelectorAll('.svc .prev canvas');
+svc.forEach((s, i) => {
+  paint(pc[i], 55 + i * 23, 800, 1000, s[4]);
+  const li = document.createElement('li');
+  li.innerHTML = '<a href="#"' + (i === 0 ? ' class="on"' : '') + '><span class="n">0' + (i + 1) + '</span><h3 data-fa="' + s[1] + '" data-en="' + s[0] + '">' + s[1] + '</h3><span class="pr" data-fa="' + s[3] + '" data-en="' + s[2] + '">' + s[3] + '</span></a>';
+  li.firstChild.addEventListener('mouseenter', () => sel(i)); li.firstChild.addEventListener('focus', () => sel(i));
+  $('svc').appendChild(li);
+});
+function sel(i) { pc.forEach((c, k) => c.classList.toggle('on', k === i)); document.querySelectorAll('#svc a').forEach((a, k) => a.classList.toggle('on', k === i)); $('prevlbl').textContent = svc[i][0]; }
+
+/* cursor label over reel */
+const cur = $('cursor');
+if (matchMedia('(pointer:fine)').matches) {
+  document.addEventListener('mousemove', (e) => { cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px'; cur.classList.toggle('on', !!e.target.closest('[data-view]')); });
+}
+
+function show(w) { $('site').hidden = w !== 'site'; $('panel').hidden = w !== 'panel'; $('tab-site').setAttribute('aria-pressed', w === 'site'); $('tab-panel').setAttribute('aria-pressed', w === 'panel'); }
+$('tab-site').onclick = () => show('site'); $('tab-panel').onclick = () => show('panel');
+let en = false;
+$('lang').onclick = () => {
+  en = !en; root.lang = en ? 'en' : 'fa'; root.dir = en ? 'ltr' : 'rtl';
+  $('lang').setAttribute('aria-pressed', en); $('lang').textContent = en ? 'فارسی / RTL' : 'English / LTR';
+  document.querySelectorAll('[data-fa]').forEach(el => { if (!el.querySelector('[data-fa]')) el.innerHTML = en ? el.dataset.en : el.dataset.fa; });
+  cur.textContent = en ? 'View' : 'نمایش';
+};
+$('theme').onclick = () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark'; $('theme').setAttribute('aria-pressed', !dark);
+};
+cur.textContent = 'نمایش';
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('pre'); io.unobserve(e.target); } }), { threshold: .1 });
+  document.querySelectorAll('.rv').forEach(el => { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add('pre'); io.observe(el); } });
+}
+</script>
