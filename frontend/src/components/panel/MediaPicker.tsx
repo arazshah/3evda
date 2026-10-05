@@ -92,7 +92,7 @@ function PickerBody({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">کتابخانه رسانه</h2>
+      <h2 className="font-display text-2xl">کتابخانه رسانه</h2>
       <Uploader />
       {list.isError && <Alert>بارگذاری فهرست ناموفق بود.</Alert>}
       {list.data && list.data.results.length === 0 && (

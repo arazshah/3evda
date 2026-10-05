@@ -9,7 +9,7 @@ import { Alert, Button, Card, Field } from "./ui";
 export function SecuritySettings() {
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">امنیت</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">امنیت</h1>
       <div className="grid gap-6 lg:grid-cols-2">
         <PasswordChange />
         <RegenerateCodes />
@@ -50,7 +50,7 @@ function PasswordChange() {
   return (
     <Card>
       <form onSubmit={submit} className="flex flex-col gap-4">
-        <h2 className="text-lg font-bold">تغییر رمز عبور</h2>
+        <h2 className="font-display text-2xl">تغییر رمز عبور</h2>
         {message && <Alert tone={message.tone}>{message.text}</Alert>}
         <Field
           label="رمز فعلی"
@@ -108,7 +108,7 @@ function RegenerateCodes() {
 
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-bold">کدهای بازیابی جدید</h2>
+      <h2 className="mb-4 font-display text-2xl">کدهای بازیابی جدید</h2>
       {codes ? (
         <RecoveryCodes codes={codes} />
       ) : (

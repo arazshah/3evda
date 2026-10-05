@@ -43,7 +43,7 @@ export function BookingSettingsManager() {
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <h1 className="text-2xl font-bold">تنظیمات رزرو</h1>
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">تنظیمات رزرو</h1>
         <p className="mt-1 text-sm text-muted">
           مشتری فقط ساعت‌هایی را می‌بیند که در ساعت کاری باشد، روز بسته نباشد، سقف روزانه پر نشده باشد و با
           رزرو دیگری هم‌پوشانی نداشته باشد.
@@ -78,7 +78,7 @@ function TypesSection() {
 
   return (
     <section className="flex flex-col gap-3" aria-labelledby="types-title">
-      <h2 id="types-title" className="text-xl font-bold">
+      <h2 id="types-title" className="font-display text-3xl">
         انواع جلسه
       </h2>
       {error && <Alert>{error}</Alert>}
@@ -210,7 +210,7 @@ function HoursSection() {
   const hours = useBookingHours();
   return (
     <section className="flex flex-col gap-3" aria-labelledby="hours-title">
-      <h2 id="hours-title" className="text-xl font-bold">
+      <h2 id="hours-title" className="font-display text-3xl">
         ساعت کاری هفتگی
       </h2>
       {hours.isError && <Alert>بارگذاری ساعت کاری ناموفق بود.</Alert>}
@@ -327,7 +327,7 @@ function ClosedSection() {
 
   return (
     <section className="flex flex-col gap-3" aria-labelledby="closed-title">
-      <h2 id="closed-title" className="text-xl font-bold">
+      <h2 id="closed-title" className="font-display text-3xl">
         روزهای بسته
       </h2>
       <p className="text-sm text-muted">تعطیلی یا مسافرت. رزروهای قبلی همان روزها دست‌نخورده می‌ماند.</p>
@@ -397,7 +397,7 @@ function LimitsSection() {
   const settings = useBookingSettings();
   return (
     <section className="flex flex-col gap-3" aria-labelledby="limits-title">
-      <h2 id="limits-title" className="text-xl font-bold">
+      <h2 id="limits-title" className="font-display text-3xl">
         سقف‌ها
       </h2>
       {settings.isError && <Alert>بارگذاری تنظیمات ناموفق بود.</Alert>}

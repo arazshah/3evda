@@ -41,7 +41,7 @@ export function CategoriesManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">دسته‌های نمونه‌کار</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">دسته‌های نمونه‌کار</h1>
       <p className="text-sm text-muted">مثل «غذا» یا «محصول». دسته‌ای که پروژه دارد حذف نمی‌شود.</p>
       {error && <Alert>{error}</Alert>}
       {categories.isError && <Alert>بارگذاری فهرست ناموفق بود.</Alert>}

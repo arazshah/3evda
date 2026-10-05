@@ -10,7 +10,7 @@ import { STATUS_ORDER, statusLabel } from "./status";
 
 const PAGE_SIZE = 20;
 const CONTROL =
-  "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent";
+  "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text";
 
 export function ProformasManager() {
   const [status, setStatus] = useState("");
@@ -38,7 +38,7 @@ export function ProformasManager() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">پیش‌فاکتورها</h1>
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">پیش‌فاکتورها</h1>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/panel/proformas/settings"

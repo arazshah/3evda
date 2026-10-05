@@ -15,7 +15,7 @@ import {
 } from "@/lib/api/queries";
 import { Alert, Button, Card, Field, TextArea } from "../ui";
 
-const SELECT = "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text";
+const SELECT = "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text";
 
 export function NewBookingPage({
   inquiryId,
@@ -33,7 +33,7 @@ export function NewBookingPage({
       <Link href="/panel/booking" className="inline-flex min-h-11 items-center text-accent hover:underline">
         ← همه‌ی رزروها
       </Link>
-      <h1 className="text-2xl font-bold">رزرو دستی</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">رزرو دستی</h1>
       {types.isError && <Alert>{errorMessage(types.error)}</Alert>}
       {inquiryId !== null && inquiry.isError && <Alert>{errorMessage(inquiry.error)}</Alert>}
       {waiting && <p className="text-muted">در حال بارگذاری…</p>}

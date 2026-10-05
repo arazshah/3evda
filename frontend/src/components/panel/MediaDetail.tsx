@@ -53,7 +53,7 @@ export function MediaDetail({ asset, onClose }: { asset: MediaAsset; onClose: ()
       className="m-auto w-[min(56rem,calc(100vw-2rem))] rounded-brand border border-line bg-surface p-0 text-text backdrop:bg-black/70"
     >
       <div className="flex items-center justify-between border-b border-line p-4">
-        <h2 id="media-detail-title" className="truncate text-lg font-bold" dir="auto">
+        <h2 id="media-detail-title" className="truncate font-display text-2xl" dir="auto">
           {asset.title || asset.original_filename}
         </h2>
         <Button variant="ghost" onClick={() => dialog.current?.close()} aria-label="بستن">

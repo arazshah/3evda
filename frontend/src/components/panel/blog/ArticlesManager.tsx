@@ -34,7 +34,7 @@ export function ArticlesManager() {
       <select
         value={value}
         onChange={(e) => set((e.target.value || undefined) as never)}
-        className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+        className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
       >
         <option value="">همه</option>
         {options.map(([v, text]) => (
@@ -48,7 +48,7 @@ export function ArticlesManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">مقاله‌های مجله</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">مقاله‌های مجله</h1>
       <div className="flex flex-wrap gap-3">
         <Link href="/panel/articles/new?language=fa" className={NEW_LINK}>
           مقاله‌ی جدید (فارسی)
@@ -70,7 +70,7 @@ export function ArticlesManager() {
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text"
           />
         </label>
         {select("زبان", language ?? "", setLanguage, [

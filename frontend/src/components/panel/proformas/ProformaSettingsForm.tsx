@@ -13,7 +13,7 @@ export function ProformaSettingsForm() {
       <Link href="/panel/proformas" className="inline-flex min-h-11 items-center text-accent hover:underline">
         ← پیش‌فاکتورها
       </Link>
-      <h1 className="text-2xl font-bold">اطلاعات صدور پیش‌فاکتور</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">اطلاعات صدور پیش‌فاکتور</h1>
       <p className="text-sm text-muted">
         این اطلاعات هنگام صدور روی پیش‌فاکتور ثبت می‌شود؛ تغییرشان پیش‌فاکتورهای قبلی را عوض نمی‌کند. شرایط و
         مالیات، مقدار اولیه‌ی پیش‌نویس‌های تازه است.

@@ -49,7 +49,7 @@ export function PackagesManager() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4" aria-labelledby="groups-title">
-        <h1 id="groups-title" className="text-2xl font-bold">
+        <h1 id="groups-title" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
           پکیج‌ها و قیمت‌ها
         </h1>
         <p className="text-sm text-muted">
@@ -80,7 +80,7 @@ export function PackagesManager() {
 
       {list.length > 0 && current && (
         <section className="flex flex-col gap-4" aria-labelledby="packages-title">
-          <h2 id="packages-title" className="text-xl font-bold">
+          <h2 id="packages-title" className="font-display text-3xl">
             پکیج‌های گروه
           </h2>
           <div role="group" aria-label="گروه" className="flex flex-wrap gap-2">
@@ -327,7 +327,7 @@ function PackageForm({ groupId, pkg, onDone }: { groupId: number; pkg: Package |
           <select
             value={mode}
             onChange={(e) => setMode(e.target.value)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             {PRICE_MODES.map((m) => (
               <option key={m.value} value={m.value}>

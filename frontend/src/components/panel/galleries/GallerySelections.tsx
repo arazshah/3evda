@@ -31,7 +31,7 @@ export function GallerySelections({ galleryId }: { galleryId: number }) {
 
   return (
     <Card className="space-y-4">
-      <h2 className="text-lg font-bold">انتخاب‌های مشتری</h2>
+      <h2 className="font-display text-2xl">انتخاب‌های مشتری</h2>
       {data.isError && <Alert>{errorMessage(data.error)}</Alert>}
       {summary && (
         <>
@@ -53,7 +53,7 @@ export function GallerySelections({ galleryId }: { galleryId: number }) {
               dir="ltr"
               value={summary.filenames}
               onFocus={(e) => e.currentTarget.select()}
-              className="w-full rounded-brand border border-line bg-elevated px-3 py-2 text-text"
+              className="w-full rounded-none border-0 border-b border-text/60 bg-transparent px-1 py-2 text-text"
             />
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="ghost" disabled={!summary.filenames} onClick={copy}>

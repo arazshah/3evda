@@ -43,7 +43,7 @@ export function MediaLibrary() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">کتابخانه رسانه</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">کتابخانه رسانه</h1>
       <Uploader />
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-48 flex-1 flex-col gap-1 text-sm text-muted">
@@ -53,7 +53,7 @@ export function MediaLibrary() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="نام فایل، عنوان یا متن جایگزین"
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-muted">
@@ -61,7 +61,7 @@ export function MediaLibrary() {
           <select
             value={kind ?? ""}
             onChange={(e) => setParam("kind", e.target.value || undefined)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             <option value="">همه</option>
             <option value="image">عکس</option>
@@ -73,7 +73,7 @@ export function MediaLibrary() {
           <select
             value={status ?? ""}
             onChange={(e) => setParam("status", e.target.value || undefined)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             <option value="">همه</option>
             {Object.entries(STATUS_LABELS).map(([value, label]) => (

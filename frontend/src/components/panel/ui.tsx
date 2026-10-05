@@ -5,16 +5,18 @@ export function Button({
   variant = "primary",
   className = "",
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" | "inverseGhost" }) {
   const styles = {
-    primary: "bg-accent text-bg hover:opacity-90",
-    ghost: "border border-line text-text hover:border-accent",
-    danger: "border border-accent-2 text-text hover:bg-accent-2",
+    primary: "border border-text bg-text text-bg hover:border-accent hover:bg-accent",
+    ghost: "border border-text/50 text-text hover:border-text hover:bg-text hover:text-bg",
+    // On the always-dark sidebar.
+    inverseGhost: "border border-on-ink/40 text-on-ink hover:bg-on-ink hover:text-ink",
+    danger: "border border-accent-2 text-text hover:bg-accent-2 hover:text-bg",
   }[variant];
   return (
     <button
       type="button"
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-brand px-5 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
       {...props}
     />
   );
@@ -37,7 +39,7 @@ export function Field({
       type={isPassword && revealed ? "text" : type}
       aria-invalid={error ? true : undefined}
       aria-describedby={describedBy}
-      className="min-h-11 w-full rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent"
+      className="min-h-11 w-full rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text"
       {...props}
     />
   );
@@ -58,7 +60,7 @@ export function Field({
             aria-controls={id}
             aria-pressed={revealed}
             onClick={() => setRevealed((value) => !value)}
-            className="min-h-11 shrink-0 rounded-brand border border-line px-3 text-sm hover:border-accent"
+            className="min-h-11 shrink-0 rounded-full border border-text/50 px-4 text-sm hover:border-text"
           >
             {revealed ? "پنهان" : "نمایش"}
           </button>
@@ -116,7 +118,7 @@ export function TextArea({
         rows={4}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className="rounded-brand border border-line bg-elevated px-3 py-2 text-text outline-none focus:border-accent"
+        className="rounded-brand border border-text/60 bg-transparent px-3 py-2 text-text outline-none focus:border-text"
         {...props}
       />
       {hint && (

@@ -33,7 +33,7 @@ export function LoginFlow() {
         <p className="mb-1 text-sm tracking-widest text-accent">3EVDA</p>
         {recoveryCodes ? (
           <>
-            <h1 className="mb-4 text-2xl font-bold">کدهای بازیابی</h1>
+            <h1 className="mb-4 font-display text-[clamp(2rem,4vw,3rem)] leading-tight">کدهای بازیابی</h1>
             <RecoveryCodes codes={recoveryCodes} />
             <Button className="mt-6 w-full" onClick={() => router.replace("/panel")}>
               کدها را ذخیره کردم، ادامه
@@ -85,7 +85,7 @@ function PasswordStep({ onDone }: { onDone: (state: AuthState) => void }) {
   );
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-      <h1 className="text-2xl font-bold">ورود به پنل</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">ورود به پنل</h1>
       {error && <Alert>{error}</Alert>}
       <Field
         label="نام کاربری"
@@ -145,7 +145,7 @@ function VerifyStep({ onDone }: { onDone: (state: AuthState) => void }) {
   );
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-      <h1 className="text-2xl font-bold">ورود دومرحله‌ای</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">ورود دومرحله‌ای</h1>
       <p className="text-sm text-muted">کد ۶ رقمی اپ احراز هویت یا یکی از کدهای بازیابی را وارد کنید.</p>
       {error && <Alert>{error}</Alert>}
       <CodeField label="کد" value={code} onChange={setCode} />
@@ -174,7 +174,7 @@ function EnrollStep({ onDone }: { onDone: (codes: string[]) => void }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-      <h1 className="text-2xl font-bold">فعال‌سازی ورود دومرحله‌ای</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">فعال‌سازی ورود دومرحله‌ای</h1>
       <p className="text-sm text-muted">
         با اپی مثل Google Authenticator یا Microsoft Authenticator این کد QR را اسکن کنید، سپس کد ۶ رقمی را
         وارد کنید.

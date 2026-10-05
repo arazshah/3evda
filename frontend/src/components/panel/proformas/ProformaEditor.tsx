@@ -22,7 +22,7 @@ type Row = { description: string; quantity: string; unit_price: string };
 type Discount = "none" | "amount" | "percent";
 
 const EMPTY_ROW: Row = { description: "", quantity: "1", unit_price: "" };
-const SELECT = "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text";
+const SELECT = "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text";
 
 export function ProformaEditorPage({ id }: { id: number | null }) {
   const proforma = useProforma(id);
@@ -142,7 +142,9 @@ function DraftForm({ initial }: { initial: Proforma | null }) {
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">{initial ? "پیش‌نویس پیش‌فاکتور" : "پیش‌فاکتور جدید"}</h1>
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
+          {initial ? "پیش‌نویس پیش‌فاکتور" : "پیش‌فاکتور جدید"}
+        </h1>
         {initial?.replaces_number && (
           <p className="text-sm text-muted">
             نسخه‌ی اصلاح‌شده‌ی <span dir="ltr">{initial.replaces_number}</span> — با صدور این، نسخه‌ی قبلی
@@ -173,7 +175,7 @@ function DraftForm({ initial }: { initial: Proforma | null }) {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">آیتم‌ها</h2>
+        <h2 className="font-display text-2xl">آیتم‌ها</h2>
         <ul aria-label="آیتم‌ها" className="flex flex-col gap-3">
           {rows.map((row, i) => (
             <li key={i} className="grid gap-2 sm:grid-cols-[1fr_6rem_9rem_auto] sm:items-end">
@@ -309,7 +311,7 @@ function DraftForm({ initial }: { initial: Proforma | null }) {
 function Totals({ proforma, note }: { proforma: Proforma; note?: string }) {
   return (
     <Card className="space-y-1">
-      <h2 className="text-lg font-bold">جمع‌ها</h2>
+      <h2 className="font-display text-2xl">جمع‌ها</h2>
       <dl className="grid max-w-sm grid-cols-[1fr_auto] gap-x-6 gap-y-1">
         <dt className="text-muted">جمع آیتم‌ها</dt>
         <dd>{`${formatNumber(proforma.subtotal)} تومان`}</dd>
@@ -366,7 +368,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold" dir="auto">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
           پیش‌فاکتور <span dir="ltr">{proforma.number}</span>
         </h1>
         <p className="text-sm text-muted">
@@ -377,7 +379,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
       {message && <Alert tone={message.tone}>{message.text}</Alert>}
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">لینک برای مشتری</h2>
+        <h2 className="font-display text-2xl">لینک برای مشتری</h2>
         <div className="flex flex-wrap gap-2">
           <input
             readOnly
@@ -385,7 +387,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
             dir="ltr"
             value={proforma.link ?? ""}
             onFocus={(e) => e.currentTarget.select()}
-            className="min-h-11 min-w-0 flex-1 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 min-w-0 flex-1 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           />
           <Button variant="ghost" onClick={copy}>
             {copied ? "کپی شد" : "کپی لینک"}
@@ -398,7 +400,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
       </Card>
 
       <Card className="space-y-2">
-        <h2 className="text-lg font-bold">وضعیت</h2>
+        <h2 className="font-display text-2xl">وضعیت</h2>
         <dl className="space-y-1 text-sm">
           {proforma.issued_at && <Row label="صدور">{formatDate(proforma.issued_at)}</Row>}
           {proforma.valid_until && <Row label="اعتبار تا">{formatDate(proforma.valid_until)}</Row>}
@@ -417,7 +419,7 @@ function IssuedView({ proforma }: { proforma: Proforma }) {
       </Card>
 
       <Card className="space-y-2">
-        <h2 className="text-lg font-bold">آیتم‌ها</h2>
+        <h2 className="font-display text-2xl">آیتم‌ها</h2>
         <ul aria-label="آیتم‌ها" className="space-y-1">
           {(proforma.items ?? []).map((item, i) => (
             <li key={i} className="flex flex-wrap justify-between gap-2" dir="auto">

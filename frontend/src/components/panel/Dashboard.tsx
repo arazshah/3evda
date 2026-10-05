@@ -8,9 +8,9 @@ import { Card } from "./ui";
 
 function Stat({ label, value, href }: { label: string; value?: number; href: string }) {
   return (
-    <Link href={href} className="block rounded-brand border border-line bg-surface p-5 hover:border-accent">
+    <Link href={href} className="group block border-t border-text pt-4 transition-colors hover:border-accent">
       <p className="text-sm text-muted">{label}</p>
-      <p className="mt-2 text-3xl font-extrabold tabular-nums">
+      <p className="font-display mt-1 text-5xl tabular-nums transition-colors group-hover:text-accent">
         {value === undefined ? "…" : formatNumber(value)}
       </p>
     </Link>
@@ -25,7 +25,7 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">داشبورد</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">داشبورد</h1>
       <SystemStatusCard />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="همه‌ی فایل‌ها" value={all.data?.count} href="/panel/media" />
@@ -34,7 +34,7 @@ export function Dashboard() {
         <Stat label="پردازش ناموفق" value={failed.data?.count} href="/panel/media?status=failed" />
       </div>
       <Card>
-        <h2 className="mb-2 text-lg font-bold">قدم‌های بعدی</h2>
+        <h2 className="mb-2 font-display text-2xl">قدم‌های بعدی</h2>
         <p className="text-muted">
           عکس‌ها و ویدیوهای نمونه‌کار را در کتابخانه رسانه آپلود کنید و برای هر کدام متن جایگزین فارسی و
           انگلیسی بنویسید. مدیریت صفحات سایت، پکیج‌ها، بلاگ، رزرو و گالری مشتری در فازهای بعد به این پنل اضافه

@@ -10,7 +10,7 @@ import { Alert, Button, Field, TextArea } from "../ui";
 import { LEVELS, LEVEL_LABELS, endOfTehranDay, tehranDay } from "./status";
 
 const CONTROL =
-  "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent";
+  "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text";
 
 /** Create or edit a gallery. The password is write-only: an empty box leaves it as it is. */
 export function GalleryForm({

@@ -61,17 +61,17 @@ export function PanelShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
-      <aside className="border-line bg-surface md:w-60 md:shrink-0 md:border-l">
-        <div className="flex items-center justify-between gap-2 p-4 md:block">
-          <p className="font-extrabold">
-            3EVDA<span className="text-accent">.</span>
+      <aside className="border-on-ink/10 bg-ink text-on-ink md:w-64 md:shrink-0 md:border-s">
+        <div className="flex items-center justify-between gap-2 p-4 md:block md:p-6">
+          <p className="font-display text-3xl leading-none">
+            سودا<span className="text-accent-on-ink">.</span>
           </p>
-          <p className="text-sm text-muted md:mt-1">
+          <p className="text-sm text-on-ink/60 md:mt-2">
             {me.data?.user?.display_name || me.data?.user?.username}
           </p>
         </div>
         <nav aria-label="منوی پنل" className="overflow-x-auto">
-          <ul className="flex gap-1 px-2 pb-2 md:flex-col">
+          <ul className="flex gap-1 px-2 pb-2 md:flex-col md:px-3">
             {NAV.map((item) => {
               const active =
                 item.href === "/panel"
@@ -84,8 +84,10 @@ export function PanelShell({ children }: { children: ReactNode }) {
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={`block whitespace-nowrap rounded-brand px-3 py-2 ${
-                      active ? "bg-elevated text-accent" : "text-muted hover:text-text"
+                    className={`block whitespace-nowrap border-s-2 px-3 py-2 transition-colors ${
+                      active
+                        ? "border-accent-on-ink bg-on-ink/10 text-on-ink"
+                        : "border-transparent text-on-ink/65 hover:text-on-ink"
                     }`}
                   >
                     {item.label}
@@ -98,8 +100,8 @@ export function PanelShell({ children }: { children: ReactNode }) {
           </ul>
         </nav>
         <div className="hidden items-center gap-2 p-4 md:flex">
-          <ThemeToggle labels={THEME_LABELS} />
-          <Button variant="ghost" className="flex-1" onClick={logout}>
+          <ThemeToggle labels={THEME_LABELS} tone="onInk" />
+          <Button variant="inverseGhost" className="flex-1" onClick={logout}>
             خروج
           </Button>
         </div>
@@ -111,7 +113,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
             خروج
           </Button>
         </div>
-        <main className="mx-auto max-w-6xl p-4 md:p-8">{children}</main>
+        <main className="mx-auto max-w-6xl p-4 md:p-10">{children}</main>
       </div>
     </div>
   );

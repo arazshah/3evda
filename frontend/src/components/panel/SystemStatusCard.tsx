@@ -42,12 +42,12 @@ export function SystemStatusCard() {
   return (
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">وضعیت سیستم</h2>
+        <h2 className="font-display text-2xl">وضعیت سیستم</h2>
         <button
           type="button"
           onClick={() => void refetch()}
           disabled={isFetching}
-          className="min-h-11 rounded-brand border border-line px-4 text-sm hover:border-accent disabled:opacity-50"
+          className="min-h-11 rounded-full border border-text/50 px-5 text-sm hover:border-text disabled:opacity-50"
         >
           {isFetching ? "در حال بررسی…" : "بررسی دوباره"}
         </button>

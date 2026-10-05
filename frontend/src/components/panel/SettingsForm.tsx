@@ -74,7 +74,7 @@ function SettingsEditor({ initial }: { initial: Settings }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">تنظیمات سایت</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">تنظیمات سایت</h1>
       {message && <Alert tone={message.tone}>{message.text}</Alert>}
 
       <Card className="grid gap-4 md:grid-cols-2">
