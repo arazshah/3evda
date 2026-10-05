@@ -7,7 +7,8 @@ import { SplashSeen } from "./SplashSeen";
  * skipped under reduced motion, and never rendered again once the visitor has seen it.
  */
 export async function Splash({ brand, tagline }: { brand: string; tagline: string }) {
-  if (!(await splashPending())) return null;
+  // On later visits there is no curtain, but the cookie is still refreshed: "away" means half an hour of nothing.
+  if (!(await splashPending())) return <SplashSeen />;
   return (
     <>
       <div className="splash" aria-hidden="true">
