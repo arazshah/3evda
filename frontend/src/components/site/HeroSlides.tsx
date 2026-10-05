@@ -84,7 +84,7 @@ export function HeroSlides({
           <div
             key={s.media.id + i}
             aria-hidden="true"
-            className={`absolute inset-0 -z-20 transition-opacity duration-[1400ms] ${i === index ? "opacity-100" : "opacity-0"}`}
+            className={`hero-parallax absolute inset-0 -z-20 transition-opacity duration-[1400ms] ${i === index ? "opacity-100" : "opacity-0"}`}
           >
             <Photo
               media={s.media}

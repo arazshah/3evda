@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/ui/Button";
 import { PackageCard } from "@/components/site/PackageCard";
 import { JsonLd } from "@/components/site/JsonLd";
+import { Marquee } from "@/components/site/Marquee";
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { Photo } from "@/components/site/Photo";
 import { ProjectReel } from "@/components/site/ProjectReel";
@@ -107,6 +108,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           pause: t("common.pause"),
           play: t("common.play"),
         }}
+      />
+
+      <Marquee
+        label={pick(locale, "مشتری‌ها و خدمات", "Clients and services")}
+        items={[...c.client, ...c.service].map((x) => localized(locale, x, "title"))}
       />
 
       {statement ? (

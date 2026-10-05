@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Photo } from "./Photo";
 import { vtName } from "@/lib/site/transitions";
-import { href, localized } from "@/lib/site/text";
+import { href, localized, pick } from "@/lib/site/text";
 import type { Category, Project } from "@/lib/site/types";
 
 /**
@@ -110,6 +110,7 @@ export function PortfolioGrid({
             <li key={p.slug} className={`relative overflow-hidden bg-elevated ${SPANS[i % SPANS.length]}`}>
               <a
                 href={href(locale, `/portfolio/${p.slug}`)}
+                data-cursor={pick(locale, "مشاهده", "View")}
                 className="group absolute inset-0 block"
                 style={vtName(`project-${p.slug}`)}
               >

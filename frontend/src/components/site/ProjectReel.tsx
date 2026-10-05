@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import { Photo } from "./Photo";
 import { GUTTER } from "./Section";
-import { href, localized } from "@/lib/site/text";
+import { href, localized, pick } from "@/lib/site/text";
 import type { Project } from "@/lib/site/types";
 
 /**
@@ -29,6 +29,7 @@ export function ProjectReel({
         <a
           key={p.slug}
           href={href(locale, `/portfolio/${p.slug}`)}
+          data-cursor={pick(locale, "مشاهده", "View")}
           className={`group block w-[clamp(16rem,30vw,28rem)] shrink-0 snap-start ${i % 2 ? "md:mt-14" : ""}`}
         >
           <div className="relative aspect-[4/5] overflow-hidden bg-elevated">
