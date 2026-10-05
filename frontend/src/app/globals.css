@@ -400,17 +400,42 @@ html[data-splash="on"] .mask-load {
 
 /* A ticker of clients and services under the hero. */
 .marquee {
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
   padding-block: 1.1rem;
+  padding-inline: 0 clamp(0.75rem, 2vw, 1.5rem);
   background: var(--c-bg);
+}
+.marquee-window {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 .marquee-track {
   display: flex;
   width: max-content;
   animation: marquee-run 46s linear infinite;
 }
-.marquee:hover .marquee-track {
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track,
+.marquee[data-paused="true"] .marquee-track {
   animation-play-state: paused;
+}
+/* A pause control for people who cannot hover (keyboard, touch): moving text must be stoppable. */
+.marquee-toggle {
+  display: inline-flex;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-text);
+  border-radius: 9999px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 .marquee-row {
   display: flex;
@@ -519,7 +544,8 @@ html[dir="rtl"] .marquee-track {
     width: auto;
     flex-wrap: wrap;
   }
-  .marquee-row[aria-hidden="true"] {
+  .marquee-row[aria-hidden="true"],
+  .marquee-toggle {
     display: none;
   }
   .cursor-ring {

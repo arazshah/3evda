@@ -47,6 +47,8 @@
       "play": "Play slideshow",
       "prevSlide": "Previous slide",
       "nextSlide": "Next slide",
+      "marqueePause": "Pause the ticker",
+      "marqueePlay": "Play the ticker",
       "menuOpen": "Menu",
       "scroll": "Scroll"
     },
