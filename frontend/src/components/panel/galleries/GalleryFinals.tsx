@@ -37,7 +37,7 @@ export function GalleryFinals({ galleryId }: { galleryId: number }) {
   const list = finals.data ?? [];
   return (
     <Card className="space-y-4">
-      <h2 className="text-lg font-bold">نسخه‌های نهایی تحویلی</h2>
+      <h2 className="font-display text-2xl">نسخه‌های نهایی تحویلی</h2>
       <p className="text-sm text-muted">
         عکس‌های آماده‌ی تحویل. مشتری همیشه می‌تواند این‌ها را دانلود کند، حتی اگر دانلود عکس‌های گالری بسته
         باشد.

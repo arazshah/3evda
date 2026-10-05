@@ -53,7 +53,7 @@ function WatermarkEditor({ initial }: { initial: Form }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">واترمارک</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">واترمارک</h1>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <form onSubmit={submit} className="flex flex-col gap-4">
@@ -79,7 +79,7 @@ function WatermarkEditor({ initial }: { initial: Form }) {
               <select
                 value={form.position}
                 onChange={(e) => set("position", e.target.value as Form["position"])}
-                className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+                className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
               >
                 {POSITIONS.map((p) => (
                   <option key={p.value} value={p.value}>

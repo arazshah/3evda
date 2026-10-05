@@ -18,7 +18,7 @@ export function EditorDialog({
   return (
     <Dialog open={open} onClose={onClose} label={title} closeLabel="بستن">
       <div className="max-h-dvh w-[min(48rem,100dvw)] overflow-y-auto rounded-brand border border-line bg-surface p-4 sm:p-6">
-        <h2 className="mb-4 text-lg font-bold">{title}</h2>
+        <h2 className="mb-4 font-display text-2xl">{title}</h2>
         {children}
       </div>
     </Dialog>

@@ -21,7 +21,7 @@ export function LinkedBookings({ inquiry, proforma }: { inquiry?: number | null;
   return (
     <Card className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-bold">رزروها</h2>
+        <h2 className="font-display text-2xl">رزروها</h2>
         <Link
           href={`/panel/booking/new?${query}`}
           className="inline-flex min-h-11 items-center rounded-brand border border-line px-5 hover:border-accent"

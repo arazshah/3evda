@@ -72,7 +72,7 @@ function GalleryView({ gallery }: { gallery: Gallery }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold" dir="auto">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
           {gallery.title}
         </h1>
         <p className="text-sm text-muted">
@@ -84,7 +84,7 @@ function GalleryView({ gallery }: { gallery: Gallery }) {
       {message && <Alert tone={message.tone}>{message.text}</Alert>}
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">وضعیت و لینک</h2>
+        <h2 className="font-display text-2xl">وضعیت و لینک</h2>
         <div className="flex flex-wrap gap-3">
           {gallery.status === "draft" && (
             <Button
@@ -134,7 +134,7 @@ function GalleryView({ gallery }: { gallery: Gallery }) {
             dir="ltr"
             value={gallery.link}
             onFocus={(e) => e.currentTarget.select()}
-            className="min-h-11 min-w-0 flex-1 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 min-w-0 flex-1 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           />
           <Button variant="ghost" onClick={copy}>
             {copied ? "کپی شد" : "کپی لینک"}
@@ -165,7 +165,7 @@ function GalleryView({ gallery }: { gallery: Gallery }) {
       <GalleryFinals galleryId={gallery.id} />
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-bold">تنظیمات</h2>
+        <h2 className="font-display text-2xl">تنظیمات</h2>
         <GalleryForm
           gallery={gallery}
           submitLabel="ذخیره‌ی تنظیمات"
@@ -176,7 +176,7 @@ function GalleryView({ gallery }: { gallery: Gallery }) {
       <DownloadLog galleryId={gallery.id} />
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">حذف گالری</h2>
+        <h2 className="font-display text-2xl">حذف گالری</h2>
         <p className="text-sm text-muted">
           گالری، همه‌ی عکس‌ها، نهایی‌ها و ZIPها حذف می‌شود و برگشت‌پذیر نیست.
         </p>
@@ -203,7 +203,7 @@ function DownloadLog({ galleryId }: { galleryId: number }) {
   const rows = log.data ?? [];
   return (
     <Card className="space-y-3">
-      <h2 className="text-lg font-bold">لاگ دانلود</h2>
+      <h2 className="font-display text-2xl">لاگ دانلود</h2>
       {log.isError && <Alert>{errorMessage(log.error)}</Alert>}
       {log.isSuccess && rows.length === 0 && <p className="text-muted">هنوز دانلودی نشده.</p>}
       {rows.length > 0 && (

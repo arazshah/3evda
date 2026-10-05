@@ -25,7 +25,7 @@ export function RetentionManager() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">نگهداری اطلاعات</h1>
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">نگهداری اطلاعات</h1>
         <p className="mt-1 max-w-prose text-sm text-muted">
           اطلاعات شخصی مشتری‌ها تا ابد نگه داشته نمی‌شود. هر شب پس از پشتیبان‌گیری، موارد قدیمی‌تر از مدت‌های
           زیر ناشناس یا حذف می‌شوند. <strong>پیش‌فاکتورِ صادرشده هرگز حذف نمی‌شود</strong> و شماره، اقلام،
@@ -43,7 +43,7 @@ function SettingsSection() {
   const settings = useRetentionSettings();
   return (
     <Card>
-      <h2 className="mb-3 text-lg font-bold">مدت‌ها</h2>
+      <h2 className="mb-3 font-display text-2xl">مدت‌ها</h2>
       {settings.isError && <Alert>بارگذاری تنظیمات ناموفق بود.</Alert>}
       {settings.data && <SettingsForm initial={settings.data} />}
     </Card>
@@ -154,7 +154,7 @@ function PreviewSection() {
 
   return (
     <Card>
-      <h2 className="mb-1 text-lg font-bold">پیش‌نمایش: همین حالا چه چیزی پاک می‌شود؟</h2>
+      <h2 className="mb-1 font-display text-2xl">پیش‌نمایش: همین حالا چه چیزی پاک می‌شود؟</h2>
       <p className="mb-3 text-sm text-muted">
         فقط شمارش است؛ چیزی تغییر نمی‌کند و اطلاعات شخصی نشان داده نمی‌شود.
       </p>

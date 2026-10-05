@@ -50,7 +50,7 @@ export function ProjectsManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">نمونه‌کارها</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">نمونه‌کارها</h1>
       {error && <Alert>{error}</Alert>}
       {projects.isError && <Alert>بارگذاری فهرست ناموفق بود.</Alert>}
       <div>
@@ -196,7 +196,7 @@ function ProjectForm({ project, onDone }: { project: Project | null; onDone: () 
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             <option value="">بدون دسته</option>
             {categories.data?.map((c) => (
@@ -211,7 +211,7 @@ function ProjectForm({ project, onDone }: { project: Project | null; onDone: () 
           <select
             value={style}
             onChange={(e) => setStyle(e.target.value)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             {STYLES.map((s) => (
               <option key={s.value} value={s.value}>

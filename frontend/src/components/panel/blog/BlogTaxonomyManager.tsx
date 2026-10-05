@@ -34,7 +34,7 @@ function Categories() {
   const list = categories.data ?? [];
   return (
     <section className="flex flex-col gap-4" aria-labelledby="blog-categories">
-      <h1 id="blog-categories" className="text-2xl font-bold">
+      <h1 id="blog-categories" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
         دسته‌های مجله
       </h1>
       <p className="text-sm text-muted">با حذف یک دسته، مقاله‌هایش حذف نمی‌شوند و فقط بی‌دسته می‌شوند.</p>
@@ -123,7 +123,7 @@ function Tags() {
   const list = tags.data ?? [];
   return (
     <section className="flex flex-col gap-4" aria-labelledby="blog-tags">
-      <h2 id="blog-tags" className="text-2xl font-bold">
+      <h2 id="blog-tags" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
         برچسب‌های مجله
       </h2>
       {error && <Alert>{error}</Alert>}

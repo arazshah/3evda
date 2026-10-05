@@ -174,7 +174,7 @@ function ArticleForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
           {article ? "ویرایش مقاله" : "مقاله‌ی جدید"}{" "}
           <span className="text-base text-muted">({LANGUAGE_NAMES[language]})</span>
         </h1>
@@ -222,7 +222,7 @@ function ArticleForm({
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as "draft" | "published")}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             <option value="draft">پیش‌نویس (عمومی نیست)</option>
             <option value="published">منتشر شود</option>
@@ -256,7 +256,7 @@ function ArticleForm({
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           >
             <option value="">بدون دسته</option>
             {categories.data?.map((c) => (
@@ -370,7 +370,7 @@ function ArticleForm({
             value={link}
             aria-label="لینک پیش‌نمایش"
             onFocus={(e) => e.target.select()}
-            className="min-h-11 rounded-brand border border-line bg-elevated px-3"
+            className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1"
           />
         </Card>
       )}

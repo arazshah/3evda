@@ -87,7 +87,7 @@ function BookingView({ booking }: { booking: Booking }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold" dir="auto">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
           {booking.name}
           {booking.brand ? ` · ${booking.brand}` : ""}
         </h1>
@@ -101,7 +101,7 @@ function BookingView({ booking }: { booking: Booking }) {
       {message && <Alert tone={message.tone}>{message.text}</Alert>}
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">جلسه</h2>
+        <h2 className="font-display text-2xl">جلسه</h2>
         <dl className="space-y-2">
           <Row label="نوع">{booking.session_label}</Row>
           {booking.package_label && <Row label="پکیج">{booking.package_label}</Row>}
@@ -120,7 +120,7 @@ function BookingView({ booking }: { booking: Booking }) {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">راه‌های تماس</h2>
+        <h2 className="font-display text-2xl">راه‌های تماس</h2>
         <dl className="space-y-2">
           {booking.phone && (
             <Row label="تلفن">
@@ -150,7 +150,7 @@ function BookingView({ booking }: { booking: Booking }) {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">پیوندها</h2>
+        <h2 className="font-display text-2xl">پیوندها</h2>
         {(booking.inquiry || booking.proforma) && (
           <dl className="space-y-2">
             {booking.inquiry && (
@@ -179,7 +179,7 @@ function BookingView({ booking }: { booking: Booking }) {
             dir="ltr"
             value={booking.link}
             onFocus={(e) => e.currentTarget.select()}
-            className="min-h-11 min-w-0 flex-1 rounded-brand border border-line bg-elevated px-3 text-text"
+            className="min-h-11 min-w-0 flex-1 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
           />
           <Button variant="ghost" onClick={copy}>
             {copied ? "کپی شد" : "کپی لینک"}
@@ -190,7 +190,7 @@ function BookingView({ booking }: { booking: Booking }) {
 
       {open && (
         <Card className="space-y-4">
-          <h2 className="text-lg font-bold">اقدام</h2>
+          <h2 className="font-display text-2xl">اقدام</h2>
           <div className="flex flex-wrap gap-3">
             {booking.status === "pending" && (
               <Button

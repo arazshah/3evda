@@ -125,7 +125,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold" dir="auto">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight" dir="auto">
           {inquiry.name}
           {inquiry.brand ? ` · ${inquiry.brand}` : ""}
         </h1>
@@ -135,7 +135,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
       </div>
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">راه‌های تماس</h2>
+        <h2 className="font-display text-2xl">راه‌های تماس</h2>
         <dl className="space-y-2">
           {inquiry.phone && (
             <Row label="تلفن">
@@ -165,7 +165,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="text-lg font-bold">درخواست</h2>
+        <h2 className="font-display text-2xl">درخواست</h2>
         <dl className="space-y-2">
           {inquiry.service_label ? (
             <>
@@ -195,7 +195,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
 
       {inquiry.attachments.length > 0 && (
         <Card className="space-y-3">
-          <h2 className="text-lg font-bold">پیوست‌ها</h2>
+          <h2 className="font-display text-2xl">پیوست‌ها</h2>
           <ul aria-label="پیوست‌ها" className="flex flex-col gap-1">
             {inquiry.attachments.map((file) => (
               <li key={file.id}>
@@ -217,7 +217,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
 
       <Card>
         <form onSubmit={submit} className="space-y-4">
-          <h2 className="text-lg font-bold">پیگیری</h2>
+          <h2 className="font-display text-2xl">پیگیری</h2>
           {message && <Alert tone={message.tone}>{message.text}</Alert>}
           <div className="flex max-w-sm flex-col gap-1">
             <label htmlFor="inquiry-status" className="text-sm text-muted">
@@ -227,7 +227,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
               id="inquiry-status"
               value={status}
               onChange={(e) => setStatus(e.target.value as InquiryStatus)}
-              className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+              className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
             >
               {STATUS_ORDER.map((value) => (
                 <option key={value} value={value}>
@@ -252,7 +252,7 @@ function InquiryView({ inquiry, onDeleted }: { inquiry: Inquiry; onDeleted: () =
 
       {inquiry.history.length > 0 && (
         <Card className="space-y-2">
-          <h2 className="text-lg font-bold">تاریخچه‌ی وضعیت</h2>
+          <h2 className="font-display text-2xl">تاریخچه‌ی وضعیت</h2>
           <ol aria-label="تاریخچه‌ی وضعیت" className="space-y-1 text-sm">
             {inquiry.history.map((change, index) => (
               <li key={`${change.at}-${index}`}>

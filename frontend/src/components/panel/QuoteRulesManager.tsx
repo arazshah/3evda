@@ -56,7 +56,7 @@ export function QuoteRulesManager() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4" aria-labelledby="rules-title">
-        <h1 id="rules-title" className="text-2xl font-bold">
+        <h1 id="rules-title" className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">
           قواعد قیمت
         </h1>
         <p className="text-sm text-muted">
@@ -107,7 +107,7 @@ function SettingsSection() {
   const settings = useQuoteSettings();
   return (
     <section className="flex flex-col gap-4" aria-labelledby="quote-settings-title">
-      <h2 id="quote-settings-title" className="text-xl font-bold">
+      <h2 id="quote-settings-title" className="font-display text-3xl">
         بازه‌ی برآورد
       </h2>
       {settings.isError && <Alert>بارگذاری تنظیمات ناموفق بود.</Alert>}
@@ -245,7 +245,7 @@ function RuleForm({ rule, onDone }: { rule: QuoteRule | null; onDone: () => void
         <select
           value={kind}
           onChange={(e) => setKind(e.target.value)}
-          className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+          className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
         >
           {KINDS.map((k) => (
             <option key={k.value} value={k.value}>
@@ -367,7 +367,7 @@ function PreviewSection({ rules }: { rules: QuoteRule[] }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="preview-title">
-      <h2 id="preview-title" className="text-xl font-bold">
+      <h2 id="preview-title" className="font-display text-3xl">
         امتحان قیمت
       </h2>
       <p className="text-sm text-muted">
@@ -384,7 +384,7 @@ function PreviewSection({ rules }: { rules: QuoteRule[] }) {
                 <select
                   value={activeService}
                   onChange={(e) => setService(e.target.value)}
-                  className="min-h-11 rounded-brand border border-line bg-elevated px-3 text-text"
+                  className="min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text"
                 >
                   {services.map((s) => (
                     <option key={s.key} value={s.key}>

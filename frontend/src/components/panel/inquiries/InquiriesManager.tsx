@@ -10,7 +10,7 @@ import { rangeText, STATUS_LABELS, STATUS_ORDER } from "./status";
 
 const PAGE_SIZE = 20;
 const CONTROL =
-  "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent";
+  "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text";
 
 export function InquiriesManager() {
   const [status, setStatus] = useState<InquiryStatus | "">("");
@@ -48,7 +48,7 @@ export function InquiriesManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">استعلام‌ها</h1>
+      <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-tight">استعلام‌ها</h1>
       <p className="text-sm text-muted">
         استعلام‌هایی که از فرم سایت می‌رسد. تا هر استعلام را باز نکرده‌اید، نشانگر «خوانده‌نشده» دارد.
       </p>

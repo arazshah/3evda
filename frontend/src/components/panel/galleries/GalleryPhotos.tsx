@@ -109,7 +109,7 @@ export function GalleryPhotos({ galleryId, upload }: { galleryId: number; upload
 
   return (
     <Card className="space-y-4">
-      <h2 className="text-lg font-bold">عکس‌ها</h2>
+      <h2 className="font-display text-2xl">عکس‌ها</h2>
       <div
         onDragOver={(e) => {
           e.preventDefault();
