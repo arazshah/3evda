@@ -42,13 +42,13 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       />
       <Section>
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-20">
-          <dl className="border-t border-text">
+          <dl className="min-w-0 border-t border-text">
             {s.phone ? (
               <div className="border-b border-line py-6">
                 <dt className="eyebrow text-muted">{t("contact.phone")}</dt>
                 <dd className="mt-2">
                   <a
-                    className="font-display link-line text-[clamp(1.75rem,4vw,3.25rem)] hover:text-accent"
+                    className="font-display link-line text-[clamp(1.75rem,4vw,3.25rem)] [overflow-wrap:anywhere] hover:text-accent"
                     dir="ltr"
                     href={telHref(s.phone)}
                   >
@@ -62,7 +62,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <dt className="eyebrow text-muted">{t("contact.email")}</dt>
                 <dd className="mt-2">
                   <a
-                    className="font-display link-line text-[clamp(1.5rem,3.4vw,2.75rem)] hover:text-accent"
+                    className="font-display link-line text-[clamp(1.5rem,3.4vw,2.75rem)] [overflow-wrap:anywhere] hover:text-accent"
                     href={`mailto:${s.email}`}
                   >
                     {s.email}
@@ -73,7 +73,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             {address ? (
               <div className="border-b border-line py-6">
                 <dt className="eyebrow text-muted">{t("contact.address")}</dt>
-                <dd className="mt-2 text-xl">{address}</dd>
+                <dd className="mt-2 text-xl [overflow-wrap:anywhere]">{address}</dd>
               </div>
             ) : null}
           </dl>

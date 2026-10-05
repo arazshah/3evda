@@ -34,13 +34,16 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         className={`${WIDE} grid items-start gap-10 pt-[clamp(2.5rem,6vw,5rem)] md:grid-cols-[1fr_1.1fr] md:gap-20`}
       >
         {photo ? (
-          <Photo
-            media={photo}
-            locale={locale}
-            priority
-            sizes="(min-width: 768px) 45vw, 100vw"
-            className="w-full object-cover md:sticky md:top-8"
-          />
+          // The sticky element is the grid item itself: a sticky <img> would only move inside its own <picture>.
+          <div className="md:sticky md:top-8 md:self-start">
+            <Photo
+              media={photo}
+              locale={locale}
+              priority
+              sizes="(min-width: 768px) 45vw, 100vw"
+              className="w-full object-cover"
+            />
+          </div>
         ) : null}
         <p
           className={`reveal max-w-[58ch] whitespace-pre-line text-lg leading-[2] ${photo ? "" : "md:col-span-2"}`}
