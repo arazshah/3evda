@@ -1,5 +1,4 @@
 import type { Locale } from "@/i18n/config";
-import { Card } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatToman, href, localized } from "@/lib/site/text";
 import type { Package } from "@/lib/site/types";
@@ -30,23 +29,40 @@ export function PackageCard({
       ? labels.inquiry
       : `${pkg.price_mode === "from" ? `${labels.from} ` : ""}${formatToman(pkg.price_amount, locale)} ${labels.toman}`;
 
+  const featured = pkg.is_featured;
   return (
-    <Card className={`flex h-full flex-col gap-4 ${pkg.is_featured ? "border-accent" : ""}`}>
+    <article
+      className={`flex h-full flex-col gap-5 p-6 ${featured ? "bg-ink text-on-ink" : "border-t border-text"}`}
+    >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-xl font-extrabold">{localized(locale, pkg, "title")}</h3>
+        <h3 className="font-display text-3xl leading-tight">{localized(locale, pkg, "title")}</h3>
         {badge ? (
-          <span className="rounded-full bg-accent px-3 text-sm font-semibold text-bg">{badge}</span>
+          <span
+            className={`rounded-full border px-3 text-xs ${featured ? "border-accent-on-ink text-accent-on-ink" : "border-accent text-accent"}`}
+          >
+            {badge}
+          </span>
         ) : null}
       </div>
-      {summary ? <p className="text-muted">{summary}</p> : null}
-      <p className="text-2xl font-extrabold text-accent">
+      {summary ? <p className={featured ? "text-on-ink/75" : "text-muted"}>{summary}</p> : null}
+      <p className={`font-display text-3xl ${featured ? "text-accent-on-ink" : "text-accent"}`}>
         {price}
-        {unit ? <span className="ms-2 text-sm font-normal text-muted">{unit}</span> : null}
+        {unit ? (
+          <span className={`ms-2 font-sans text-sm ${featured ? "text-on-ink/70" : "text-muted"}`}>
+            {unit}
+          </span>
+        ) : null}
       </p>
-      <ul className="flex-1 space-y-2">
+      <ul className="flex-1 space-y-2 border-t border-current/20 pt-4">
         {pkg.features.map((f, i) => (
-          <li key={i} className={`flex gap-2 ${f.included ? "" : "text-muted line-through"}`}>
-            <span aria-hidden className={f.included ? "text-success" : "text-accent-2"}>
+          <li
+            key={i}
+            className={`flex gap-2 ${f.included ? "" : featured ? "text-on-ink/60 line-through" : "text-muted line-through"}`}
+          >
+            <span
+              aria-hidden
+              className={f.included ? (featured ? "text-accent-on-ink" : "text-success") : "text-accent-2"}
+            >
               {f.included ? "✓" : "✕"}
             </span>
             <span>
@@ -56,9 +72,13 @@ export function PackageCard({
           </li>
         ))}
       </ul>
-      <ButtonLink href={href(locale, "/quote")} variant={pkg.is_featured ? "primary" : "secondary"}>
+      <ButtonLink
+        href={href(locale, "/quote")}
+        variant={featured ? "inverse" : "secondary"}
+        className="rounded-full"
+      >
         {labels.quote}
       </ButtonLink>
-    </Card>
+    </article>
   );
 }

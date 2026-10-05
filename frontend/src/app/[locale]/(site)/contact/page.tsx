@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { PageTitle, Section } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
@@ -42,62 +41,73 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         intro={block(site, locale, "contact.intro") || t("contact.soon")}
       />
       <Section>
-        <Card className="max-w-2xl space-y-4">
-          <dl className="space-y-3">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-20">
+          <dl className="border-t border-text">
             {s.phone ? (
-              <div>
-                <dt className="text-sm text-muted">{t("contact.phone")}</dt>
-                <dd>
-                  <a className="text-lg hover:text-accent" dir="ltr" href={telHref(s.phone)}>
+              <div className="border-b border-line py-6">
+                <dt className="eyebrow text-muted">{t("contact.phone")}</dt>
+                <dd className="mt-2">
+                  <a
+                    className="font-display link-line text-[clamp(1.75rem,4vw,3.25rem)] hover:text-accent"
+                    dir="ltr"
+                    href={telHref(s.phone)}
+                  >
                     {s.phone}
                   </a>
                 </dd>
               </div>
             ) : null}
             {s.email ? (
-              <div>
-                <dt className="text-sm text-muted">{t("contact.email")}</dt>
-                <dd>
-                  <a className="text-lg hover:text-accent" href={`mailto:${s.email}`}>
+              <div className="border-b border-line py-6">
+                <dt className="eyebrow text-muted">{t("contact.email")}</dt>
+                <dd className="mt-2">
+                  <a
+                    className="font-display link-line text-[clamp(1.5rem,3.4vw,2.75rem)] hover:text-accent"
+                    href={`mailto:${s.email}`}
+                  >
                     {s.email}
                   </a>
                 </dd>
               </div>
             ) : null}
             {address ? (
-              <div>
-                <dt className="text-sm text-muted">{t("contact.address")}</dt>
-                <dd className="text-lg">{address}</dd>
+              <div className="border-b border-line py-6">
+                <dt className="eyebrow text-muted">{t("contact.address")}</dt>
+                <dd className="mt-2 text-xl">{address}</dd>
               </div>
             ) : null}
           </dl>
-          <ButtonLink href={href(locale, "/quote")}>{t("contact.quoteCta")}</ButtonLink>
-          {channels.length ? (
-            <div className="flex flex-wrap gap-3" role="group" aria-label={t("contact.channels")}>
-              {channels.map((c) => (
-                <ButtonLink
-                  key={c.label}
-                  href={c.url}
-                  variant="secondary"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {c.label}
-                </ButtonLink>
-              ))}
-            </div>
-          ) : null}
-          {s.map_url ? (
-            <a
-              className="inline-flex min-h-11 items-center text-accent hover:underline"
-              href={s.map_url}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              {t("contact.map")}
-            </a>
-          ) : null}
-        </Card>
+          <div className="space-y-8">
+            <ButtonLink href={href(locale, "/quote")} className="rounded-full">
+              {t("contact.quoteCta")}
+            </ButtonLink>
+            {channels.length ? (
+              <div className="flex flex-wrap gap-x-6 gap-y-1" role="group" aria-label={t("contact.channels")}>
+                {channels.map((c) => (
+                  <a
+                    key={c.label}
+                    href={c.url}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className="link-line inline-flex min-h-11 items-center text-lg"
+                  >
+                    {c.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
+            {s.map_url ? (
+              <a
+                className="link-line inline-flex min-h-11 items-center text-accent"
+                href={s.map_url}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t("contact.map")}
+              </a>
+            ) : null}
+          </div>
+        </div>
       </Section>
     </SitePage>
   );

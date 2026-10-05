@@ -22,27 +22,29 @@ export function ArticleCard({
     new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(article.reading_minutes),
   );
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-brand border border-line bg-surface">
+    <article className="group relative flex h-full flex-col">
       {article.cover ? (
-        <Photo
-          media={article.cover}
-          locale={locale}
-          alt=""
-          priority={priority}
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        <div className="overflow-hidden bg-elevated">
+          <Photo
+            media={article.cover}
+            locale={locale}
+            alt=""
+            priority={priority}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="aspect-[3/2] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+          />
+        </div>
       ) : null}
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className="flex flex-1 flex-col gap-2 pt-4">
         {article.category ? (
           <a
             href={href(locale, `/blog/category/${encodeURIComponent(article.category.slug)}`)}
-            className="relative z-10 inline-flex min-h-6 items-center text-sm text-accent hover:underline"
+            className="eyebrow relative z-10 inline-flex min-h-6 items-center text-accent hover:underline"
           >
             {localized(locale, article.category, "title")}
           </a>
         ) : null}
-        <h2 className="text-xl font-bold leading-snug">
+        <h2 className="font-display text-2xl leading-snug">
           <a
             href={href(locale, `/blog/${encodeURIComponent(article.slug)}`)}
             className="after:absolute after:inset-0 hover:text-accent"
