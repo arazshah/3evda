@@ -3,11 +3,11 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost";
 
 const BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-brand px-6 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "btn-label inline-flex min-h-11 items-center justify-center gap-2 rounded-brand border px-6 transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50";
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-accent text-bg hover:bg-accent/90",
-  secondary: "border border-line text-text hover:border-accent",
-  ghost: "text-muted hover:text-text",
+  primary: "border-text bg-text text-bg hover:border-accent hover:bg-accent",
+  secondary: "border-text text-text hover:bg-text hover:text-bg",
+  ghost: "border-transparent text-muted hover:text-text",
 };
 
 export function buttonClass(variant: Variant = "primary", extra = ""): string {

@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import { ButtonLink } from "@/components/ui/Button";
+import { ThemeToggle, type ThemeLabels } from "@/components/ui/ThemeToggle";
 import { Photo } from "./Photo";
 import { block, href, localized, pick } from "@/lib/site/text";
 import type { SiteData } from "@/lib/site/types";
@@ -21,12 +22,14 @@ export function SiteHeader({
   site,
   locale,
   labels,
+  themeLabels,
   currentPath,
   switchPath,
 }: {
   site: SiteData;
   locale: Locale;
   labels: NavLabels;
+  themeLabels: ThemeLabels;
   currentPath: string;
   /** The same page in the other language, when its address differs (e.g. a translated article). */
   switchPath?: string;
@@ -88,6 +91,7 @@ export function SiteHeader({
           >
             {labels.switchLanguage}
           </a>
+          <ThemeToggle labels={themeLabels} />
           <ButtonLink href={href(locale, "/quote")} className="hidden sm:inline-flex">
             {block(site, locale, "home.cta_primary") || labels.quote}
           </ButtonLink>

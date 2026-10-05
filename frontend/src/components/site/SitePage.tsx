@@ -33,6 +33,12 @@ export async function SitePage({
     switchLanguage: t("nav.switchLanguage"),
     quote: t("nav.quote"),
   };
+  const theme = {
+    label: t("theme.label"),
+    system: t("theme.system"),
+    light: t("theme.light"),
+    dark: t("theme.dark"),
+  };
   return (
     <>
       <a
@@ -41,7 +47,14 @@ export async function SitePage({
       >
         {t("common.skip")}
       </a>
-      <SiteHeader site={site} locale={locale} labels={nav} currentPath={path} switchPath={switchPath} />
+      <SiteHeader
+        site={site}
+        locale={locale}
+        labels={nav}
+        themeLabels={theme}
+        currentPath={path}
+        switchPath={switchPath}
+      />
       <main id="content">{children}</main>
       <SiteFooter
         site={site}
