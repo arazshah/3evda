@@ -51,7 +51,7 @@ export function ProjectGallery({
                   media={img.media}
                   locale={locale}
                   alt={items[i]!.alt}
-                  sizes="(min-width: 640px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="w-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                 />
               </button>

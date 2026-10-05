@@ -20,6 +20,16 @@ const SPANS = [
   "col-span-1 row-span-2 md:col-span-2",
 ];
 
+/** What each tile of `SPANS` really occupies (phones, then from `md`), so the browser picks a fitting rendition. */
+const SIZES = [
+  "(min-width: 768px) 33vw, 100vw",
+  "(min-width: 768px) 33vw, 50vw",
+  "(min-width: 768px) 33vw, 50vw",
+  "(min-width: 768px) 50vw, 100vw",
+  "(min-width: 768px) 17vw, 50vw",
+  "(min-width: 768px) 33vw, 50vw",
+];
+
 type Labels = {
   filter: string;
   all: string;
@@ -109,7 +119,7 @@ export function PortfolioGrid({
                     locale={locale}
                     alt=""
                     priority={i < 2}
-                    sizes="(min-width: 768px) 33vw, 50vw"
+                    sizes={SIZES[i % SIZES.length]!}
                     className="size-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
                   />
                 ) : null}
