@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { PackageCard } from "@/components/site/PackageCard";
 import { JsonLd } from "@/components/site/JsonLd";
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { Photo } from "@/components/site/Photo";
-import { ProjectCard } from "@/components/site/ProjectCard";
-import { Section } from "@/components/site/Section";
+import { ProjectReel } from "@/components/site/ProjectReel";
+import { ServiceIndex } from "@/components/site/ServiceIndex";
+import { Section, WIDE } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { featuredPackages, getPackageGroups, getPortfolio, getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
@@ -40,7 +40,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   ]);
   const b = (key: string) => block(site, locale, key);
   const c = site.collections;
-  const featured = portfolio.projects.filter((p) => p.is_featured).slice(0, 6);
+  const featured = portfolio.projects.filter((p) => p.is_featured).slice(0, 8);
   const packages = featuredPackages(groups).slice(0, 3);
   const slides = c.hero_slide;
   const fallbackHero = {
@@ -66,41 +66,79 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     quote: t("packages.quote"),
   };
 
+  const number = new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", { minimumIntegerDigits: 2 });
+  const statement = slides.length ? fallbackHero.subtitle : "";
+  const ctaHref = href(locale, "/quote");
+
   return (
-    <SitePage site={site} locale={locale} path="/">
+    <SitePage
+      site={site}
+      locale={locale}
+      path="/"
+      overlay
+      footerTop={
+        <section id="cta" aria-labelledby="cta-title" className={`${WIDE} py-[clamp(4rem,9vw,8rem)]`}>
+          <h2 id="cta-title" className="font-display text-[clamp(2.75rem,9vw,8.5rem)] leading-[0.98]">
+            <a href={ctaHref} className="transition-colors duration-500 hover:text-accent-on-ink">
+              {b("home.cta_title")}
+            </a>
+          </h2>
+          <div className="mt-8 flex flex-wrap items-center gap-6">
+            {b("home.cta_body") ? <p className="max-w-prose text-on-ink/75">{b("home.cta_body")}</p> : null}
+            <ButtonLink href={ctaHref} variant="inverse" className="rounded-full">
+              {b("home.cta_primary") || t("nav.quote")}
+            </ButtonLink>
+          </div>
+        </section>
+      }
+    >
       <JsonLd data={photographerLd(site, locale)} />
       <HeroSlides
         slides={heroSlides}
         locale={locale}
         eyebrow={pick(locale, site.settings.tagline_fa, site.settings.tagline_en) || brand}
-        primary={{ href: href(locale, "/quote"), label: b("home.cta_primary") || t("nav.quote") }}
+        primary={{ href: ctaHref, label: b("home.cta_primary") || t("nav.quote") }}
         secondary={{ href: href(locale, "/portfolio"), label: b("home.cta_secondary") || t("nav.portfolio") }}
-        slideLabelTemplate={t.raw("common.slide") as string}
-        groupLabel={t("common.slides")}
+        labels={{
+          slideTemplate: t.raw("common.slide") as string,
+          group: t("common.slides"),
+          previous: t("common.prevSlide"),
+          next: t("common.nextSlide"),
+          pause: t("common.pause"),
+          play: t("common.play"),
+        }}
       />
+
+      {statement ? (
+        <section className={`${WIDE} pt-[clamp(4rem,9vw,8.5rem)]`}>
+          <p className="reveal font-display max-w-[28ch] text-[clamp(1.75rem,4vw,3.75rem)] leading-[1.25]">
+            {statement}
+          </p>
+        </section>
+      ) : null}
 
       {portfolio.categories.length ? (
         <Section id="categories" title={b("home.categories_title")}>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {portfolio.categories.map((cat) => (
-              <li key={cat.slug}>
+              <li key={cat.slug} className="reveal">
                 <a
                   href={href(locale, `/portfolio?category=${cat.slug}`)}
-                  className="group relative block overflow-hidden rounded-brand border border-line bg-surface"
+                  className="group relative block aspect-[4/5] overflow-hidden bg-elevated"
                 >
                   {cat.cover ? (
                     <Photo
                       media={cat.cover}
                       locale={locale}
                       alt=""
-                      sizes="(min-width: 1024px) 33vw, 100vw"
-                      className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 100vw"
+                      className="size-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
                     />
-                  ) : (
-                    <div className="aspect-[4/3]" />
-                  )}
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 to-transparent p-4 pt-10 text-lg font-bold">
-                    {localized(locale, cat, "title")}
+                  ) : null}
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent p-5 pt-16">
+                    <span className="font-display text-3xl text-on-ink">
+                      {localized(locale, cat, "title")}
+                    </span>
                   </span>
                 </a>
               </li>
@@ -110,54 +148,41 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       ) : null}
 
       {featured.length ? (
-        <Section
-          id="featured"
-          title={b("home.featured_title")}
-          action={
-            <ButtonLink href={href(locale, "/portfolio")} variant="ghost">
+        <section id="featured" aria-labelledby="featured-title" className="pt-[clamp(4rem,9vw,8.5rem)]">
+          <div className={`${WIDE} reveal mb-10 flex flex-wrap items-end justify-between gap-4 md:mb-14`}>
+            <h2 id="featured-title" className="font-display text-[clamp(2.25rem,5.5vw,5rem)] leading-[1.05]">
+              {b("home.featured_title")}
+            </h2>
+            <ButtonLink href={href(locale, "/portfolio")} variant="secondary" className="rounded-full">
               {t("common.viewAll")}
             </ButtonLink>
-          }
-        >
-          <ul className="flex flex-wrap gap-3 after:grow-[100] after:content-['']">
-            {featured.map((p) => (
-              <li key={p.slug} className="contents">
-                <ProjectCard project={p} locale={locale} />
-              </li>
-            ))}
-          </ul>
-        </Section>
+          </div>
+          <ProjectReel projects={featured} locale={locale} label={b("home.featured_title")} />
+        </section>
       ) : null}
 
       {c.service.length ? (
         <Section id="services" title={b("home.services_title")}>
-          <ul className="grid gap-4 md:grid-cols-3">
-            {c.service.map((s) => (
-              <li key={s.id}>
-                <Card className="h-full space-y-2">
-                  <h3 className="text-lg font-bold">{localized(locale, s, "title")}</h3>
-                  <p className="text-muted">
-                    {localized(locale, s, "body") || localized(locale, s, "subtitle")}
-                  </p>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <ServiceIndex
+            locale={locale}
+            rows={c.service.map((s) => ({
+              id: s.id,
+              title: localized(locale, s, "title"),
+              body: localized(locale, s, "body") || localized(locale, s, "subtitle"),
+              media: s.media,
+            }))}
+          />
         </Section>
       ) : null}
 
       {c.process_step.length ? (
         <Section id="process" title={b("home.process_title")}>
-          <ol className="grid gap-4 md:grid-cols-4">
+          <ol className="grid gap-x-8 gap-y-10 md:grid-cols-4">
             {c.process_step.map((s, i) => (
-              <li key={s.id}>
-                <Card className="h-full space-y-2">
-                  <span className="font-display text-3xl font-extrabold text-accent">
-                    {new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(i + 1)}
-                  </span>
-                  <h3 className="font-bold">{localized(locale, s, "title")}</h3>
-                  <p className="text-muted">{localized(locale, s, "body")}</p>
-                </Card>
+              <li key={s.id} className="reveal border-t border-text pt-5">
+                <span className="font-display text-5xl text-accent">{number.format(i + 1)}</span>
+                <h3 className="font-display mt-4 text-2xl leading-tight">{localized(locale, s, "title")}</h3>
+                <p className="mt-2 text-muted">{localized(locale, s, "body")}</p>
               </li>
             ))}
           </ol>
@@ -168,7 +193,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Section id="packages" title={b("home.packages_title")}>
           <ul className="grid gap-4 md:grid-cols-3">
             {packages.map((p) => (
-              <li key={p.id}>
+              <li key={p.id} className="reveal">
                 <PackageCard pkg={p} locale={locale} labels={packageLabels} />
               </li>
             ))}
@@ -178,7 +203,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {c.client.length ? (
         <Section id="clients" title={b("home.clients_title")}>
-          <ul className="flex flex-wrap items-center gap-x-10 gap-y-6">
+          <ul className="flex flex-wrap items-center gap-x-12 gap-y-8">
             {c.client.map((cl) => (
               <li key={cl.id}>
                 {cl.media ? (
@@ -187,10 +212,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                     locale={locale}
                     alt={localized(locale, cl, "title")}
                     sizes="160px"
-                    className="h-12 w-auto opacity-80"
+                    className="h-12 w-auto opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0"
                   />
                 ) : (
-                  <span className="text-muted">{localized(locale, cl, "title")}</span>
+                  <span className="font-display text-2xl text-muted">{localized(locale, cl, "title")}</span>
                 )}
               </li>
             ))}
@@ -200,16 +225,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {c.testimonial.length ? (
         <Section id="testimonials" title={b("home.testimonials_title")}>
-          <ul className="grid gap-4 md:grid-cols-2">
+          <ul className="grid gap-x-12 gap-y-12 md:grid-cols-2">
             {c.testimonial.map((q) => (
-              <li key={q.id}>
-                <Card className="h-full space-y-3">
-                  <blockquote className="text-lg">{localized(locale, q, "body")}</blockquote>
-                  <p className="text-sm text-muted">
-                    {localized(locale, q, "title")}
-                    {localized(locale, q, "subtitle") ? ` · ${localized(locale, q, "subtitle")}` : ""}
-                  </p>
-                </Card>
+              <li key={q.id} className="reveal border-t border-line pt-6">
+                <blockquote className="font-display text-[clamp(1.4rem,2.4vw,2rem)] leading-[1.4]">
+                  {localized(locale, q, "body")}
+                </blockquote>
+                <p className="mt-4 text-sm text-muted">
+                  {localized(locale, q, "title")}
+                  {localized(locale, q, "subtitle") ? ` · ${localized(locale, q, "subtitle")}` : ""}
+                </p>
               </li>
             ))}
           </ul>
@@ -218,16 +243,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {c.behind_scenes.length ? (
         <Section id="behind" title={b("home.behind_title")}>
-          <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
             {c.behind_scenes.map((m) =>
               m.media ? (
-                <li key={m.id}>
+                <li key={m.id} className="reveal overflow-hidden bg-elevated">
                   <Photo
                     media={m.media}
                     locale={locale}
                     alt={localized(locale, m, "title")}
                     sizes="(min-width: 768px) 25vw, 50vw"
-                    className="aspect-square w-full rounded-brand object-cover"
+                    className="aspect-square w-full object-cover transition-transform duration-[1200ms] ease-out hover:scale-105"
                   />
                 </li>
               ) : null,
@@ -238,26 +263,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {c.faq.length ? (
         <Section id="faq" title={b("home.faq_title")}>
-          <div className="max-w-3xl space-y-2">
+          <div className="max-w-3xl border-t border-line">
             {c.faq.map((f) => (
-              <details key={f.id} className="group rounded-brand border border-line bg-surface p-4">
-                <summary className="min-h-11 cursor-pointer font-semibold marker:text-accent">
+              <details key={f.id} className="group border-b border-line py-1">
+                <summary className="font-display flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 text-xl [&::-webkit-details-marker]:hidden">
                   {localized(locale, f, "title")}
+                  <span
+                    aria-hidden="true"
+                    className="text-2xl transition-transform duration-300 group-open:rotate-45"
+                  >
+                    +
+                  </span>
                 </summary>
-                <p className="mt-2 text-muted">{localized(locale, f, "body")}</p>
+                <p className="pb-4 text-muted">{localized(locale, f, "body")}</p>
               </details>
             ))}
           </div>
         </Section>
       ) : null}
-
-      <Section id="cta">
-        <Card className="space-y-4 border-accent bg-elevated p-10 text-center">
-          <h2 className="font-display text-3xl font-extrabold">{b("home.cta_title")}</h2>
-          <p className="mx-auto max-w-prose text-muted">{b("home.cta_body")}</p>
-          <ButtonLink href={href(locale, "/quote")}>{b("home.cta_primary") || t("nav.quote")}</ButtonLink>
-        </Card>
-      </Section>
     </SitePage>
   );
 }

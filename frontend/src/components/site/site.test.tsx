@@ -216,8 +216,14 @@ describe("HeroSlides", () => {
     eyebrow: "Tagline",
     primary: { href: "/en/quote", label: "Quote" },
     secondary: { href: "/en/portfolio", label: "Portfolio" },
-    slideLabelTemplate: "Slide {n}",
-    groupLabel: "Slides",
+    labels: {
+      slideTemplate: "Slide {n}",
+      group: "Slides",
+      previous: "Previous slide",
+      next: "Next slide",
+      pause: "Pause slideshow",
+      play: "Play slideshow",
+    },
   };
 
   it("shows the first slide and lets the visitor reach the others", () => {
@@ -232,8 +238,35 @@ describe("HeroSlides", () => {
     expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("steps with the arrows and wraps around", () => {
+    const slides = [
+      { title: "One", subtitle: "", media: null },
+      { title: "Two", subtitle: "", media: null },
+    ];
+    render(<HeroSlides {...props} slides={slides} />);
+    fireEvent.click(screen.getByRole("button", { name: "Next slide" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Two" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next slide" }));
+    expect(screen.getByRole("heading", { level: 1, name: "One" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Previous slide" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Two" })).toBeInTheDocument();
+  });
+
+  it("has a pause control that reports its state (WCAG 2.2.2)", () => {
+    const slides = [
+      { title: "One", subtitle: "", media: null },
+      { title: "Two", subtitle: "", media: null },
+    ];
+    render(<HeroSlides {...props} slides={slides} />);
+    const pause = screen.getByRole("button", { name: "Pause slideshow" });
+    expect(pause).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(pause);
+    expect(screen.getByRole("button", { name: "Play slideshow" })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("hides the slide buttons when there is only one slide", () => {
     render(<HeroSlides {...props} slides={[{ title: "Solo", subtitle: "", media: null }]} />);
     expect(screen.queryByRole("group", { name: "Slides" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Next slide" })).not.toBeInTheDocument();
   });
 });

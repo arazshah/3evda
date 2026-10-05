@@ -11,12 +11,18 @@ export async function SitePage({
   locale,
   path,
   switchPath,
+  overlay = false,
+  footerTop,
   children,
 }: {
   site: SiteData;
   locale: Locale;
   path: string;
   switchPath?: string;
+  /** The header floats over the first section (the home hero). */
+  overlay?: boolean;
+  /** Rendered at the top of the footer, in its dark area. */
+  footerTop?: ReactNode;
   children: ReactNode;
 }) {
   setRequestLocale(locale);
@@ -30,6 +36,7 @@ export async function SitePage({
     about: t("nav.about"),
     contact: t("nav.contact"),
     menu: t("nav.menu"),
+    menuOpen: t("common.menuOpen"),
     switchLanguage: t("nav.switchLanguage"),
     quote: t("nav.quote"),
   };
@@ -54,8 +61,11 @@ export async function SitePage({
         themeLabels={theme}
         currentPath={path}
         switchPath={switchPath}
+        overlay={overlay}
       />
-      <main id="content">{children}</main>
+      <main id="content" className={overlay ? "relative" : ""}>
+        {children}
+      </main>
       <SiteFooter
         site={site}
         locale={locale}
@@ -65,7 +75,9 @@ export async function SitePage({
           whatsapp: t("footer.whatsapp"),
           book: t("nav.book"),
         }}
-      />
+      >
+        {footerTop}
+      </SiteFooter>
     </>
   );
 }

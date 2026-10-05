@@ -29,7 +29,16 @@ function apply(choice: ThemeChoice) {
 }
 
 /** Cycles system, light, dark. The button names the choice in force; its icon is decorative. */
-export function ThemeToggle({ labels, className = "" }: { labels: ThemeLabels; className?: string }) {
+export function ThemeToggle({
+  labels,
+  tone = "default",
+  className = "",
+}: {
+  labels: ThemeLabels;
+  /** `onInk` for the always-dark surfaces, where the page text colour is not the right one. */
+  tone?: "default" | "onInk";
+  className?: string;
+}) {
   // The server already wrote the choice on <html>; reading it on the first client render matches that markup.
   const [choice, setChoice] = useState<ThemeChoice>(current);
 
@@ -45,7 +54,11 @@ export function ThemeToggle({ labels, className = "" }: { labels: ThemeLabels; c
       onClick={next}
       aria-label={`${labels.label}: ${labels[choice]}`}
       title={`${labels.label}: ${labels[choice]}`}
-      className={`inline-flex size-11 items-center justify-center rounded-full border border-line text-text transition-colors hover:border-accent ${className}`.trim()}
+      className={`inline-flex size-11 items-center justify-center rounded-full border transition-colors ${
+        tone === "onInk"
+          ? "border-on-ink/40 text-on-ink hover:border-on-ink"
+          : "border-line text-text hover:border-accent"
+      } ${className}`.trim()}
     >
       <svg
         viewBox="0 0 24 24"

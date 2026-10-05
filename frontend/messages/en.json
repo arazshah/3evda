@@ -42,7 +42,13 @@
       "empty": "Coming soon",
       "back": "Back",
       "slide": "Slide {n}",
-      "slides": "Home slides"
+      "slides": "Home slides",
+      "pause": "Pause slideshow",
+      "play": "Play slideshow",
+      "prevSlide": "Previous slide",
+      "nextSlide": "Next slide",
+      "menuOpen": "Menu",
+      "scroll": "Scroll"
     },
     "portfolio": {
       "filterLabel": "Filter portfolio",

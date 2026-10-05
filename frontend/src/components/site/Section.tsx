@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+/** Page gutter and width shared by the header, the sections and the footer. */
+export const GUTTER = "px-[clamp(1rem,4vw,3.5rem)]";
+export const WIDE = `mx-auto w-full max-w-[84rem] ${GUTTER}`;
+
 export function Section({
   title,
   intro,
@@ -15,14 +19,18 @@ export function Section({
 }) {
   const headingId = id ? `${id}-title` : undefined;
   return (
-    <section id={id} aria-labelledby={title ? headingId : undefined} className="mx-auto max-w-6xl px-4 pt-16">
+    <section
+      id={id}
+      aria-labelledby={title ? headingId : undefined}
+      className={`${WIDE} pt-[clamp(4rem,9vw,8.5rem)]`}
+    >
       {title ? (
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="reveal mb-10 flex flex-wrap items-end justify-between gap-4 md:mb-14">
           <div className="max-w-prose">
-            <h2 id={headingId} className="font-display text-3xl font-extrabold">
+            <h2 id={headingId} className="font-display text-[clamp(2.25rem,5.5vw,5rem)] leading-[1.05]">
               {title}
             </h2>
-            {intro ? <p className="mt-2 text-muted">{intro}</p> : null}
+            {intro ? <p className="mt-3 text-muted">{intro}</p> : null}
           </div>
           {action}
         </div>
@@ -34,9 +42,9 @@ export function Section({
 
 export function PageTitle({ title, intro }: { title: string; intro?: string }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-14">
-      <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{title}</h1>
-      {intro ? <p className="mt-4 max-w-prose text-lg text-muted">{intro}</p> : null}
+    <div className={`${WIDE} pt-[clamp(3rem,7vw,6rem)]`}>
+      <h1 className="font-display text-[clamp(2.75rem,7vw,6.5rem)] leading-[1]">{title}</h1>
+      {intro ? <p className="mt-5 max-w-prose text-lg text-muted">{intro}</p> : null}
     </div>
   );
 }
