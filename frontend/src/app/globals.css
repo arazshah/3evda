@@ -190,6 +190,22 @@ html[dir="rtl"] .link-line::after {
   }
 }
 
+/* Cross-document view transitions: pages fade into each other and shared names (project tile and hero) morph. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Horizontal reel: a slim scrollbar in the line colour instead of the default one. */
 .reel {
   scrollbar-width: thin;

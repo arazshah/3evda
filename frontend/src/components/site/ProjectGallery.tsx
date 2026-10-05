@@ -29,19 +29,20 @@ export function ProjectGallery({
   return (
     <LightboxGallery images={items} labels={labels}>
       {(open) => (
-        <ul aria-label={labels.gallery} className="grid gap-3 sm:grid-cols-2">
+        // Columns keep every photo at its own proportions (nothing is cropped), like a contact sheet.
+        <ul aria-label={labels.gallery} className="columns-1 gap-1.5 sm:columns-2 lg:columns-3">
           {images.map((img, i) => (
-            <li key={img.media.id}>
+            <li key={img.media.id} className="mb-1.5 break-inside-avoid">
               <button
                 type="button"
                 onClick={() => open(i)}
                 aria-label={items[i]!.alt || `${labels.dialog} ${i + 1}`}
-                className="relative block w-full overflow-hidden rounded-brand"
+                className="group relative block w-full cursor-zoom-in overflow-hidden bg-elevated"
               >
                 {img.media.kind === "video" ? (
                   <span
                     aria-hidden
-                    className="absolute inset-0 z-10 m-auto flex size-14 items-center justify-center rounded-full bg-bg/80 text-2xl"
+                    className="absolute inset-0 z-10 m-auto flex size-14 items-center justify-center rounded-full bg-ink/70 text-2xl text-on-ink"
                   >
                     ▶
                   </span>
@@ -51,7 +52,7 @@ export function ProjectGallery({
                   locale={locale}
                   alt={items[i]!.alt}
                   sizes="(min-width: 640px) 50vw, 100vw"
-                  className="w-full object-cover"
+                  className="w-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                 />
               </button>
             </li>
