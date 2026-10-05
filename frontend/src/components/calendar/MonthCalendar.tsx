@@ -172,10 +172,10 @@ export function MonthCalendar({
                       onClick={() => onSelect?.(iso)}
                       className={`flex min-h-11 w-full flex-col items-center justify-center rounded-brand border text-sm font-semibold disabled:cursor-not-allowed disabled:font-normal disabled:text-muted ${
                         value === iso
-                          ? "border-accent bg-accent text-bg"
+                          ? "border-text bg-text text-bg"
                           : iso === today
-                            ? "border-accent hover:bg-elevated"
-                            : "border-line hover:border-accent hover:bg-elevated disabled:border-transparent disabled:hover:bg-transparent"
+                            ? "border-text hover:bg-elevated"
+                            : "border-line hover:border-text hover:bg-elevated disabled:border-transparent disabled:hover:bg-transparent"
                       }`}
                     >
                       <span>{label(iso)}</span>

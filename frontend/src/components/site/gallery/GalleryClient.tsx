@@ -396,7 +396,7 @@ export function GalleryClient({
   if (phase === "expired") {
     return (
       <Card className="mx-auto max-w-xl space-y-3">
-        <h1 className="font-display text-2xl font-extrabold">{labels.expiredTitle}</h1>
+        <h1 className="font-display text-3xl">{labels.expiredTitle}</h1>
         <p className="text-muted">{labels.expiredBody}</p>
       </Card>
     );
@@ -434,7 +434,7 @@ export function GalleryClient({
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="font-display text-3xl font-extrabold" dir="auto">
+        <h1 className="font-display text-4xl" dir="auto">
           {initial.title}
         </h1>
         {!submitted && <p className="max-w-2xl text-muted">{labels.intro}</p>}

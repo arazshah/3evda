@@ -4,7 +4,7 @@ import { useId } from "react";
 import { isoOf, jalaliMonthLength, parseIso, todayIso, toGregorian, toJalali } from "@/lib/calendar/jalali";
 
 const SELECT =
-  "min-h-11 rounded-brand border border-line bg-elevated px-3 text-text outline-none focus:border-accent";
+  "min-h-11 rounded-none border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-accent";
 
 const monthName = (jy: number, jm: number) =>
   new Intl.DateTimeFormat("fa-IR", { month: "long", timeZone: "UTC" }).format(

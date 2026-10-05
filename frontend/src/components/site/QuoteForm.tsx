@@ -220,7 +220,7 @@ export function QuoteForm({
     return (
       <Card className="max-w-2xl space-y-3">
         <div ref={thanks} tabIndex={-1} role="status" className="space-y-3 outline-none">
-          <h2 className="font-display text-2xl font-extrabold">{labels.thanksTitle}</h2>
+          <h2 className="font-display text-3xl">{labels.thanksTitle}</h2>
           <p className="text-muted">{labels.thanksBody}</p>
         </div>
       </Card>
@@ -256,7 +256,7 @@ export function QuoteForm({
 
       {hasCalculator && (
         <Card className="grid gap-5">
-          <h2 className="font-display text-2xl font-extrabold">{labels.calculator}</h2>
+          <h2 className="font-display text-3xl">{labels.calculator}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="quote-service" className="text-sm font-semibold">
@@ -266,7 +266,7 @@ export function QuoteForm({
                 id="quote-service"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
-                className="min-h-11 w-full rounded-brand border border-line bg-elevated px-3 text-text"
+                className="min-h-11 w-full rounded-none border-0 border-b border-text/60 bg-transparent px-0 text-text focus-visible:border-text"
               >
                 {options.services.map((s) => (
                   <option key={s.key} value={s.key}>
@@ -341,7 +341,7 @@ export function QuoteForm({
 
       <Card className="grid gap-4">
         <div>
-          <h2 className="font-display text-2xl font-extrabold">{labels.details}</h2>
+          <h2 className="font-display text-3xl">{labels.details}</h2>
           <p className="mt-1 text-sm text-muted">{labels.detailsIntro}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -388,7 +388,7 @@ export function QuoteForm({
             }}
             aria-invalid={errors.attachments ? true : undefined}
             aria-describedby="quote-files-note"
-            className="min-h-11 w-full rounded-brand border border-line bg-elevated p-2 text-sm"
+            className="min-h-11 w-full rounded-none border-0 border-b border-text/60 bg-transparent px-0 py-2 text-sm focus-visible:border-text"
           />
           <p
             id="quote-files-note"
