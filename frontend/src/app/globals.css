@@ -1,30 +1,80 @@
 @import "tailwindcss";
-@import "@fontsource/vazirmatn/400.css";
-@import "@fontsource/vazirmatn/600.css";
-@import "@fontsource/vazirmatn/800.css";
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/fraunces/600.css";
-@import "@fontsource/fraunces/800.css";
+@import "@fontsource/vazirmatn/arabic-200.css";
+@import "@fontsource/vazirmatn/arabic-300.css";
+@import "@fontsource/vazirmatn/arabic-400.css";
+@import "@fontsource/vazirmatn/arabic-600.css";
+@import "@fontsource/manrope/latin-300.css";
+@import "@fontsource/manrope/latin-400.css";
+@import "@fontsource/manrope/latin-500.css";
+@import "@fontsource/manrope/latin-600.css";
+@import "@fontsource/bodoni-moda/latin-400.css";
+@import "@fontsource/bodoni-moda/latin-400-italic.css";
 
-/* Brand tokens — see docs/design/brand-preview.html */
-@theme {
-  --color-bg: #0f0d0b;
-  --color-surface: #1a1612;
-  --color-elevated: #262019;
-  --color-line: #3a3128;
-  --color-text: #f2eadf;
-  --color-muted: #b3a594;
-  --color-accent: #e3a33b;
-  --color-accent-2: #b4473c;
-  --color-success: #7e9a6c;
-  --radius-brand: 6px;
-  --font-sans: "Vazirmatn", "Inter", system-ui, sans-serif;
-  --font-display: "Fraunces", "Vazirmatn", Georgia, serif;
+/*
+ * Brand tokens, "editorial studio" (docs/design/redesign-preview-b.html): bone paper and ink, one brass accent.
+ * Light is the default; dark applies when the visitor chose it (cookie, written as data-theme by the layout)
+ * or, with no choice made, when the system asks for it. Text pairs were measured for WCAG AA in both themes.
+ */
+:root {
+  --c-bg: #f3eee6;
+  --c-surface: #faf7f2;
+  --c-elevated: #e8e0d4;
+  --c-line: #c9bfae;
+  --c-text: #141311;
+  --c-muted: #5a5148;
+  --c-accent: #755524;
+  --c-accent-2: #8f3f19;
+  --c-success: #3b6133;
+  --c-ink: #111110;
+  --c-on-ink: #ece6dc;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --c-bg: #0e0e0d;
+  --c-surface: #151514;
+  --c-elevated: #1c1b19;
+  --c-line: #2d2b27;
+  --c-text: #ece6dc;
+  --c-muted: #9d9487;
+  --c-accent: #cfa95e;
+  --c-accent-2: #e58a56;
+  --c-success: #9dc08a;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --c-bg: #0e0e0d;
+    --c-surface: #151514;
+    --c-elevated: #1c1b19;
+    --c-line: #2d2b27;
+    --c-text: #ece6dc;
+    --c-muted: #9d9487;
+    --c-accent: #cfa95e;
+    --c-accent-2: #e58a56;
+    --c-success: #9dc08a;
+    color-scheme: dark;
+  }
 }
 
-html {
-  color-scheme: dark;
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-elevated: var(--c-elevated);
+  --color-line: var(--c-line);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-accent: var(--c-accent);
+  --color-accent-2: var(--c-accent-2);
+  --color-success: var(--c-success);
+  --color-ink: var(--c-ink);
+  --color-on-ink: var(--c-on-ink);
+}
+
+@theme {
+  --radius-brand: 2px;
+  --font-sans: "Vazirmatn", "Manrope", system-ui, sans-serif;
+  --font-display: "Bodoni Moda", "Vazirmatn", Georgia, serif;
+  --ease-out-expo: cubic-bezier(0.16, 0.84, 0.24, 1);
 }
 
 body {
@@ -32,12 +82,111 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   line-height: 1.9;
-  background-image: radial-gradient(ellipse 80% 50% at 70% 0%, rgb(227 163 59 / 0.1), transparent 70%);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
 }
 
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
+}
+
+/* English pages use Manrope for body text; Persian keeps Vazirmatn for both scripts. */
+html[lang="en"] body {
+  font-family: "Manrope", "Vazirmatn", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/*
+ * Headings. Latin: Bodoni Moda at regular weight, tight tracking. Persian has no Bodoni glyphs, so headings
+ * use a light Vazirmatn with no letter-spacing (cutting Persian letters apart breaks the joins).
+ * These rules are unlayered on purpose: they win over the weight/tracking utilities left on older components.
+ */
+.font-display {
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+html[lang="fa"] .font-display {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+/* Small capital labels (Latin) / plain small labels (Persian). */
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[lang="fa"] .eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Button text: small spaced capitals in Latin, plain semibold in Persian. */
+.btn-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+html[lang="fa"] .btn-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Link with a hairline that draws in from the reading start edge. */
+.link-line {
+  position: relative;
+  padding-block: 0.25rem;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease-out-expo);
+}
+html[dir="rtl"] .link-line::after {
+  transform-origin: right;
+}
+.link-line:hover::after,
+.link-line[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+/*
+ * Scroll reveal. The resting state is fully visible: browsers without scroll-driven animations (and anyone
+ * who asked for less motion) see the content straight away, nothing is ever parked at opacity 0.
+ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -49,17 +198,9 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* English pages use Inter for body text; Persian keeps Vazirmatn for both scripts. */
-html[lang="en"] body {
-  font-family: "Inter", "Vazirmatn", system-ui, sans-serif;
-  line-height: 1.7;
-}
-
-/* Fraunces has no Persian glyphs: Persian headings stay in Vazirmatn. */
-html[lang="fa"] .font-display {
-  font-family: var(--font-sans);
+  .reveal {
+    animation: none;
+  }
 }
 
 /* Article text: the editor in the panel and the public article page share it. */
@@ -67,14 +208,16 @@ html[lang="fa"] .font-display {
   margin-block-start: 1rem;
 }
 .rich h2 {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
   line-height: 1.4;
   margin-block-start: 2rem;
 }
 .rich h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
   margin-block-start: 1.6rem;
 }
 .rich h4 {

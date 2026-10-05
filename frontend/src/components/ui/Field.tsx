@@ -1,7 +1,7 @@
 import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 
 const CONTROL =
-  "min-h-11 w-full rounded-brand border border-line bg-elevated px-3 text-text placeholder:text-muted/70 focus-visible:border-accent aria-[invalid=true]:border-accent-2";
+  "min-h-11 w-full rounded-brand border border-line bg-surface px-3 text-text placeholder:text-muted/70 transition-colors focus-visible:border-text aria-[invalid=true]:border-accent-2";
 
 type Common = { label: string; error?: string; hint?: ReactNode };
 

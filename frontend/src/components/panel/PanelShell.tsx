@@ -8,6 +8,7 @@ import { api } from "@/lib/api/client";
 import { useMe } from "@/lib/api/queries";
 import { BookingBadge } from "./booking/BookingBadge";
 import { InquiryBadge } from "./inquiries/InquiryBadge";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Button } from "./ui";
 
 const NAV = [
@@ -30,6 +31,8 @@ const NAV = [
   { href: "/panel/retention", label: "نگهداری اطلاعات" },
   { href: "/panel/security", label: "امنیت" },
 ];
+
+const THEME_LABELS = { label: "تم رنگی", system: "مطابق سیستم", light: "روشن", dark: "تیره" };
 
 export function PanelShell({ children }: { children: ReactNode }) {
   const me = useMe();
@@ -94,14 +97,16 @@ export function PanelShell({ children }: { children: ReactNode }) {
             })}
           </ul>
         </nav>
-        <div className="hidden p-4 md:block">
-          <Button variant="ghost" className="w-full" onClick={logout}>
+        <div className="hidden items-center gap-2 p-4 md:flex">
+          <ThemeToggle labels={THEME_LABELS} />
+          <Button variant="ghost" className="flex-1" onClick={logout}>
             خروج
           </Button>
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <div className="flex justify-end p-2 md:hidden">
+        <div className="flex items-center justify-end gap-2 p-2 md:hidden">
+          <ThemeToggle labels={THEME_LABELS} />
           <Button variant="ghost" onClick={logout}>
             خروج
           </Button>

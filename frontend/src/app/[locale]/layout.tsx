@@ -7,6 +7,7 @@ import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { directionOf } from "@/i18n/config";
 import { routing } from "@/i18n/routing";
+import { themeAttribute } from "@/lib/theme.server";
 import "../globals.css";
 
 // Preloading the Persian faces lets them arrive before first paint, which removes the layout
@@ -17,11 +18,7 @@ const PERSIAN_FONTS = [
     import.meta.url,
   ),
   new URL(
-    "../../../node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2",
-    import.meta.url,
-  ),
-  new URL(
-    "../../../node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2",
+    "../../../node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-300-normal.woff2",
     import.meta.url,
   ),
 ];
@@ -53,9 +50,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
   // The gateway's id for this request: if the page fails, the visitor can quote it ("tracking code").
   const requestId = (await headers()).get("x-request-id") ?? "";
+  const theme = await themeAttribute();
 
   return (
-    <html lang={locale} dir={directionOf(locale)}>
+    <html lang={locale} dir={directionOf(locale)} data-theme={theme}>
       <head>
         {/^[A-Za-z0-9_-]{1,64}$/.test(requestId) ? <meta name="request-id" content={requestId} /> : null}
         {locale === "fa"

@@ -298,6 +298,12 @@
       "finalsHint": "These files are ready for delivery.",
       "downloadFinal": "Download {name}",
       "finalsFailed": "The list of final photos could not be loaded; please try again."
+    },
+    "theme": {
+      "label": "Colour theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
     }
   }
 }

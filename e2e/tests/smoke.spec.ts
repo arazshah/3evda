@@ -45,8 +45,43 @@ for (const p of pages) {
       const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
       expect(serious.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
     });
+
+    test("has no serious accessibility violations in the dark theme either", async ({ page, baseURL }) => {
+      await page.context().addCookies([{ name: "threevda_theme", value: "dark", url: baseURL! }]);
+      await page.goto(p.path);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+      const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+      expect(serious.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    });
   });
 }
+
+test.describe("colour theme", () => {
+  test("follows the system until a choice is made, then keeps the choice across pages and reloads", async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ baseURL, colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto("/");
+    // No choice yet: nothing on <html>, the dark system preference decides.
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(14, 14, 13)");
+
+    const toggle = page.getByRole("banner").getByRole("button", { name: /تم رنگی/ });
+    await toggle.click(); // system -> light
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(243, 238, 230)");
+
+    // The server paints the chosen theme on the next request (no flash), on any page.
+    await page.goto("/en/portfolio");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await context.close();
+  });
+});
 
 test("language switch links between Persian and English", async ({ page }) => {
   await page.goto("/");
