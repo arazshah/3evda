@@ -181,3 +181,39 @@ def test_a_task_that_lost_its_lease_stops_and_writes_nothing(owner_client):
     assert service.run_load(None, stale) == {}
     assert not SampleRecord.objects.exists() and not Project.objects.exists()
     assert SampleState.load().status == "failed"
+
+
+def test_filling_a_field_writes_only_that_column(owner_client):
+    stale = SiteSettings.load()  # what the loader holds while it draws pictures
+    SiteSettings.objects.filter(pk=stale.pk).update(address_fa="نشانی تازه‌ی مالک")  # the owner edits meanwhile
+    service._Loader(None).fill(stale, "phone", "021")
+    fresh = SiteSettings.load()
+    assert fresh.phone == "021" and fresh.address_fa == "نشانی تازه‌ی مالک"
+    # and a column the owner filled in the meantime is not touched at all
+    SiteSettings.objects.filter(pk=stale.pk).update(email="mine@example.com")
+    service._Loader(None).fill(stale, "email", "x@example.com")
+    assert SiteSettings.load().email == "mine@example.com"
+
+
+def test_a_lost_lease_takes_the_new_thing_away_again(owner_client):
+    import uuid
+
+    SampleState.load()
+    loader = service._Loader(None, uuid.uuid4())  # this lease is not the current one
+    with pytest.raises(service.Superseded):
+        loader.image(1, (60, 40), "late")
+    assert not MediaAsset.objects.exists() and not SampleRecord.objects.exists()
+
+
+def test_a_picture_that_failed_to_process_fails_the_load(owner_client, settings, monkeypatch):
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    settings.CELERY_TASK_EAGER_PROPAGATES = False
+
+    def fail(asset_id):
+        MediaAsset.objects.filter(pk=asset_id).update(status="failed")
+        return "failed"
+
+    monkeypatch.setattr(service, "process_asset", fail)
+    load(owner_client)
+    body = owner_client.get(URL).json()
+    assert body["status"] == "failed" and "ناموفق" in body["message"]

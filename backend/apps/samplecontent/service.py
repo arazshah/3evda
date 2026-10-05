@@ -15,7 +15,7 @@ from typing import Any
 from django.apps import apps
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.utils import timezone
 
 from apps.audit.service import record as audit
@@ -68,10 +68,15 @@ def current_state() -> SampleState:
     state = SampleState.load()
     busy = state.status in (SampleState.Status.LOADING, SampleState.Status.UNLOADING)
     if busy and state.started_at and timezone.now() - state.started_at > STALE_AFTER:
-        state.status = SampleState.Status.FAILED
-        state.run_id = uuid.uuid4()  # a task that is still alive (or redelivered) loses its lease
-        state.message = "عملیات نیمه‌کاره ماند (احتمالاً سرویس پس‌زمینه دوباره راه افتاد). پاک‌سازی و دوباره بارگذاری کنید."
-        state.save()
+        with transaction.atomic():
+            state = SampleState.objects.select_for_update().get(pk=1)
+            if state.status in (SampleState.Status.LOADING, SampleState.Status.UNLOADING):
+                state.status = SampleState.Status.FAILED
+                state.run_id = uuid.uuid4()  # a task that is still alive (or redelivered) loses its lease
+                state.message = (
+                    "عملیات نیمه‌کاره ماند (احتمالاً سرویس پس‌زمینه دوباره راه افتاد). پاک‌سازی و دوباره بارگذاری کنید."
+                )
+                state.save()
     return state
 
 
@@ -110,11 +115,24 @@ class _Loader:
         self.user = user
         self.run_id = run_id
 
+    def _record(self, **fields: Any) -> None:
+        """Write a record only while this run still holds the lease: the check and the write share the row lock."""
+        with transaction.atomic():
+            if (
+                self.run_id is not None
+                and not SampleState.objects.select_for_update().filter(pk=1, run_id=self.run_id).exists()
+            ):
+                raise Superseded
+            SampleRecord.objects.create(**fields)
+
     def track(self, obj: Any, group: str) -> Any:
-        hold(self.run_id)
-        SampleRecord.objects.create(
-            kind=SampleRecord.Kind.OBJECT, model_label=obj._meta.label_lower, object_id=str(obj.pk), group=group
-        )
+        try:
+            self._record(
+                kind=SampleRecord.Kind.OBJECT, model_label=obj._meta.label_lower, object_id=str(obj.pk), group=group
+            )
+        except Superseded:
+            _remove(obj._meta.label_lower, obj)  # made a moment ago and nobody knows it: take it away again
+            raise
         return obj
 
     def image(self, seed: int, size: tuple[int, int], name: str) -> MediaAsset:
@@ -125,23 +143,36 @@ class _Loader:
             self.track(asset, "media")
             process_asset(str(asset.pk))  # inline: the page can show the photo as soon as loading says "loaded"
             asset.refresh_from_db()
+            if asset.status != MediaAsset.Status.READY:
+                raise RuntimeError(f"media processing ended as {asset.status}")
         return asset
 
     def fill(self, obj: Any, field: str, value: Any) -> None:
-        """Set an empty field of a singleton and remember it, so unloading can empty it again."""
+        """Set an empty field of a singleton and remember it, so unloading can empty it again.
+
+        Only that one column is written, and only if it is still empty at that moment: the owner may be editing the
+        other fields while the load runs, and their changes must survive.
+        """
         hold(self.run_id)
-        current = getattr(obj, f"{field}_id" if obj._meta.get_field(field).is_relation else field)
-        if current not in (None, ""):
-            return
-        setattr(obj, field, value)
-        obj.save()
-        SampleRecord.objects.create(
-            kind=SampleRecord.Kind.FIELD,
-            model_label=obj._meta.label_lower,
-            object_id=str(obj.pk),
-            field=field,
-            value=str(value.pk if hasattr(value, "pk") else value)[:300],
-        )
+        model = type(obj)
+        relation = model._meta.get_field(field).is_relation
+        attr = f"{field}_id" if relation else field
+        stored = value.pk if relation else value
+        with transaction.atomic():
+            empty = Q(**{f"{attr}__isnull": True}) if relation else Q(**{attr: ""})
+            if not model.objects.filter(Q(pk=obj.pk) & empty).update(**{attr: stored}):
+                return
+            self._record(
+                kind=SampleRecord.Kind.FIELD,
+                model_label=obj._meta.label_lower,
+                object_id=str(obj.pk),
+                field=field,
+                value=str(stored)[:300],
+            )
+            fresh = model.objects.get(pk=obj.pk)
+            sync = getattr(fresh, "_sync_media_references", None)
+            if sync is not None:
+                sync()  # the references of a media field follow it (update() skips save())
 
     def guard(self) -> None:
         slugs = [p["slug"] for p in c.PROJECTS] + [p["slug"] for p in c.CATEGORIES]
@@ -360,7 +391,8 @@ class _Loader:
                 f"sample-gallery-{i + 1}.jpg", make_image(200 + i, *size), content_type="image/jpeg"
             )
             photo = galleries.add_photo(gallery, upload, queue=False)
-            process_photo(photo.pk)
+            if process_photo(photo.pk) != "ready":
+                raise RuntimeError("gallery photo processing failed")
         galleries.publish(gallery)
 
 
@@ -425,15 +457,15 @@ def run_unload(user: Any = None, run_id: uuid.UUID | None = None) -> dict[str, i
         for rec in SampleRecord.objects.filter(kind=SampleRecord.Kind.FIELD).order_by("-id"):
             hold(run_id)
             model = apps.get_model(rec.model_label)
-            obj = model.objects.filter(pk=rec.object_id).first()
-            if obj is not None:
-                field = model._meta.get_field(rec.field)
-                attr = f"{rec.field}_id" if field.is_relation else rec.field
-                if str(getattr(obj, attr) or "") == rec.value:
-                    setattr(
-                        obj, attr, None if field.is_relation else field.get_default() if field.has_default() else ""
-                    )
-                    obj.save()
+            field = model._meta.get_field(rec.field)
+            attr = f"{rec.field}_id" if field.is_relation else rec.field
+            # Only the column we filled, and only if the owner has not changed it since.
+            empty = None if field.is_relation else ""
+            model.objects.filter(pk=rec.object_id, **{attr: rec.value}).update(**{attr: empty})
+            fresh = model.objects.filter(pk=rec.object_id).first()
+            sync = getattr(fresh, "_sync_media_references", None)
+            if sync is not None:
+                sync()
             rec.delete()
         # Newest first, but media last: an asset is made before the things that use it only sometimes (a category's
         # cover is a project photo made after the category), so it can only go once nothing refers to it.
