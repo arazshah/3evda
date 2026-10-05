@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/admin/bookings/", include("apps.booking.urls")),
     path("api/admin/galleries/", include("apps.galleries.urls")),
     path("api/admin/retention/", include("apps.retention.urls")),
+    path("api/admin/sample-content/", include("apps.samplecontent.urls")),
     path("api/admin/", include("apps.media.urls")),
     path("api/public/", include("apps.cms.public_urls")),
     path("api/public/", include("apps.portfolio.public_urls")),

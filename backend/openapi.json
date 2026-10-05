@@ -6942,6 +6942,122 @@
                 }
             }
         },
+        "/api/admin/sample-content/": {
+            "get": {
+                "operationId": "sample_content_state",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleState"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/sample-content/load/": {
+            "post": {
+                "operationId": "sample_content_load",
+                "description": "Starts loading in the background (202); the panel polls the state.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleState"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/sample-content/unload/": {
+            "post": {
+                "operationId": "sample_content_unload",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Confirm"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleState"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/settings/watermark": {
             "get": {
                 "operationId": "admin_settings_watermark_retrieve",
@@ -9765,6 +9881,17 @@
                 ],
                 "type": "string",
                 "description": "* `hero_slide` - اسلاید هیرو\n* `service` - خدمت\n* `process_step` - مرحله‌ی همکاری\n* `client` - مشتری\n* `testimonial` - نظر مشتری\n* `behind_scenes` - پشت صحنه\n* `faq` - پرسش پرتکرار\n* `nav_link` - پیوند منو"
+            },
+            "Confirm": {
+                "type": "object",
+                "properties": {
+                    "confirm": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "confirm"
+                ]
             },
             "ContentBlock": {
                 "type": "object",
@@ -15102,6 +15229,51 @@
                     "enabled",
                     "trigger"
                 ]
+            },
+            "SampleState": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/SampleStateStatusEnum"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "counts": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer"
+                        }
+                    },
+                    "result": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer"
+                        }
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "counts",
+                    "message",
+                    "result",
+                    "status",
+                    "updated_at"
+                ]
+            },
+            "SampleStateStatusEnum": {
+                "enum": [
+                    "empty",
+                    "loading",
+                    "loaded",
+                    "unloading",
+                    "failed"
+                ],
+                "type": "string",
+                "description": "* `empty` - empty\n* `loading` - loading\n* `loaded` - loaded\n* `unloading` - unloading\n* `failed` - failed"
             },
             "Selection": {
                 "type": "object",

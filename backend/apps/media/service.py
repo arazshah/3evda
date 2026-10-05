@@ -23,8 +23,11 @@ def _sha256(upload: UploadedFile[bytes]) -> str:
     return digest.hexdigest()
 
 
-def create_asset(upload: UploadedFile[bytes], user: Any) -> tuple[MediaAsset, bool]:
-    """Validate and store an upload. Returns (asset, created); identical files are not stored twice."""
+def create_asset(upload: UploadedFile[bytes], user: Any, *, queue: bool = True) -> tuple[MediaAsset, bool]:
+    """Validate and store an upload. Returns (asset, created); identical files are not stored twice.
+
+    `queue=False` leaves the processing to the caller (the sample-content loader does it inline).
+    """
     from .tasks import process_asset
 
     info = inspect_upload(upload)
@@ -50,7 +53,8 @@ def create_asset(upload: UploadedFile[bytes], user: Any) -> tuple[MediaAsset, bo
                 height=info.height,
                 uploaded_by=user if getattr(user, "is_authenticated", False) else None,
             )
-            transaction.on_commit(lambda: process_asset.delay(str(asset.pk)))
+            if queue:
+                transaction.on_commit(lambda: process_asset.delay(str(asset.pk)))
     except IntegrityError:
         storage.delete(key)  # a concurrent upload of the same file won the race
         return MediaAsset.objects.get(sha256=checksum), False
