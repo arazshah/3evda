@@ -77,7 +77,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
         >
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="px-2 pt-3 md:px-3">
-              <p className="px-3 pb-1 text-xs tracking-wide text-on-ink/50">{group.title}</p>
+              <p className="px-3 pb-1 text-xs tracking-wide text-on-ink/70">{group.title}</p>
               <ul>
                 {group.items.map((entry) => {
                   const active = isActive(entry, pathname);
