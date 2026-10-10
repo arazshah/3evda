@@ -118,7 +118,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         items={[...c.client, ...c.service].map((x) => localized(locale, x, "title"))}
       />
 
-      {statement || introImage ? (
+      {slides.length > 0 && (statement || introImage) ? (
         <section
           className={`${WIDE} grid items-center gap-10 pt-[clamp(4rem,9vw,8.5rem)] ${
             introImage ? "md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-16" : ""

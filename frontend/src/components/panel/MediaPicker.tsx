@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import type { MediaAsset } from "@/lib/api/client";
-import { useMediaList } from "@/lib/api/queries";
+import { useMediaAsset, useMediaList } from "@/lib/api/queries";
 import { IMAGE_SPECS, sizeLabel, type ImageSpecKey } from "@/lib/image-specs";
 import { previewUrl, STATUS_LABELS } from "./media-utils";
 import { Alert, Button } from "./ui";
@@ -107,7 +107,8 @@ function PickerBody({
   const pages = Math.max(1, Math.ceil((list.data?.count ?? 0) / 40));
   const [waiting, setWaiting] = useState<string | null>(null);
   const taken = useRef(false);
-  const arrived = waiting ? list.data?.results.find((a) => a.id === waiting) : undefined;
+  // Looked up by id: the new (or, for a duplicate, older) asset need not be on the page being shown.
+  const arrived = useMediaAsset(waiting).data;
   const failed = arrived?.status === "failed";
 
   // The upload is in the list straight away but pending; the list polls until it is ready, then it is chosen
@@ -136,6 +137,7 @@ function PickerBody({
         // ready image), with no need to find its tile.
         onUploaded={(asset, count) => {
           setWaiting(count === 1 ? asset.id : null);
+          setPage(1); // the new file is first in the list
         }}
       />
       {waiting && !failed && (

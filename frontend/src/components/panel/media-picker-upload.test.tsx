@@ -35,6 +35,7 @@ const ready = asset("ready", [
   { name: "w480", format: "webp", url: "/media/n.webp", width: 480, height: 480, size_bytes: 1 },
 ]);
 const GET = { method: "GET", path: "/api/admin/media/" };
+const ONE = { method: "GET", path: "/api/admin/media/33333333-3333-3333-3333-333333333333/" };
 
 describe("MediaPicker upload", () => {
   it("takes a lone upload only once the worker has finished it (a field accepts a ready image only)", async () => {
@@ -42,8 +43,11 @@ describe("MediaPicker upload", () => {
     uploadMedia.mockResolvedValue({ asset: asset("pending"), duplicate: false });
     const api = fakeApi([
       { ...GET, body: { count: 0, results: [] } },
-      { ...GET, body: { count: 1, results: [asset("pending")] } },
-      { ...GET, body: { count: 1, results: [ready] } },
+      // The list on screen (page 1, or any page) need not contain the new file: it is looked up by id.
+      { ...GET, body: { count: 40, results: [] } },
+      { ...ONE, body: asset("pending") },
+      { ...ONE, body: ready },
+      { ...ONE, body: ready },
     ]);
     vi.stubGlobal("fetch", api.fetchImpl);
     const onChange = vi.fn();
@@ -63,7 +67,8 @@ describe("MediaPicker upload", () => {
     uploadMedia.mockResolvedValue({ asset: asset("pending"), duplicate: false });
     const api = fakeApi([
       { ...GET, body: { count: 0, results: [] } },
-      { ...GET, body: { count: 1, results: [asset("failed")] } },
+      { ...GET, body: { count: 1, results: [] } },
+      { ...ONE, body: asset("failed") },
     ]);
     vi.stubGlobal("fetch", api.fetchImpl);
     const onChange = vi.fn();

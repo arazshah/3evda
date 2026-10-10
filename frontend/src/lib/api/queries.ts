@@ -96,6 +96,16 @@ export function useMediaList(params: MediaListParams) {
   });
 }
 
+/** One asset by id, polled until the worker is done with it (the list page it lands on can vary). */
+export function useMediaAsset(id: string | null) {
+  return useQuery({
+    queryKey: [...keys.media, "asset", id] as const,
+    queryFn: () => unwrap(api.GET("/api/admin/media/{id}/", { params: { path: { id: id! } } })),
+    enabled: id !== null,
+    refetchInterval: (query) => (query.state.data && isBusy(query.state.data) ? 3000 : false),
+  });
+}
+
 export function useUpdateMedia() {
   const client = useQueryClient();
   return useMutation({
