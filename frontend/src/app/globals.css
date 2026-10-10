@@ -117,7 +117,6 @@ html[lang="en"] body {
   line-height: 1.7;
 }
 
-
 /* The Persian faces chosen in the site settings; the server puts the keys on <html> (no inline styles under the CSP). */
 html[data-fa-body="vazirmatn"] {
   --fa-body: "Vazirmatn";
