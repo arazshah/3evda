@@ -638,6 +638,11 @@ html[dir="rtl"] .marquee-track {
   font-weight: 400;
   margin-block-start: 1.6rem;
 }
+/* Persian article headings follow the heading face chosen in the site settings, like .font-display does. */
+html[lang="fa"] .rich h2,
+html[lang="fa"] .rich h3 {
+  font-family: var(--fa-heading, var(--fa-body, "Vazirmatn")), "Manrope", system-ui, sans-serif;
+}
 .rich h4 {
   font-size: 1.1rem;
   font-weight: 700;
