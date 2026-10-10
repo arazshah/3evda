@@ -3,6 +3,8 @@ from django.db import models
 from apps.media.models import MediaAsset
 from apps.media.references import MediaRefsMixin
 
+from .fonts import BODY_FONTS, DEFAULT_FONT, HEADING_FONTS
+
 
 class SiteSettings(MediaRefsMixin, models.Model):
     """Singleton: brand, contact details and default SEO texts."""
@@ -25,6 +27,12 @@ class SiteSettings(MediaRefsMixin, models.Model):
     map_url = models.URLField(blank=True)
     footer_text_fa = models.TextField(blank=True)
     footer_text_en = models.TextField(blank=True)
+    font_fa_body = models.CharField(
+        max_length=20, choices=BODY_FONTS, default=DEFAULT_FONT, help_text="Persian body text typeface"
+    )
+    font_fa_heading = models.CharField(
+        max_length=20, choices=HEADING_FONTS, default=DEFAULT_FONT, help_text="Persian headings typeface"
+    )
     logo = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     og_image = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)

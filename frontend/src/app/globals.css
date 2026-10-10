@@ -3,6 +3,21 @@
 @import "@fontsource/vazirmatn/arabic-300.css";
 @import "@fontsource/vazirmatn/arabic-400.css";
 @import "@fontsource/vazirmatn/arabic-600.css";
+@import "@fontsource/noto-sans-arabic/arabic-400.css";
+@import "@fontsource/noto-sans-arabic/arabic-600.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+@import "@fontsource/cairo/arabic-400.css";
+@import "@fontsource/cairo/arabic-600.css";
+@import "@fontsource/noto-naskh-arabic/arabic-400.css";
+@import "@fontsource/noto-naskh-arabic/arabic-600.css";
+@import "@fontsource/amiri/arabic-400.css";
+@import "@fontsource/amiri/arabic-700.css";
+@import "@fontsource/harmattan/arabic-400.css";
+@import "@fontsource/harmattan/arabic-600.css";
+@import "@fontsource/almarai/arabic-400.css";
+@import "@fontsource/almarai/arabic-700.css";
+@import "@fontsource/lalezar/arabic-400.css";
 @import "@fontsource/manrope/latin-300.css";
 @import "@fontsource/manrope/latin-400.css";
 @import "@fontsource/manrope/latin-500.css";
@@ -74,7 +89,7 @@
 
 @theme {
   --radius-brand: 2px;
-  --font-sans: "Vazirmatn", "Manrope", system-ui, sans-serif;
+  --font-sans: var(--fa-body, "Vazirmatn"), "Manrope", system-ui, sans-serif;
   --font-display: "Bodoni Moda", "Vazirmatn", Georgia, serif;
   --ease-out-expo: cubic-bezier(0.16, 0.84, 0.24, 1);
 }
@@ -98,8 +113,61 @@ body {
 
 /* English pages use Manrope for body text; Persian keeps Vazirmatn for both scripts. */
 html[lang="en"] body {
-  font-family: "Manrope", "Vazirmatn", system-ui, sans-serif;
+  font-family: "Manrope", var(--fa-body, "Vazirmatn"), system-ui, sans-serif;
   line-height: 1.7;
+}
+
+/* The Persian faces chosen in the site settings; the server puts the keys on <html> (no inline styles under the CSP). */
+html[data-fa-body="vazirmatn"] {
+  --fa-body: "Vazirmatn";
+}
+html[data-fa-body="noto-sans"] {
+  --fa-body: "Noto Sans Arabic";
+}
+html[data-fa-body="ibm-plex"] {
+  --fa-body: "IBM Plex Sans Arabic";
+}
+html[data-fa-body="cairo"] {
+  --fa-body: "Cairo";
+}
+html[data-fa-body="noto-naskh"] {
+  --fa-body: "Noto Naskh Arabic";
+}
+html[data-fa-body="amiri"] {
+  --fa-body: "Amiri";
+}
+html[data-fa-body="harmattan"] {
+  --fa-body: "Harmattan";
+}
+html[data-fa-body="almarai"] {
+  --fa-body: "Almarai";
+}
+html[data-fa-heading="vazirmatn"] {
+  --fa-heading: "Vazirmatn";
+}
+html[data-fa-heading="noto-sans"] {
+  --fa-heading: "Noto Sans Arabic";
+}
+html[data-fa-heading="ibm-plex"] {
+  --fa-heading: "IBM Plex Sans Arabic";
+}
+html[data-fa-heading="cairo"] {
+  --fa-heading: "Cairo";
+}
+html[data-fa-heading="noto-naskh"] {
+  --fa-heading: "Noto Naskh Arabic";
+}
+html[data-fa-heading="amiri"] {
+  --fa-heading: "Amiri";
+}
+html[data-fa-heading="harmattan"] {
+  --fa-heading: "Harmattan";
+}
+html[data-fa-heading="almarai"] {
+  --fa-heading: "Almarai";
+}
+html[data-fa-heading="lalezar"] {
+  --fa-heading: "Lalezar";
 }
 
 /*
@@ -113,7 +181,7 @@ html[lang="en"] body {
   text-wrap: balance;
 }
 html[lang="fa"] .font-display {
-  font-family: var(--font-sans);
+  font-family: var(--fa-heading, var(--fa-body, "Vazirmatn")), "Manrope", system-ui, sans-serif;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.22; /* Persian joins and dots need room: the tight Latin leading would collide them */
@@ -569,6 +637,11 @@ html[dir="rtl"] .marquee-track {
   font-size: 1.5rem;
   font-weight: 400;
   margin-block-start: 1.6rem;
+}
+/* Persian article headings follow the heading face chosen in the site settings, like .font-display does. */
+html[lang="fa"] .rich h2,
+html[lang="fa"] .rich h3 {
+  font-family: var(--fa-heading, var(--fa-body, "Vazirmatn")), "Manrope", system-ui, sans-serif;
 }
 .rich h4 {
   font-size: 1.1rem;

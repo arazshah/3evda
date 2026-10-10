@@ -8,10 +8,34 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/almarai':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/amiri':
+        specifier: 5.3.0
+        version: 5.3.0
       '@fontsource/bodoni-moda':
         specifier: 5.3.0
         version: 5.3.0
+      '@fontsource/cairo':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/harmattan':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/ibm-plex-sans-arabic':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/lalezar':
+        specifier: 5.3.0
+        version: 5.3.0
       '@fontsource/manrope':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/noto-naskh-arabic':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/noto-sans-arabic':
         specifier: 5.3.0
         version: 5.3.0
       '@fontsource/vazirmatn':
@@ -308,11 +332,35 @@ packages:
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
+  '@fontsource/almarai@5.3.0':
+    resolution: {integrity: sha512-btLbQO3LSL6F6KLQeZqTFwmS3wArSDJxHdXAYJMaKLyxhp8C7ZQqTYjPFqENx+SwROzDyAyFRK5fKFWh5+uZtQ==}
+
+  '@fontsource/amiri@5.3.0':
+    resolution: {integrity: sha512-i4SWJnVIphj8556EdVzNrEG/Qu82k6JXjXTtSUIohx3tHmo2GHw1Kv60TWo+xjk7Yf1Etb2Gskh0lUFclTKyUw==}
+
   '@fontsource/bodoni-moda@5.3.0':
     resolution: {integrity: sha512-Wt2XBCHivYxkTP3ydq/Ax+7VshwsOh/6ayA5om2t+yClCkGwLPj2Mi6OnyMANjyLcqDUWs4rlOHnc8SBLf6/pA==}
 
+  '@fontsource/cairo@5.3.0':
+    resolution: {integrity: sha512-MdY6+gee1DVz4eUvx1Dd8Y1f50WcRELRKwKBarYZA3zT8dMhkuTWbcoE1LzezAy97h/9rob87s02NI6L8MaDgA==}
+
+  '@fontsource/harmattan@5.3.0':
+    resolution: {integrity: sha512-l6BwKdqTrY4Z0Jfh0Bw8us2jTM83z/w0sz3Iep0XyXrH6jpc9AMUFqvHt46vJNwuaa0pj3jcuZxSDbcDNwv6tg==}
+
+  '@fontsource/ibm-plex-sans-arabic@5.3.0':
+    resolution: {integrity: sha512-ZZ4g+JDgQY0NqSh4o0MNWU1sHQmtcee1g++aKAwyJvZxnT5y51JXsN1cIXnaQaMd40dcbK6QFYa+Z1LbaiNuqA==}
+
+  '@fontsource/lalezar@5.3.0':
+    resolution: {integrity: sha512-ptwEfWP7OlucVaRHpuMo6tfvw9xDcBEoaiIvzSDUb7z5pih+DZIRKLarulkJunVR+DnQ5VaJVjuVVOwrqiq7Cw==}
+
   '@fontsource/manrope@5.3.0':
     resolution: {integrity: sha512-obJ1Dv3+uCA6HlHgW8u4BGYxJR9In2HW7gjJhlflEvkrj1X1iSEwu0fToL+JYGC/FEKFfIz1sBuPduvcL2gIAA==}
+
+  '@fontsource/noto-naskh-arabic@5.3.0':
+    resolution: {integrity: sha512-S/GDgQ6mh/PKo4mz5+eXNYbEarvpI7yh6eCdOz8tTVbeM7+OUiacIEscaYEibr/+egDtGbO2ZB00sjy1bJC1kQ==}
+
+  '@fontsource/noto-sans-arabic@5.3.0':
+    resolution: {integrity: sha512-i3t6GR0LOReyJVEk+YfYCnxv53wuIelg7Y9NGNvOq4Diq/EP0YszaGXkQwfQNigLjfO4POrLaPGM0sNliGYk7A==}
 
   '@fontsource/vazirmatn@5.3.0':
     resolution: {integrity: sha512-XC/2yN2r5gwhFT3klSuWaqncODX2DOfRYfNmbyzgtWYxHxMC+tcoaX+tgggrm6hSkEgpR1TuSDEf1PiI91G7qg==}
@@ -3419,9 +3467,25 @@ snapshots:
   '@floating-ui/utils@0.2.12':
     optional: true
 
+  '@fontsource/almarai@5.3.0': {}
+
+  '@fontsource/amiri@5.3.0': {}
+
   '@fontsource/bodoni-moda@5.3.0': {}
 
+  '@fontsource/cairo@5.3.0': {}
+
+  '@fontsource/harmattan@5.3.0': {}
+
+  '@fontsource/ibm-plex-sans-arabic@5.3.0': {}
+
+  '@fontsource/lalezar@5.3.0': {}
+
   '@fontsource/manrope@5.3.0': {}
+
+  '@fontsource/noto-naskh-arabic@5.3.0': {}
+
+  '@fontsource/noto-sans-arabic@5.3.0': {}
 
   '@fontsource/vazirmatn@5.3.0': {}
 

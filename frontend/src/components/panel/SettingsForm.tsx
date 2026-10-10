@@ -1,9 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { errorMessage } from "@/lib/api/client";
 import { useSaveSettings, useSettings } from "@/lib/api/queries";
 import type { components } from "@/lib/api/schema";
+import {
+  asFontKey,
+  BODY_FONT_KEYS,
+  FONTS,
+  HEADING_FONT_KEYS,
+  type BodyFont,
+  type HeadingFont,
+} from "@/lib/fonts";
 import { previewUrl } from "./media-utils";
 import { MediaPicker, type PickedMedia } from "./MediaPicker";
 import { Alert, Button, Card, Field, TextArea } from "./ui";
@@ -50,6 +58,8 @@ function SettingsEditor({ initial }: { initial: Settings }) {
   const [ogImage, setOgImage] = useState(() =>
     toPicked(initial.og_image, initial.og_image_detail, "تصویر اشتراک‌گذاری"),
   );
+  const [fontBody, setFontBody] = useState<BodyFont>(() => asFontKey(initial.font_fa_body) as BodyFont);
+  const [fontHeading, setFontHeading] = useState<HeadingFont>(() => asFontKey(initial.font_fa_heading));
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
@@ -63,7 +73,13 @@ function SettingsEditor({ initial }: { initial: Settings }) {
     event.preventDefault();
     setFieldErrors({});
     try {
-      await save.mutateAsync({ ...text, logo: logo?.id ?? null, og_image: ogImage?.id ?? null });
+      await save.mutateAsync({
+        ...text,
+        logo: logo?.id ?? null,
+        og_image: ogImage?.id ?? null,
+        font_fa_body: fontBody,
+        font_fa_heading: fontHeading,
+      });
       setMessage({ tone: "success", text: "ذخیره شد و روی سایت اعمال شد." });
     } catch (err) {
       const fields = (err as { fields?: Record<string, string[]> })?.fields;
@@ -90,6 +106,34 @@ function SettingsEditor({ initial }: { initial: Settings }) {
       </Card>
 
       <Card className="grid gap-4 md:grid-cols-2">
+        <h2 className="font-bold md:col-span-2">ظاهر سایت (فونت فارسی)</h2>
+        <FontSelect
+          label="فونت متن‌ها"
+          value={fontBody}
+          keys={BODY_FONT_KEYS}
+          onChange={(k) => setFontBody(k as BodyFont)}
+        />
+        <FontSelect
+          label="فونت تیترها"
+          value={fontHeading}
+          keys={HEADING_FONT_KEYS}
+          onChange={setFontHeading}
+        />
+        <div className="rounded-sm border border-line p-4 md:col-span-2" aria-label="پیش‌نمایش فونت">
+          <p className="text-2xl leading-snug" style={{ fontFamily: `"${FONTS[fontHeading].family}"` }}>
+            عکاسی غذا و محصول، با طعمی از هنر
+          </p>
+          <p className="mt-2 leading-8 text-muted" style={{ fontFamily: `"${FONTS[fontBody].family}"` }}>
+            هر عکس داستانی دارد؛ این نوشته نشان می‌دهد متن‌های سایت با فونت انتخابی شما چگونه دیده می‌شوند.
+            ۰۱۲۳۴۵۶۷۸۹
+          </p>
+        </div>
+        <p className="text-xs text-muted md:col-span-2">
+          فونت انگلیسی سایت ثابت است. تغییر فونت پس از ذخیره روی همه‌ی صفحه‌های فارسی اعمال می‌شود.
+        </p>
+      </Card>
+
+      <Card className="grid gap-4 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">راه‌های ارتباطی</h2>
         <Field label="تلفن" dir="ltr" type="tel" {...bind("phone")} />
         <Field label="ایمیل" dir="ltr" type="email" {...bind("email")} />
@@ -109,5 +153,38 @@ function SettingsEditor({ initial }: { initial: Settings }) {
         </Button>
       </div>
     </form>
+  );
+}
+
+function FontSelect({
+  label,
+  value,
+  keys,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  keys: readonly HeadingFont[];
+  onChange: (key: HeadingFont) => void;
+}) {
+  const id = useId();
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor={id} className="text-sm text-muted">
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value as HeadingFont)}
+        className="min-h-11 w-full border-0 border-b border-text/60 bg-transparent px-1 text-text outline-none focus:border-text"
+      >
+        {keys.map((k) => (
+          <option key={k} value={k}>
+            {FONTS[k].label} — {FONTS[k].note}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
