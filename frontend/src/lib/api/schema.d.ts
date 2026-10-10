@@ -2517,6 +2517,41 @@ export interface components {
       /** Format: date-time */
       readonly created_at: string;
     };
+    /**
+     * @description * `vazirmatn` - وزیرمتن (پیش‌فرض)
+     *     * `noto-sans` - نوتو سنس عربی
+     *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+     *     * `cairo` - قاهره
+     *     * `noto-naskh` - نوتو نسخ
+     *     * `amiri` - امیری
+     *     * `harmattan` - هارماتان
+     *     * `almarai` - المرعی
+     * @enum {string}
+     */
+    FontFaBodyEnum:
+      "vazirmatn" | "noto-sans" | "ibm-plex" | "cairo" | "noto-naskh" | "amiri" | "harmattan" | "almarai";
+    /**
+     * @description * `vazirmatn` - وزیرمتن (پیش‌فرض)
+     *     * `noto-sans` - نوتو سنس عربی
+     *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+     *     * `cairo` - قاهره
+     *     * `noto-naskh` - نوتو نسخ
+     *     * `amiri` - امیری
+     *     * `harmattan` - هارماتان
+     *     * `almarai` - المرعی
+     *     * `lalezar` - لاله‌زار (فقط تیتر)
+     * @enum {string}
+     */
+    FontFaHeadingEnum:
+      | "vazirmatn"
+      | "noto-sans"
+      | "ibm-plex"
+      | "cairo"
+      | "noto-naskh"
+      | "amiri"
+      | "harmattan"
+      | "almarai"
+      | "lalezar";
     Gallery: {
       readonly id: number;
       title: string;
@@ -3245,6 +3280,33 @@ export interface components {
       map_url?: string;
       footer_text_fa?: string;
       footer_text_en?: string;
+      /**
+       * @description Persian body text typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       */
+      font_fa_body?: components["schemas"]["FontFaBodyEnum"];
+      /**
+       * @description Persian headings typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       *     * `lalezar` - لاله‌زار (فقط تیتر)
+       */
+      font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
       /** Format: date-time */
       readonly updated_at?: string;
     };
@@ -3704,6 +3766,33 @@ export interface components {
       readonly map_url: string;
       readonly footer_text_fa: string;
       readonly footer_text_en: string;
+      /**
+       * @description Persian body text typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       */
+      readonly font_fa_body: components["schemas"]["FontFaBodyEnum"];
+      /**
+       * @description Persian headings typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       *     * `lalezar` - لاله‌زار (فقط تیتر)
+       */
+      readonly font_fa_heading: components["schemas"]["FontFaHeadingEnum"];
     };
     PublicSite: {
       settings: components["schemas"]["PublicSettings"];
@@ -3925,6 +4014,33 @@ export interface components {
       map_url?: string;
       footer_text_fa?: string;
       footer_text_en?: string;
+      /**
+       * @description Persian body text typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       */
+      font_fa_body?: components["schemas"]["FontFaBodyEnum"];
+      /**
+       * @description Persian headings typeface
+       *
+       *     * `vazirmatn` - وزیرمتن (پیش‌فرض)
+       *     * `noto-sans` - نوتو سنس عربی
+       *     * `ibm-plex` - آی‌بی‌ام پلکس عربی
+       *     * `cairo` - قاهره
+       *     * `noto-naskh` - نوتو نسخ
+       *     * `amiri` - امیری
+       *     * `harmattan` - هارماتان
+       *     * `almarai` - المرعی
+       *     * `lalezar` - لاله‌زار (فقط تیتر)
+       */
+      font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
       /** Format: date-time */
       readonly updated_at: string;
     };

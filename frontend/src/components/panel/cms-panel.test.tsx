@@ -73,6 +73,29 @@ describe("SettingsForm", () => {
     expect(revalidatePublic).toHaveBeenCalledWith("site");
   });
 
+  it("saves the chosen Persian fonts and offers the display face for headings only", async () => {
+    const api = fakeApi([
+      { method: "GET", path: "/api/admin/cms/settings", body: settings },
+      { method: "PATCH", path: "/api/admin/cms/settings", body: settings },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<SettingsForm />);
+
+    const body = await screen.findByLabelText("فونت متن‌ها");
+    const heading = screen.getByLabelText("فونت تیترها");
+    expect(within(body).queryByRole("option", { name: /لاله‌زار/ })).not.toBeInTheDocument();
+    expect(within(heading).getByRole("option", { name: /لاله‌زار/ })).toBeInTheDocument();
+    fireEvent.change(body, { target: { value: "cairo" } });
+    fireEvent.change(heading, { target: { value: "lalezar" } });
+    fireEvent.click(screen.getByRole("button", { name: "ذخیره" }));
+
+    expect(await screen.findByText("ذخیره شد و روی سایت اعمال شد.")).toBeInTheDocument();
+    expect(api.calls.find((c) => c.method === "PATCH")?.body).toMatchObject({
+      font_fa_body: "cairo",
+      font_fa_heading: "lalezar",
+    });
+  });
+
   it("shows the server's message when saving fails", async () => {
     const api = fakeApi([
       { method: "GET", path: "/api/admin/cms/settings", body: settings },

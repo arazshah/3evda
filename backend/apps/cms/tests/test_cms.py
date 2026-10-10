@@ -207,3 +207,34 @@ def test_clearing_the_only_content_of_an_item_is_rejected(owner_client):
     assert (
         owner_client.patch(f"{ITEMS}{item.pk}/", {"media": None, "title_fa": "متن"}, format="json").status_code == 200
     )
+
+
+# ---- Persian typefaces -----------------------------------------------------------------------------
+
+
+def test_fonts_default_to_vazirmatn_and_visitors_can_read_them(client, owner_client):
+    body = client.get("/api/public/site").json()["settings"]
+    assert (body["font_fa_body"], body["font_fa_heading"]) == ("vazirmatn", "vazirmatn")
+    assert owner_client.get("/api/admin/cms/settings").json()["font_fa_body"] == "vazirmatn"
+
+
+def test_the_owner_picks_the_persian_fonts_and_it_shows_on_the_public_site(client, owner_client):
+    response = owner_client.patch(
+        "/api/admin/cms/settings", {"font_fa_body": "noto-naskh", "font_fa_heading": "lalezar"}, format="json"
+    )
+    assert response.status_code == 200
+    settings = client.get("/api/public/site").json()["settings"]
+    assert (settings["font_fa_body"], settings["font_fa_heading"]) == ("noto-naskh", "lalezar")
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"font_fa_body": "comic-sans"},
+        {"font_fa_heading": "tajawal"},  # no Persian letters
+        {"font_fa_body": "lalezar"},  # a display face is for headings only
+        {"font_fa_body": ""},
+    ],
+)
+def test_unknown_or_unsuitable_fonts_are_refused(owner_client, bad):
+    assert owner_client.patch("/api/admin/cms/settings", bad, format="json").status_code == 400

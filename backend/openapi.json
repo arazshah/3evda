@@ -10187,6 +10187,35 @@
                     "size_bytes"
                 ]
             },
+            "FontFaBodyEnum": {
+                "enum": [
+                    "vazirmatn",
+                    "noto-sans",
+                    "ibm-plex",
+                    "cairo",
+                    "noto-naskh",
+                    "amiri",
+                    "harmattan",
+                    "almarai"
+                ],
+                "type": "string",
+                "description": "* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی"
+            },
+            "FontFaHeadingEnum": {
+                "enum": [
+                    "vazirmatn",
+                    "noto-sans",
+                    "ibm-plex",
+                    "cairo",
+                    "noto-naskh",
+                    "amiri",
+                    "harmattan",
+                    "almarai",
+                    "lalezar"
+                ],
+                "type": "string",
+                "description": "* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
+            },
             "Gallery": {
                 "type": "object",
                 "properties": {
@@ -12748,6 +12777,22 @@
                     "footer_text_en": {
                         "type": "string"
                     },
+                    "font_fa_body": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaBodyEnum"
+                            }
+                        ],
+                        "description": "Persian body text typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی"
+                    },
+                    "font_fa_heading": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaHeadingEnum"
+                            }
+                        ],
+                        "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
+                    },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
@@ -14722,6 +14767,24 @@
                     "footer_text_en": {
                         "type": "string",
                         "readOnly": true
+                    },
+                    "font_fa_body": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaBodyEnum"
+                            }
+                        ],
+                        "readOnly": true,
+                        "description": "Persian body text typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی"
+                    },
+                    "font_fa_heading": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaHeadingEnum"
+                            }
+                        ],
+                        "readOnly": true,
+                        "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
                     }
                 },
                 "required": [
@@ -14732,6 +14795,8 @@
                     "description_en",
                     "description_fa",
                     "email",
+                    "font_fa_body",
+                    "font_fa_heading",
                     "footer_text_en",
                     "footer_text_fa",
                     "instagram",
@@ -15541,6 +15606,22 @@
                     },
                     "footer_text_en": {
                         "type": "string"
+                    },
+                    "font_fa_body": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaBodyEnum"
+                            }
+                        ],
+                        "description": "Persian body text typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی"
+                    },
+                    "font_fa_heading": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FontFaHeadingEnum"
+                            }
+                        ],
+                        "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
                     },
                     "updated_at": {
                         "type": "string",

@@ -20,8 +20,16 @@
     "api:types": "openapi-typescript ../backend/openapi.json -o src/lib/api/schema.d.ts && prettier --write src/lib/api/schema.d.ts"
   },
   "dependencies": {
+    "@fontsource/almarai": "5.3.0",
+    "@fontsource/amiri": "5.3.0",
     "@fontsource/bodoni-moda": "5.3.0",
+    "@fontsource/cairo": "5.3.0",
+    "@fontsource/harmattan": "5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "5.3.0",
+    "@fontsource/lalezar": "5.3.0",
     "@fontsource/manrope": "5.3.0",
+    "@fontsource/noto-naskh-arabic": "5.3.0",
+    "@fontsource/noto-sans-arabic": "5.3.0",
     "@fontsource/vazirmatn": "5.3.0",
     "@tanstack/react-query": "5.104.1",
     "@tiptap/core": "3.31.4",
