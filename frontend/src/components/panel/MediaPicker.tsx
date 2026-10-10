@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import type { MediaAsset } from "@/lib/api/client";
 import { useMediaList } from "@/lib/api/queries";
@@ -106,20 +106,18 @@ function PickerBody({
   const list = useMediaList({ kind: kind === "any" ? undefined : kind, page });
   const pages = Math.max(1, Math.ceil((list.data?.count ?? 0) / 40));
   const [waiting, setWaiting] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+  const taken = useRef(false);
+  const arrived = waiting ? list.data?.results.find((a) => a.id === waiting) : undefined;
+  const failed = arrived?.status === "failed";
 
-  // The upload is in the list straight away but pending; the list polls until it is ready, then it is chosen.
+  // The upload is in the list straight away but pending; the list polls until it is ready, then it is chosen
+  // (choosing closes the library, so there is nothing to reset afterwards).
   useEffect(() => {
-    if (!waiting) return;
-    const asset = list.data?.results.find((a) => a.id === waiting);
-    if (asset?.status === "ready") {
-      setWaiting(null);
-      onPick(asset);
-    } else if (asset?.status === "failed") {
-      setWaiting(null);
-      setFailed(true);
+    if (arrived?.status === "ready" && !taken.current) {
+      taken.current = true;
+      onPick(arrived);
     }
-  }, [waiting, list.data, onPick]);
+  }, [arrived, onPick]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -137,11 +135,10 @@ function PickerBody({
         // A single new file is what the owner came for: use it as soon as it is processed (a field only accepts a
         // ready image), with no need to find its tile.
         onUploaded={(asset, count) => {
-          setFailed(false);
-          if (count === 1) setWaiting(asset.id);
+          setWaiting(count === 1 ? asset.id : null);
         }}
       />
-      {waiting && (
+      {waiting && !failed && (
         <p role="status" className="text-sm text-muted">
           در حال آماده‌سازی تصویر؛ به‌محض آماده‌شدن انتخاب می‌شود…
         </p>
