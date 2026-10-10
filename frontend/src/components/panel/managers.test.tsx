@@ -15,8 +15,10 @@ beforeEach(() => {
   HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
     this.setAttribute("open", "");
   };
-  HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+  // Like a browser: closing a dialog fires its `close` event (which once leaked from a nested dialog to its parent).
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
     this.removeAttribute("open");
+    this.dispatchEvent(new Event("close"));
   };
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -38,7 +40,53 @@ const item = (id: number, title: string, extra = {}) => ({
   ...extra,
 });
 
+const photo = {
+  id: "22222222-2222-2222-2222-222222222222",
+  kind: "image",
+  status: "ready",
+  original_filename: "plate.jpg",
+  title: "",
+  alt_fa: "",
+  alt_en: "",
+  lqip: "",
+  variants: [{ name: "w480", format: "webp", url: "/media/p.webp", width: 480, height: 480, size_bytes: 1 }],
+};
+
 describe("ItemsManager", () => {
+  it("picks a library image inside the editor and keeps the editor open to save it", async () => {
+    const api = fakeApi([
+      { method: "GET", path: "/api/admin/cms/items/", body: [] },
+      { method: "GET", path: "/api/admin/media/", body: { count: 1, results: [photo] } },
+      {
+        method: "POST",
+        path: "/api/admin/cms/items/",
+        status: 201,
+        body: item(1, "اسلاید", { collection: "hero_slide", media: photo.id, media_detail: photo }),
+      },
+      { method: "GET", path: "/api/admin/cms/items/", body: [] },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<ItemsManager />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "افزودن اسلاید" }));
+    fireEvent.change(await screen.findByLabelText("عنوان بزرگ (فارسی)"), { target: { value: "اسلاید" } });
+    // The size to shoot for is written under the field.
+    expect(screen.getByText(/2400×1350 پیکسل/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "انتخاب تصویر" }));
+    fireEvent.click(await screen.findByRole("button", { name: "plate.jpg" }));
+
+    // The library closed, the editor did not: what was typed is still there and the image is chosen.
+    expect(screen.getByLabelText("عنوان بزرگ (فارسی)")).toHaveValue("اسلاید");
+    expect(await screen.findByRole("button", { name: "تغییر تصویر" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "ذخیره" }));
+    await waitFor(() => expect(api.calls.some((c) => c.method === "POST")).toBe(true));
+    expect(api.calls.find((c) => c.method === "POST")?.body).toMatchObject({
+      collection: "hero_slide",
+      title_fa: "اسلاید",
+      media: photo.id,
+    });
+  });
+
   it("adds an item to the chosen collection and refreshes the site", async () => {
     const api = fakeApi([
       { method: "GET", path: "/api/admin/cms/items/", body: [] },

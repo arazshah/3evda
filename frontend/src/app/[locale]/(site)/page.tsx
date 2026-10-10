@@ -44,10 +44,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const featured = portfolio.projects.filter((p) => p.is_featured).slice(0, 8);
   const packages = featuredPackages(groups).slice(0, 3);
   const slides = c.hero_slide;
+  const introImage = blockMedia(site, "home.intro_image");
   const fallbackHero = {
     title: b("home.intro_title"),
     subtitle: b("home.intro_body"),
-    media: blockMedia(site, "home.intro_image"),
+    media: introImage,
   };
   // A slide with empty text falls back to the intro text, so the page always has an h1.
   const heroSlides = slides.length
@@ -117,11 +118,30 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         items={[...c.client, ...c.service].map((x) => localized(locale, x, "title"))}
       />
 
-      {statement ? (
-        <section className={`${WIDE} pt-[clamp(4rem,9vw,8.5rem)]`}>
-          <p className="reveal font-display max-w-[28ch] text-[clamp(1.5rem,2.8vw,2.5rem)] leading-[1.25]">
-            {statement}
-          </p>
+      {slides.length > 0 && (statement || introImage) ? (
+        <section
+          className={`${WIDE} grid items-center gap-10 pt-[clamp(4rem,9vw,8.5rem)] ${
+            introImage ? "md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-16" : ""
+          }`}
+        >
+          {statement ? (
+            <p className="reveal font-display max-w-[28ch] text-[clamp(1.5rem,2.8vw,2.5rem)] leading-[1.25]">
+              {statement}
+            </p>
+          ) : (
+            <span />
+          )}
+          {introImage ? (
+            <div className="reveal relative aspect-[4/5] overflow-hidden bg-elevated">
+              <Photo
+                media={introImage}
+                locale={locale}
+                alt=""
+                sizes="(min-width: 768px) 26rem, 100vw"
+                className="size-full object-cover"
+              />
+            </div>
+          ) : null}
         </section>
       ) : null}
 

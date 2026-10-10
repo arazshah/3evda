@@ -266,7 +266,7 @@ function ArticleForm({
             ))}
           </select>
         </label>
-        <MediaPicker label="کاور" value={cover} onChange={setCover} />
+        <MediaPicker label="کاور" value={cover} onChange={setCover} spec="article_cover" />
         <fieldset className="md:col-span-2">
           <legend className="mb-1 text-sm text-muted">برچسب‌ها</legend>
           <div className="flex flex-wrap gap-2">
@@ -320,7 +320,7 @@ function ArticleForm({
           onChange={(e) => setSeoTitle(e.target.value)}
           hint="خالی = عنوان مقاله"
         />
-        <MediaPicker label="تصویر اشتراک‌گذاری" value={ogImage} onChange={setOgImage} />
+        <MediaPicker label="تصویر اشتراک‌گذاری" value={ogImage} onChange={setOgImage} spec="share" />
         <TextArea
           label="توضیح برای گوگل"
           dir={dir}

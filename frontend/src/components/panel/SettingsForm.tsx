@@ -79,8 +79,8 @@ function SettingsEditor({ initial }: { initial: Settings }) {
 
       <Card className="grid gap-4 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">برند</h2>
-        <MediaPicker label="لوگو" value={logo} onChange={setLogo} />
-        <MediaPicker label="تصویر اشتراک‌گذاری" value={ogImage} onChange={setOgImage} />
+        <MediaPicker label="لوگو" value={logo} onChange={setLogo} spec="logo" />
+        <MediaPicker label="تصویر اشتراک‌گذاری" value={ogImage} onChange={setOgImage} spec="share" />
         <Field label="نام برند (فارسی)" dir="rtl" {...bind("brand_name_fa")} />
         <Field label="نام برند (انگلیسی)" dir="ltr" {...bind("brand_name_en")} />
         <Field label="شعار (فارسی)" dir="rtl" {...bind("tagline_fa")} />

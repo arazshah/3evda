@@ -229,7 +229,7 @@ function ProjectForm({ project, onDone }: { project: Project | null; onDone: () 
           error={fieldErrors.year?.[0]}
         />
       </div>
-      <MediaPicker label="تصویر شاخص" value={cover} onChange={setCover} />
+      <MediaPicker label="تصویر شاخص" value={cover} onChange={setCover} spec="project_cover" />
 
       <fieldset className="flex flex-col gap-3 rounded-brand border border-line p-3">
         <legend className="px-2 text-sm text-muted">تصاویر پروژه</legend>
@@ -292,6 +292,7 @@ function ProjectForm({ project, onDone }: { project: Project | null; onDone: () 
         <MediaPicker
           label="افزودن تصویر یا ویدیو"
           kind="any"
+          spec="project_image"
           value={null}
           onChange={(picked) => {
             if (picked)

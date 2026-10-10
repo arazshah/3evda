@@ -10,6 +10,7 @@ import {
   type Collection,
   type ContentItem,
 } from "@/lib/api/queries";
+import type { ImageSpecKey } from "@/lib/image-specs";
 import { EditorDialog } from "./EditorDialog";
 import { previewUrl } from "./media-utils";
 import { MediaPicker, type PickedMedia } from "./MediaPicker";
@@ -19,6 +20,7 @@ import { Alert, Button, Field, TextArea } from "./ui";
 type FieldName = "title" | "subtitle" | "body" | "link_url" | "media";
 
 type Spec = {
+  spec?: ImageSpecKey;
   label: string;
   noun: string;
   fields: Partial<Record<FieldName, string>>;
@@ -28,12 +30,14 @@ type Spec = {
 /** What each collection needs, in the owner's words. */
 const SPECS: Record<Collection, Spec> = {
   hero_slide: {
+    spec: "hero",
     label: "اسلایدهای صفحه‌ی اول",
     noun: "اسلاید",
     fields: { title: "عنوان بزرگ", subtitle: "متن زیر عنوان", media: "تصویر" },
     hint: "اگر خالی بماند، متن معرفی صفحه‌ی خانه نمایش داده می‌شود.",
   },
   service: {
+    spec: "service",
     label: "خدمات",
     noun: "خدمت",
     fields: { title: "نام خدمت", subtitle: "توضیح کوتاه", body: "توضیح کامل", media: "تصویر" },
@@ -43,13 +47,14 @@ const SPECS: Record<Collection, Spec> = {
     noun: "مرحله",
     fields: { title: "عنوان مرحله", body: "توضیح" },
   },
-  client: { label: "مشتریان", noun: "مشتری", fields: { title: "نام برند", media: "لوگو" } },
+  client: { spec: "client", label: "مشتریان", noun: "مشتری", fields: { title: "نام برند", media: "لوگو" } },
   testimonial: {
     label: "نظر مشتریان",
     noun: "نظر",
     fields: { title: "نام", subtitle: "سمت یا نام برند", body: "متن نظر" },
   },
   behind_scenes: {
+    spec: "behind",
     label: "پشت صحنه",
     noun: "تصویر",
     fields: { title: "توضیح تصویر (برای نابینایان)", media: "تصویر" },
@@ -240,7 +245,7 @@ function ItemForm({
         </div>
       )}
       {f.link_url && <Field label={f.link_url} dir="ltr" {...set("link_url")} />}
-      {f.media && <MediaPicker label={f.media} value={media} onChange={setMedia} />}
+      {f.media && <MediaPicker label={f.media} value={media} onChange={setMedia} spec={spec.spec} />}
       <label className="flex min-h-11 items-center gap-3">
         <input
           type="checkbox"
