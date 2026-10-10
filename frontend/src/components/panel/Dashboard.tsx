@@ -45,6 +45,10 @@ export function Dashboard() {
     { n: failed.data?.count ?? 0, text: "تصویر با پردازش ناموفق", href: "/panel/media?status=failed" },
   ].filter((t) => t.n > 0);
 
+  const queries = [inquiries, bookings, failed];
+  const failedToLoad = queries.some((q) => q.isError);
+  const loading = !failedToLoad && queries.some((q) => q.data === undefined);
+
   return (
     <div className="flex flex-col gap-5">
       <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">داشبورد</h1>
@@ -76,7 +80,13 @@ export function Dashboard() {
           <h2 id="todo-title" className="font-display text-xl">
             نیاز به اقدام
           </h2>
-          {todo.length === 0 ? (
+          {failedToLoad ? (
+            <p role="alert" className="mt-2 text-accent-2">
+              بارگذاری این فهرست ناموفق بود؛ صفحه را دوباره باز کنید.
+            </p>
+          ) : loading ? (
+            <p className="mt-2 text-muted">در حال بارگذاری…</p>
+          ) : todo.length === 0 ? (
             <p className="mt-2 text-muted">فعلاً کاری منتظر شما نیست.</p>
           ) : (
             <ul className="mt-2 divide-y divide-line">

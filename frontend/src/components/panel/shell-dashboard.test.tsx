@@ -66,6 +66,28 @@ describe("panel menu", () => {
 });
 
 describe("Dashboard", () => {
+  it("never claims nothing is waiting while the numbers are missing or failed", async () => {
+    vi.stubGlobal(
+      "fetch",
+      fakeApi([
+        {
+          method: "GET",
+          path: "/api/admin/inquiries/summary/",
+          status: 500,
+          body: { code: "x", detail: "x" },
+        },
+        { method: "GET", path: "/api/admin/bookings/summary/", body: { pending: 0 } },
+        { method: "GET", path: "/api/admin/blog/articles/", body: [] },
+        { method: "GET", path: "/api/admin/media/", body: { count: 0, results: [] } },
+      ]).fetchImpl,
+    );
+    renderWithQuery(<Dashboard />);
+    const todo = screen.getByRole("region", { name: "نیاز به اقدام" });
+    expect(within(todo).queryByText("فعلاً کاری منتظر شما نیست.")).not.toBeInTheDocument();
+    expect(await within(todo).findByRole("alert")).toHaveTextContent("ناموفق");
+    expect(within(todo).queryByText("فعلاً کاری منتظر شما نیست.")).not.toBeInTheDocument();
+  });
+
   it("lists what needs attention and hides the system details until asked", async () => {
     vi.stubGlobal(
       "fetch",
