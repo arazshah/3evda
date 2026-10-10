@@ -80,6 +80,8 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
     has: page.getByRole("heading", { name: "وضعیت سیستم" }),
   });
   await expect(card.getByTestId("status-summary")).toBeVisible();
+  // The dashboard shows only the verdict; the individual checks open on request.
+  await card.getByRole("button", { name: "نمایش جزئیات" }).click();
   for (const label of [
     "پایگاه‌داده",
     "ذخیره‌سازی فایل",

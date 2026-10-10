@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { formatDate, toFaDigits } from "@/lib/format";
 import { useSystemStatus, type StatusCheck } from "@/lib/api/system-queries";
 import { Card } from "./ui";
@@ -36,8 +37,11 @@ const SUMMARY: Record<"ok" | "warning" | "error", string> = {
   error: "مشکلی هست که باید بررسی شود.",
 };
 
-export function SystemStatusCard() {
+/** `compact` keeps only the one-line verdict until "نمایش جزئیات" is pressed (the dashboard); otherwise every check is listed. */
+export function SystemStatusCard({ compact = false }: { compact?: boolean }) {
   const { data, isPending, isError, refetch, isFetching } = useSystemStatus();
+  const [expanded, setExpanded] = useState(false);
+  const showChecks = !compact || expanded;
 
   return (
     <Card>
@@ -66,20 +70,34 @@ export function SystemStatusCard() {
             <Badge level={data.level} />
             <span>{SUMMARY[data.level]}</span>
           </p>
-          <ul className="mt-4 divide-y divide-line">
-            {data.checks.map((check) => (
-              <li key={check.key} className="flex flex-wrap items-start justify-between gap-2 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{check.label}</p>
-                  <p className="text-sm text-muted">{toFaDigits(check.detail)}</p>
-                </div>
-                <Badge level={check.level} />
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-muted">
-            آخرین بررسی: {formatDate(data.checked_at)} · نسخه‌ی سایت: {data.version.slice(0, 7)}
-          </p>
+          {compact && (
+            <button
+              type="button"
+              aria-expanded={expanded}
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-3 min-h-11 rounded-full border border-text/50 px-5 text-sm hover:border-text"
+            >
+              {expanded ? "پنهان کردن جزئیات" : "نمایش جزئیات"}
+            </button>
+          )}
+          {showChecks && (
+            <ul className="mt-4 divide-y divide-line">
+              {data.checks.map((check) => (
+                <li key={check.key} className="flex flex-wrap items-start justify-between gap-2 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{check.label}</p>
+                    <p className="text-sm text-muted">{toFaDigits(check.detail)}</p>
+                  </div>
+                  <Badge level={check.level} />
+                </li>
+              ))}
+            </ul>
+          )}
+          {showChecks && (
+            <p className="mt-3 text-xs text-muted">
+              آخرین بررسی: {formatDate(data.checked_at)} · نسخه‌ی سایت: {data.version.slice(0, 7)}
+            </p>
+          )}
         </>
       )}
     </Card>

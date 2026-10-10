@@ -2,45 +2,123 @@
 
 import Link from "next/link";
 import { formatNumber } from "@/lib/format";
-import { useMediaList } from "@/lib/api/queries";
+import { useArticles, useBookingSummary, useInquirySummary, useMediaList } from "@/lib/api/queries";
 import { SystemStatusCard } from "./SystemStatusCard";
-import { Card } from "./ui";
+import { Icon, type IconName } from "./nav";
 
-function Stat({ label, value, href }: { label: string; value?: number; href: string }) {
+function Stat({ label, value, href, hot }: { label: string; value?: number; href: string; hot?: boolean }) {
   return (
-    <Link href={href} className="group block border-t border-text pt-4 transition-colors hover:border-accent">
+    <Link
+      href={href}
+      className="group block rounded-brand border border-line bg-surface p-4 transition-colors hover:border-accent"
+    >
       <p className="text-sm text-muted">{label}</p>
-      <p className="font-display mt-1 text-5xl tabular-nums transition-colors group-hover:text-accent">
+      <p
+        className={`font-display mt-1 text-4xl tabular-nums transition-colors group-hover:text-accent ${
+          hot ? "text-accent" : ""
+        }`}
+      >
         {value === undefined ? "…" : formatNumber(value)}
       </p>
     </Link>
   );
 }
 
+const SHORTCUTS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/panel/media", label: "آپلود عکس", icon: "image" },
+  { href: "/panel/items", label: "اسلایدها و خدمات", icon: "layers" },
+  { href: "/panel/projects", label: "نمونه‌کار جدید", icon: "grid" },
+  { href: "/panel/articles", label: "مقاله‌ی جدید", icon: "pen" },
+  { href: "/panel/galleries", label: "گالری مشتری", icon: "camera" },
+  { href: "/panel/settings", label: "تنظیمات و فونت", icon: "gear" },
+];
+
 export function Dashboard() {
-  const all = useMediaList({});
-  const images = useMediaList({ kind: "image" });
-  const videos = useMediaList({ kind: "video" });
+  const inquiries = useInquirySummary();
+  const bookings = useBookingSummary();
+  const drafts = useArticles({ status: "draft" });
   const failed = useMediaList({ status: "failed" });
 
+  const todo = [
+    { n: inquiries.data?.new ?? 0, text: "استعلام خوانده‌نشده", href: "/panel/inquiries" },
+    { n: bookings.data?.pending ?? 0, text: "رزرو در انتظار تأیید", href: "/panel/booking" },
+    { n: failed.data?.count ?? 0, text: "تصویر با پردازش ناموفق", href: "/panel/media?status=failed" },
+  ].filter((t) => t.n > 0);
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">داشبورد</h1>
-      <SystemStatusCard />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat label="همه‌ی فایل‌ها" value={all.data?.count} href="/panel/media" />
-        <Stat label="عکس" value={images.data?.count} href="/panel/media?kind=image" />
-        <Stat label="ویدیو" value={videos.data?.count} href="/panel/media?kind=video" />
-        <Stat label="پردازش ناموفق" value={failed.data?.count} href="/panel/media?status=failed" />
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat
+          label="استعلام جدید"
+          value={inquiries.data?.new}
+          href="/panel/inquiries"
+          hot={!!inquiries.data?.new}
+        />
+        <Stat
+          label="رزرو در انتظار"
+          value={bookings.data?.pending}
+          href="/panel/booking"
+          hot={!!bookings.data?.pending}
+        />
+        <Stat label="مقاله‌ی پیش‌نویس" value={drafts.data?.length} href="/panel/articles" />
+        <Stat
+          label="پردازش ناموفق"
+          value={failed.data?.count}
+          href="/panel/media?status=failed"
+          hot={!!failed.data?.count}
+        />
       </div>
-      <Card>
-        <h2 className="mb-2 font-display text-2xl">قدم‌های بعدی</h2>
-        <p className="text-muted">
-          عکس‌ها و ویدیوهای نمونه‌کار را در کتابخانه رسانه آپلود کنید و برای هر کدام متن جایگزین فارسی و
-          انگلیسی بنویسید. مدیریت صفحات سایت، پکیج‌ها، بلاگ، رزرو و گالری مشتری در فازهای بعد به این پنل اضافه
-          می‌شود.
-        </p>
-      </Card>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <section className="rounded-brand border border-line bg-surface p-5" aria-labelledby="todo-title">
+          <h2 id="todo-title" className="font-display text-xl">
+            نیاز به اقدام
+          </h2>
+          {todo.length === 0 ? (
+            <p className="mt-2 text-muted">فعلاً کاری منتظر شما نیست.</p>
+          ) : (
+            <ul className="mt-2 divide-y divide-line">
+              {todo.map((t) => (
+                <li key={t.href}>
+                  <Link
+                    href={t.href}
+                    className="flex min-h-11 items-center justify-between gap-3 hover:text-accent"
+                  >
+                    <span>{t.text}</span>
+                    <span className="tabular-nums text-accent">{formatNumber(t.n)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section
+          className="rounded-brand border border-line bg-surface p-5"
+          aria-labelledby="shortcuts-title"
+        >
+          <h2 id="shortcuts-title" className="font-display text-xl">
+            میان‌برها
+          </h2>
+          <ul className="mt-3 grid grid-cols-2 gap-2">
+            {SHORTCUTS.map((s) => (
+              <li key={s.href}>
+                <Link
+                  href={s.href}
+                  className="flex min-h-11 items-center gap-2 rounded-brand border border-line px-3 text-sm hover:border-accent hover:text-accent"
+                >
+                  <Icon name={s.icon} />
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <SystemStatusCard compact />
     </div>
   );
 }
