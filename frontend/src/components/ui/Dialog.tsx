@@ -33,7 +33,11 @@ export function Dialog({
     <dialog
       ref={ref}
       aria-label={label}
-      onClose={onClose}
+      // React lets a nested dialog's `close` reach this handler through the component tree (the DOM event does not
+      // bubble), which used to close the editor underneath a library picker and throw its input away.
+      onClose={(e) => {
+        if (e.target === ref.current) onClose();
+      }}
       onKeyDown={onKeyDown}
       onClick={(e) => {
         if (e.target === ref.current) onClose();

@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState, type DragEvent } from "react";
-import { errorMessage } from "@/lib/api/client";
+import { errorMessage, type MediaAsset } from "@/lib/api/client";
 import { keys } from "@/lib/api/queries";
 import { formatNumber } from "@/lib/format";
 import { uploadMedia } from "@/lib/upload";
@@ -18,7 +18,14 @@ type Item = {
   message?: string;
 };
 
-export function Uploader({ upload = uploadMedia }: { upload?: typeof uploadMedia }) {
+export function Uploader({
+  upload = uploadMedia,
+  onUploaded,
+}: {
+  upload?: typeof uploadMedia;
+  /** Called for each stored file, with how many files were sent together (a picker takes a lone file at once). */
+  onUploaded?: (asset: MediaAsset, batchSize: number) => void;
+}) {
   const client = useQueryClient();
   const input = useRef<HTMLInputElement>(null);
   const nextId = useRef(0);
@@ -40,8 +47,9 @@ export function Uploader({ upload = uploadMedia }: { upload?: typeof uploadMedia
         const { file, id } = job;
         patch(id, { state: "uploading" });
         try {
-          const { duplicate } = await upload(file, (progress) => patch(id, { progress }));
+          const { asset, duplicate } = await upload(file, (progress) => patch(id, { progress }));
           patch(id, { state: "done", progress: 1, message: duplicate ? "قبلاً آپلود شده بود" : undefined });
+          onUploaded?.(asset, files.length);
         } catch (err) {
           patch(id, { state: "error", message: errorMessage(err) });
         }

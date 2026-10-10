@@ -188,6 +188,72 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   await dialog.getByRole("button", { name: "حذف" }).click();
   await expect(tile).toHaveCount(0);
 
+  // A picture goes on a slide: pick it from the library inside the slide editor (the library is a dialog inside the
+  // editor dialog; choosing used to close both and lose the form), save, and it is still there on reopening.
+  await page.goto("/panel/items");
+  await page.getByRole("button", { name: "افزودن اسلاید" }).click();
+  await page.getByLabel("عنوان بزرگ (فارسی)").fill("اسلاید تصویر آزمایشی");
+  await page.getByRole("button", { name: "انتخاب تصویر", exact: true }).click();
+  await page.locator('input[type="file"]').first().setInputFiles(PHOTO);
+  // A lone upload is taken straight away: the library closes, the editor stays with what was typed.
+  await expect(page.getByRole("button", { name: "تغییر تصویر" })).toBeVisible({
+    timeout: 30_000,
+  });
+  await expect(page.getByLabel("عنوان بزرگ (فارسی)")).toHaveValue(
+    "اسلاید تصویر آزمایشی",
+  );
+  await page.getByRole("button", { name: "ذخیره", exact: true }).click();
+  const slide = page
+    .getByRole("listitem")
+    .filter({ hasText: "اسلاید تصویر آزمایشی" });
+  await expect(slide).toBeVisible();
+  await slide.getByRole("button", { name: /ویرایش/ }).click();
+  await expect(page.getByRole("button", { name: "تغییر تصویر" })).toBeVisible();
+  await page.getByRole("button", { name: "انصراف" }).click();
+
+  // The same picture as the site logo (a page-level picker, no dialog around it): choose, save, still there on reload.
+  await page.goto("/panel/settings");
+  await page.getByRole("button", { name: "انتخاب لوگو", exact: true }).click();
+  await page
+    .getByRole("list", { name: "فایل‌ها" })
+    .getByRole("button", { name: /photo-with-gps\.jpg/ })
+    .click();
+  await page
+    .getByRole("button", { name: "ذخیره", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("button", { name: "تغییر لوگو", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "تغییر لوگو", exact: true }),
+  ).toBeVisible();
+  // The exact sizes are written on the same page.
+  await expect(
+    page.getByRole("heading", { name: "راهنمای اندازه‌ی تصاویر" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "حذف لوگو", exact: true }).click();
+  await page
+    .getByRole("button", { name: "ذخیره", exact: true })
+    .first()
+    .click();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "انتخاب لوگو", exact: true }),
+  ).toBeVisible();
+
+  await page.goto("/panel/items");
+  page.once("dialog", (confirm) => confirm.accept());
+  await slide.getByRole("button", { name: /حذف/ }).click();
+  await expect(slide).toHaveCount(0);
+  // The library keeps the upload; remove it so the library is as it was.
+  await page.goto("/panel/media");
+  await tile.click();
+  page.once("dialog", (confirm) => confirm.accept());
+  await page.getByRole("dialog").getByRole("button", { name: "حذف" }).click();
+  await expect(tile).toHaveCount(0);
+
   // Edit a text block in the panel and see it on the public site at once (the panel revalidates the cache).
   const original = "پروژه‌ی بعدی‌تان را شروع کنیم";
   const edited = "عنوان ویرایش‌شده از پنل";

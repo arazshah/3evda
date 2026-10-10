@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { errorMessage } from "@/lib/api/client";
 import { useBlocks, useSaveBlock } from "@/lib/api/queries";
 import type { components } from "@/lib/api/schema";
+import { BLOCK_SPEC } from "@/lib/image-specs";
 import { previewUrl } from "./media-utils";
 import { MediaPicker, type PickedMedia } from "./MediaPicker";
 import { Alert, Button, Card, Field, TextArea } from "./ui";
@@ -93,7 +94,12 @@ function BlockEditor({ block }: { block: Block }) {
         <h2 className="font-bold">{block.display_name}</h2>
         {message && <Alert tone={message.tone}>{message.text}</Alert>}
         {isImage ? (
-          <MediaPicker label={block.display_name} value={media} onChange={setMedia} />
+          <MediaPicker
+            label={block.display_name}
+            value={media}
+            onChange={setMedia}
+            spec={BLOCK_SPEC[block.key]}
+          />
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {block.kind === "longtext" ? (

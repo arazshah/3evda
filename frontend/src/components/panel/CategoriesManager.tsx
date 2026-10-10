@@ -127,7 +127,7 @@ function CategoryForm({ category, onDone }: { category: Category | null; onDone:
         <TextArea label="توضیح (فارسی)" dir="rtl" rows={3} {...set("description_fa")} />
         <TextArea label="توضیح (English)" dir="ltr" rows={3} {...set("description_en")} />
       </div>
-      <MediaPicker label="تصویر دسته" value={cover} onChange={setCover} />
+      <MediaPicker label="تصویر دسته" value={cover} onChange={setCover} spec="category" />
       <Field
         label="نشانی در لینک (اختیاری)"
         dir="ltr"
