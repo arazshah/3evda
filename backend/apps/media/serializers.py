@@ -30,10 +30,19 @@ class MediaUploadSerializer(serializers.Serializer):  # type: ignore[type-arg]
 
 
 class WatermarkSettingSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    ready_count = serializers.SerializerMethodField()
+    marked_count = serializers.SerializerMethodField()
+
     class Meta:
         model = WatermarkSetting
-        fields = ["enabled", "text", "opacity", "position", "size_ratio", "updated_at"]
-        read_only_fields = ["updated_at"]
+        fields = ["enabled", "text", "opacity", "position", "size_ratio", "updated_at", "ready_count", "marked_count"]
+        read_only_fields = ["updated_at", "ready_count", "marked_count"]
+
+    def get_ready_count(self, obj: WatermarkSetting) -> int:
+        return MediaAsset.objects.filter(status=MediaAsset.Status.READY).count()
+
+    def get_marked_count(self, obj: WatermarkSetting) -> int:
+        return MediaAsset.objects.filter(status=MediaAsset.Status.READY, watermarked=True).count()
 
 
 MEDIA_NOT_READY = "این فایل پیدا نشد یا هنوز پردازش نشده است."

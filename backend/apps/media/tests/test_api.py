@@ -8,7 +8,7 @@ from apps.audit.models import AuditLog
 from apps.media.models import MediaAsset, MediaReference, WatermarkSetting
 from apps.media.service import create_asset
 
-from .factories import image_bytes
+from .factories import image_bytes, make_asset
 
 pytestmark = pytest.mark.django_db
 
@@ -160,3 +160,32 @@ def test_watermark_settings_are_validated(owner_client):
     )
     assert response.status_code == 400
     assert set(response.json()["fields"]) == {"opacity", "position"}
+
+
+def test_saving_a_changed_watermark_applies_it_to_existing_photos(
+    owner_client, monkeypatch, django_capture_on_commit_callbacks
+):
+    queued: list[int] = []
+    monkeypatch.setattr("apps.media.tasks.reapply_watermark.delay", lambda: queued.append(1))
+    body = {"enabled": True, "text": "© سودا", "opacity": 0.5, "position": "center", "size_ratio": 0.05}
+    with django_capture_on_commit_callbacks(execute=True):
+        assert owner_client.put("/api/admin/settings/watermark", body, format="json").status_code == 200
+    assert queued == [1]
+    with django_capture_on_commit_callbacks(execute=True):  # nothing changed: no needless re-rendering
+        assert owner_client.put("/api/admin/settings/watermark", body, format="json").status_code == 200
+    assert queued == [1]
+
+
+def test_the_watermark_can_be_applied_again_on_demand_and_reports_how_many_have_it(
+    owner_client, monkeypatch, django_capture_on_commit_callbacks
+):
+    queued: list[int] = []
+    monkeypatch.setattr("apps.media.tasks.reapply_watermark.delay", lambda: queued.append(1))
+    MediaAsset.objects.filter(pk=make_asset("a").pk).update(watermarked=True)
+    make_asset("b")
+    make_asset("c", MediaAsset.Status.PENDING)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = owner_client.post("/api/admin/settings/watermark/apply")
+    assert response.status_code == 202
+    assert (response.json()["ready_count"], response.json()["marked_count"]) == (2, 1)
+    assert queued == [1]

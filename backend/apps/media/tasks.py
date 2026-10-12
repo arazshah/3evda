@@ -14,9 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(acks_late=True)
-def process_asset(asset_id: str) -> str:
+def process_asset(asset_id: str, refresh: bool = False) -> str:
+    """Make the renditions of an asset.
+
+    `refresh` re-makes the renditions of a file that is already in use (a new watermark, say): it stays ready the whole
+    time, so pages that show it do not lose it, and a failure leaves the old renditions in place.
+    """
     asset = MediaAsset.objects.get(pk=asset_id)
-    MediaAsset.objects.filter(pk=asset.pk).update(status=MediaAsset.Status.PROCESSING, error="")
+    keep_ready = refresh and asset.status == MediaAsset.Status.READY
+    if not keep_ready:
+        MediaAsset.objects.filter(pk=asset.pk).update(status=MediaAsset.Status.PROCESSING, error="")
     try:
         with private_storage().open(asset.original_key) as f:
             data = f.read()
@@ -31,6 +38,8 @@ def process_asset(asset_id: str) -> str:
         asset.error = ""
     except Exception as exc:
         logger.exception("media processing failed", extra={"asset": str(asset.pk)})
+        if keep_ready:
+            return MediaAsset.Status.READY  # the renditions made earlier are untouched and still good
         asset.status = MediaAsset.Status.FAILED
         asset.error = f"پردازش ناموفق بود ({type(exc).__name__})."[:500]
     asset.save(update_fields=["status", "error", "watermarked", "width", "height", "duration_seconds", "lqip",
@@ -59,3 +68,12 @@ def _process_video(asset: MediaAsset, data: bytes, watermark: WatermarkSetting |
     store_renditions(asset, renditions(poster, watermark, prefix="poster-"), extra=[video])
     asset.width, asset.height, asset.duration_seconds = result.width, result.height, result.duration
     asset.lqip = lqip(poster)
+
+
+@shared_task
+def reapply_watermark() -> int:
+    """Re-make the renditions of every finished file so the watermark settings apply to existing photos too."""
+    ids = list(MediaAsset.objects.filter(status=MediaAsset.Status.READY).values_list("pk", flat=True))
+    for asset_id in ids:
+        process_asset.delay(str(asset_id), True)
+    return len(ids)

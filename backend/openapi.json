@@ -7125,6 +7125,32 @@
                 }
             }
         },
+        "/api/admin/settings/watermark/apply": {
+            "post": {
+                "operationId": "admin_settings_watermark_apply_create",
+                "description": "Re-make every finished photo with the current watermark settings (the button under the settings).",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WatermarkSetting"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/system/status": {
             "get": {
                 "operationId": "system_status",
@@ -15948,9 +15974,19 @@
                         "type": "string",
                         "format": "date-time",
                         "readOnly": true
+                    },
+                    "ready_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "marked_count": {
+                        "type": "integer",
+                        "readOnly": true
                     }
                 },
                 "required": [
+                    "marked_count",
+                    "ready_count",
                     "updated_at"
                 ]
             },

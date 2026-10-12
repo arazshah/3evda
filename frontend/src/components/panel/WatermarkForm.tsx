@@ -2,11 +2,11 @@
 
 import { useState, type FormEvent } from "react";
 import { errorMessage, type WatermarkSetting } from "@/lib/api/client";
-import { useSaveWatermark, useWatermark } from "@/lib/api/queries";
+import { useApplyWatermark, useSaveWatermark, useWatermark, watermarkPending } from "@/lib/api/queries";
 import { formatNumber } from "@/lib/format";
 import { Alert, Button, Card, Field } from "./ui";
 
-type Form = Required<Omit<WatermarkSetting, "updated_at">>;
+type Form = Required<Omit<WatermarkSetting, "updated_at" | "ready_count" | "marked_count">>;
 
 const POSITIONS: { value: Form["position"]; label: string; className: string }[] = [
   { value: "bottom_right", label: "پایین راست", className: "bottom-3 right-3" },
@@ -26,11 +26,26 @@ export function WatermarkForm() {
     position = "bottom_right",
     size_ratio = 0.035,
   } = current.data;
-  return <WatermarkEditor initial={{ enabled, text, opacity, position, size_ratio }} />;
+  return (
+    <WatermarkEditor
+      initial={{ enabled, text, opacity, position, size_ratio }}
+      counts={{ ready: current.data.ready_count ?? 0, marked: current.data.marked_count ?? 0 }}
+      pending={watermarkPending(current.data)}
+    />
+  );
 }
 
-function WatermarkEditor({ initial }: { initial: Form }) {
+function WatermarkEditor({
+  initial,
+  counts,
+  pending,
+}: {
+  initial: Form;
+  counts: { ready: number; marked: number };
+  pending: boolean;
+}) {
   const save = useSaveWatermark();
+  const apply = useApplyWatermark();
   const [form, setForm] = useState<Form>(initial);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
 
@@ -42,7 +57,7 @@ function WatermarkEditor({ initial }: { initial: Form }) {
       await save.mutateAsync(form);
       setMessage({
         tone: "success",
-        text: "ذخیره شد. روی آپلودهای بعدی اعمال می‌شود؛ برای فایل‌های قبلی «پردازش مجدد» بزنید.",
+        text: "ذخیره شد. روی همه‌ی عکس‌های سایت اعمال می‌شود؛ چند دقیقه طول می‌کشد و پیشرفتش پایین دیده می‌شود.",
       });
     } catch (err) {
       setMessage({ tone: "error", text: errorMessage(err) });
@@ -140,6 +155,18 @@ function WatermarkEditor({ initial }: { initial: Form }) {
             )}
           </div>
           <p className="mt-3 text-sm text-muted">فایل اصلی همیشه بدون واترمارک نگهداری می‌شود.</p>
+          <div className="mt-4 flex flex-col gap-2 border-t border-line pt-4 text-sm">
+            <p role="status">
+              عکس‌های آماده: <strong>{formatNumber(counts.ready)}</strong> · دارای واترمارک:{" "}
+              <strong>{formatNumber(counts.marked)}</strong>
+              {pending ? " — در حال اعمال تغییر…" : ""}
+            </p>
+            <div>
+              <Button variant="ghost" disabled={apply.isPending} onClick={() => apply.mutate()}>
+                {apply.isPending ? "در حال ارسال…" : "اعمال دوباره روی همه‌ی عکس‌ها"}
+              </Button>
+            </div>
+          </div>
         </Card>
       </div>
     </div>

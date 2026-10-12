@@ -1418,6 +1418,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/settings/watermark/apply": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Re-make every finished photo with the current watermark settings (the button under the settings). */
+    post: operations["admin_settings_watermark_apply_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/system/status": {
     parameters: {
       query?: never;
@@ -4154,6 +4171,8 @@ export interface components {
       size_ratio?: number;
       /** Format: date-time */
       readonly updated_at: string;
+      readonly ready_count: number;
+      readonly marked_count: number;
     };
     WeeklyHours: {
       hours: components["schemas"]["WorkingHours"][];
@@ -7815,6 +7834,25 @@ export interface operations {
     };
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WatermarkSetting"];
+        };
+      };
+    };
+  };
+  admin_settings_watermark_apply_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      202: {
         headers: {
           [name: string]: unknown;
         };
