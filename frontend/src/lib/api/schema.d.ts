@@ -3307,6 +3307,8 @@ export interface components {
        *     * `lalezar` - لاله‌زار (فقط تیتر)
        */
       font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
+      /** @description The moving strip of client and service names on the home page */
+      show_marquee?: boolean;
       /** Format: date-time */
       readonly updated_at?: string;
     };
@@ -3793,6 +3795,8 @@ export interface components {
        *     * `lalezar` - لاله‌زار (فقط تیتر)
        */
       readonly font_fa_heading: components["schemas"]["FontFaHeadingEnum"];
+      /** @description The moving strip of client and service names on the home page */
+      readonly show_marquee: boolean;
     };
     PublicSite: {
       settings: components["schemas"]["PublicSettings"];
@@ -4041,6 +4045,8 @@ export interface components {
        *     * `lalezar` - لاله‌زار (فقط تیتر)
        */
       font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
+      /** @description The moving strip of client and service names on the home page */
+      show_marquee?: boolean;
       /** Format: date-time */
       readonly updated_at: string;
     };

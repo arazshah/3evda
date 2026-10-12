@@ -96,6 +96,23 @@ describe("SettingsForm", () => {
     });
   });
 
+  it("switches the home page strip off from the settings", async () => {
+    const api = fakeApi([
+      { method: "GET", path: "/api/admin/cms/settings", body: { ...settings, show_marquee: true } },
+      { method: "PATCH", path: "/api/admin/cms/settings", body: settings },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<SettingsForm />);
+
+    const strip = await screen.findByLabelText(/نوار متحرک/);
+    expect(strip).toBeChecked();
+    fireEvent.click(strip);
+    fireEvent.click(screen.getByRole("button", { name: "ذخیره" }));
+
+    expect(await screen.findByText("ذخیره شد و روی سایت اعمال شد.")).toBeInTheDocument();
+    expect(api.calls.find((c) => c.method === "PATCH")?.body).toMatchObject({ show_marquee: false });
+  });
+
   it("shows the server's message when saving fails", async () => {
     const api = fakeApi([
       { method: "GET", path: "/api/admin/cms/settings", body: settings },

@@ -60,6 +60,7 @@ function SettingsEditor({ initial }: { initial: Settings }) {
   );
   const [fontBody, setFontBody] = useState<BodyFont>(() => asFontKey(initial.font_fa_body) as BodyFont);
   const [fontHeading, setFontHeading] = useState<HeadingFont>(() => asFontKey(initial.font_fa_heading));
+  const [showMarquee, setShowMarquee] = useState(initial.show_marquee ?? true);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
@@ -79,6 +80,7 @@ function SettingsEditor({ initial }: { initial: Settings }) {
         og_image: ogImage?.id ?? null,
         font_fa_body: fontBody,
         font_fa_heading: fontHeading,
+        show_marquee: showMarquee,
       });
       setMessage({ tone: "success", text: "ذخیره شد و روی سایت اعمال شد." });
     } catch (err) {
@@ -106,7 +108,7 @@ function SettingsEditor({ initial }: { initial: Settings }) {
       </Card>
 
       <Card className="grid gap-4 md:grid-cols-2">
-        <h2 className="font-bold md:col-span-2">ظاهر سایت (فونت فارسی)</h2>
+        <h2 className="font-bold md:col-span-2">ظاهر سایت</h2>
         <FontSelect
           label="فونت متن‌ها"
           value={fontBody}
@@ -128,6 +130,15 @@ function SettingsEditor({ initial }: { initial: Settings }) {
             ۰۱۲۳۴۵۶۷۸۹
           </p>
         </div>
+        <label className="flex min-h-11 items-center gap-3 md:col-span-2">
+          <input
+            type="checkbox"
+            checked={showMarquee}
+            onChange={(e) => setShowMarquee(e.target.checked)}
+            className="h-5 w-5 accent-[var(--color-accent)]"
+          />
+          نوار متحرک نام مشتری‌ها و خدمات در صفحه‌ی اول نمایش داده شود
+        </label>
         <p className="text-xs text-muted md:col-span-2">
           فونت انگلیسی سایت ثابت است. تغییر فونت پس از ذخیره روی همه‌ی صفحه‌های فارسی اعمال می‌شود.
         </p>

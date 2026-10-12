@@ -12,6 +12,7 @@ import {
 import type { SiteData } from "@/lib/site/types";
 import type { ReactNode } from "react";
 import { WIDE } from "./Section";
+import { SocialIcon, type SocialKind } from "./SocialIcon";
 
 export function SiteFooter({
   site,
@@ -30,10 +31,10 @@ export function SiteFooter({
   const about = block(site, locale, "footer.about");
   const address = localized(locale, s, "address");
   const footerText = localized(locale, s, "footer_text");
-  const socials = [
-    { label: labels.instagram!, url: instagramUrl(s.instagram) },
-    { label: labels.telegram!, url: telegramUrl(s.telegram) },
-    { label: labels.whatsapp!, url: whatsappUrl(s.whatsapp) },
+  const socials: { kind: SocialKind; label: string; url: string }[] = [
+    { kind: "instagram" as const, label: labels.instagram!, url: instagramUrl(s.instagram) },
+    { kind: "telegram" as const, label: labels.telegram!, url: telegramUrl(s.telegram) },
+    { kind: "whatsapp" as const, label: labels.whatsapp!, url: whatsappUrl(s.whatsapp) },
   ].filter((x) => x.url);
 
   return (
@@ -71,16 +72,18 @@ export function SiteFooter({
           </li>
         </ul>
         {socials.length ? (
-          <ul className="flex flex-wrap gap-6 md:justify-end">
+          <ul className="flex flex-wrap gap-3 md:justify-end">
             {socials.map((x) => (
-              <li key={x.label}>
+              <li key={x.kind}>
                 <a
-                  className="link-line inline-flex min-h-11 items-center text-on-ink/70 hover:text-accent-on-ink"
+                  className="inline-flex size-11 items-center justify-center rounded-full border border-on-ink/30 text-on-ink/80 transition-colors hover:border-accent-on-ink hover:text-accent-on-ink"
                   href={x.url}
                   rel="noopener noreferrer"
                   target="_blank"
+                  aria-label={x.label}
+                  title={x.label}
                 >
-                  {x.label}
+                  <SocialIcon kind={x.kind} />
                 </a>
               </li>
             ))}
