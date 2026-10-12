@@ -82,6 +82,7 @@ export async function SitePage({
           telegram: t("footer.telegram"),
           whatsapp: t("footer.whatsapp"),
           book: t("nav.book"),
+          sitemap: t("footer.sitemap"),
         }}
       >
         {footerTop}

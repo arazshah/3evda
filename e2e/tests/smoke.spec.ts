@@ -41,6 +41,8 @@ const pages = [
   },
   { path: "/blog/category/sample", lang: "fa", dir: "rtl", heading: "نمونه" },
   { path: "/en/blog/tag/sample", lang: "en", dir: "ltr", heading: "sample" },
+  { path: "/sitemap", lang: "fa", dir: "rtl", heading: "نقشه‌ی سایت" },
+  { path: "/en/sitemap", lang: "en", dir: "ltr", heading: "Sitemap" },
 ] as const;
 
 for (const p of pages) {
@@ -238,6 +240,7 @@ test.describe("search engines", () => {
     expect(xml).toMatch(
       /hreflang="en" href="https?:\/\/[^"]+\/en\/blog\/sample-article"/,
     );
+    expect(xml).toMatch(/<loc>https?:\/\/[^<]+\/en\/sitemap<\/loc>/);
     expect(xml).not.toContain("/panel");
   });
 
