@@ -238,3 +238,14 @@ def test_the_owner_picks_the_persian_fonts_and_it_shows_on_the_public_site(clien
 )
 def test_unknown_or_unsuitable_fonts_are_refused(owner_client, bad):
     assert owner_client.patch("/api/admin/cms/settings", bad, format="json").status_code == 400
+
+
+def test_the_home_strip_and_client_list_are_off_until_the_owner_switches_them_on(client, owner_client):
+    shown = client.get("/api/public/site").json()["settings"]
+    assert (shown["show_marquee"], shown["show_clients"]) == (False, False)
+    response = owner_client.patch(
+        "/api/admin/cms/settings", {"show_marquee": True, "show_clients": True}, format="json"
+    )
+    assert response.status_code == 200
+    shown = client.get("/api/public/site").json()["settings"]
+    assert (shown["show_marquee"], shown["show_clients"]) == (True, True)

@@ -96,6 +96,33 @@ describe("SettingsForm", () => {
     });
   });
 
+  it("keeps the home page strip and client list off until they are ticked", async () => {
+    const api = fakeApi([
+      {
+        method: "GET",
+        path: "/api/admin/cms/settings",
+        body: { ...settings, show_marquee: false, show_clients: false },
+      },
+      { method: "PATCH", path: "/api/admin/cms/settings", body: settings },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<SettingsForm />);
+
+    const strip = await screen.findByLabelText(/نوار متحرک/);
+    const clients = screen.getByLabelText(/فهرست مشتریان/);
+    expect(strip).not.toBeChecked();
+    expect(clients).not.toBeChecked();
+    fireEvent.click(strip);
+    fireEvent.click(clients);
+    fireEvent.click(screen.getByRole("button", { name: "ذخیره" }));
+
+    expect(await screen.findByText("ذخیره شد و روی سایت اعمال شد.")).toBeInTheDocument();
+    expect(api.calls.find((c) => c.method === "PATCH")?.body).toMatchObject({
+      show_marquee: true,
+      show_clients: true,
+    });
+  });
+
   it("shows the server's message when saving fails", async () => {
     const api = fakeApi([
       { method: "GET", path: "/api/admin/cms/settings", body: settings },

@@ -5,6 +5,7 @@ import { PageTitle, Section } from "@/components/site/Section";
 import { SitePage } from "@/components/site/SitePage";
 import { getSite } from "@/lib/site/api";
 import { localeOf, pageMetadata } from "@/lib/site/page";
+import { SocialIcon } from "@/components/site/SocialIcon";
 import { block, href, instagramUrl, localized, telHref, telegramUrl, whatsappUrl } from "@/lib/site/text";
 
 export async function generateMetadata({
@@ -29,9 +30,9 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const s = site.settings;
   const address = localized(locale, s, "address");
   const channels = [
-    { label: t("footer.instagram"), url: instagramUrl(s.instagram) },
-    { label: t("footer.telegram"), url: telegramUrl(s.telegram) },
-    { label: t("footer.whatsapp"), url: whatsappUrl(s.whatsapp) },
+    { kind: "instagram" as const, label: t("footer.instagram"), url: instagramUrl(s.instagram) },
+    { kind: "telegram" as const, label: t("footer.telegram"), url: telegramUrl(s.telegram) },
+    { kind: "whatsapp" as const, label: t("footer.whatsapp"), url: whatsappUrl(s.whatsapp) },
   ].filter((c) => c.url);
 
   return (
@@ -82,15 +83,16 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               {t("contact.quoteCta")}
             </ButtonLink>
             {channels.length ? (
-              <div className="flex flex-wrap gap-x-6 gap-y-1" role="group" aria-label={t("contact.channels")}>
+              <div className="flex flex-wrap gap-3" role="group" aria-label={t("contact.channels")}>
                 {channels.map((c) => (
                   <a
-                    key={c.label}
+                    key={c.kind}
                     href={c.url}
                     rel="noopener noreferrer"
                     target="_blank"
-                    className="link-line inline-flex min-h-11 items-center text-lg"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-text/30 px-4 transition-colors hover:border-accent hover:text-accent"
                   >
+                    <SocialIcon kind={c.kind} />
                     {c.label}
                   </a>
                 ))}

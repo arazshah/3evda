@@ -111,12 +111,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         }}
       />
 
-      <Marquee
-        label={pick(locale, "مشتری‌ها و خدمات", "Clients and services")}
-        pauseLabel={t("common.marqueePause")}
-        playLabel={t("common.marqueePlay")}
-        items={[...c.client, ...c.service].map((x) => localized(locale, x, "title"))}
-      />
+      {site.settings.show_marquee ? (
+        <Marquee
+          label={pick(locale, "مشتری‌ها و خدمات", "Clients and services")}
+          pauseLabel={t("common.marqueePause")}
+          playLabel={t("common.marqueePlay")}
+          items={[...c.client, ...c.service].map((x) => localized(locale, x, "title"))}
+        />
+      ) : null}
 
       {slides.length > 0 && (statement || introImage) ? (
         <section
@@ -229,7 +231,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Section>
       ) : null}
 
-      {c.client.length ? (
+      {site.settings.show_clients && c.client.length ? (
         <Section id="clients" title={b("home.clients_title")}>
           <ul className="flex flex-wrap items-center gap-x-12 gap-y-8">
             {c.client.map((cl) => (

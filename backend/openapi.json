@@ -12793,6 +12793,14 @@
                         ],
                         "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
                     },
+                    "show_marquee": {
+                        "type": "boolean",
+                        "description": "The moving strip of client and service names on the home page"
+                    },
+                    "show_clients": {
+                        "type": "boolean",
+                        "description": "The list of client names or logos on the home page"
+                    },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
@@ -14785,6 +14793,16 @@
                         ],
                         "readOnly": true,
                         "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
+                    },
+                    "show_marquee": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "The moving strip of client and service names on the home page"
+                    },
+                    "show_clients": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "The list of client names or logos on the home page"
                     }
                 },
                 "required": [
@@ -14804,6 +14822,8 @@
                     "map_url",
                     "og_image",
                     "phone",
+                    "show_clients",
+                    "show_marquee",
                     "tagline_en",
                     "tagline_fa",
                     "telegram",
@@ -15622,6 +15642,14 @@
                             }
                         ],
                         "description": "Persian headings typeface\n\n* `vazirmatn` - وزیرمتن (پیش‌فرض)\n* `noto-sans` - نوتو سنس عربی\n* `ibm-plex` - آی‌بی‌ام پلکس عربی\n* `cairo` - قاهره\n* `noto-naskh` - نوتو نسخ\n* `amiri` - امیری\n* `harmattan` - هارماتان\n* `almarai` - المرعی\n* `lalezar` - لاله‌زار (فقط تیتر)"
+                    },
+                    "show_marquee": {
+                        "type": "boolean",
+                        "description": "The moving strip of client and service names on the home page"
+                    },
+                    "show_clients": {
+                        "type": "boolean",
+                        "description": "The list of client names or logos on the home page"
                     },
                     "updated_at": {
                         "type": "string",

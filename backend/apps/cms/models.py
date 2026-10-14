@@ -33,6 +33,10 @@ class SiteSettings(MediaRefsMixin, models.Model):
     font_fa_heading = models.CharField(
         max_length=20, choices=HEADING_FONTS, default=DEFAULT_FONT, help_text="Persian headings typeface"
     )
+    show_marquee = models.BooleanField(
+        default=False, help_text="The moving strip of client and service names on the home page"
+    )
+    show_clients = models.BooleanField(default=False, help_text="The list of client names or logos on the home page")
     logo = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     og_image = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
