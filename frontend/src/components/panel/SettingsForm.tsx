@@ -60,7 +60,8 @@ function SettingsEditor({ initial }: { initial: Settings }) {
   );
   const [fontBody, setFontBody] = useState<BodyFont>(() => asFontKey(initial.font_fa_body) as BodyFont);
   const [fontHeading, setFontHeading] = useState<HeadingFont>(() => asFontKey(initial.font_fa_heading));
-  const [showMarquee, setShowMarquee] = useState(initial.show_marquee ?? true);
+  const [showMarquee, setShowMarquee] = useState(initial.show_marquee ?? false);
+  const [showClients, setShowClients] = useState(initial.show_clients ?? false);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
@@ -81,6 +82,7 @@ function SettingsEditor({ initial }: { initial: Settings }) {
         font_fa_body: fontBody,
         font_fa_heading: fontHeading,
         show_marquee: showMarquee,
+        show_clients: showClients,
       });
       setMessage({ tone: "success", text: "ذخیره شد و روی سایت اعمال شد." });
     } catch (err) {
@@ -138,6 +140,15 @@ function SettingsEditor({ initial }: { initial: Settings }) {
             className="h-5 w-5 accent-[var(--color-accent)]"
           />
           نوار متحرک نام مشتری‌ها و خدمات در صفحه‌ی اول نمایش داده شود
+        </label>
+        <label className="flex min-h-11 items-center gap-3 md:col-span-2">
+          <input
+            type="checkbox"
+            checked={showClients}
+            onChange={(e) => setShowClients(e.target.checked)}
+            className="h-5 w-5 accent-[var(--color-accent)]"
+          />
+          فهرست مشتریان در صفحه‌ی اول نمایش داده شود
         </label>
         <p className="text-xs text-muted md:col-span-2">
           فونت انگلیسی سایت ثابت است. تغییر فونت پس از ذخیره روی همه‌ی صفحه‌های فارسی اعمال می‌شود.

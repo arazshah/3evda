@@ -231,7 +231,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Section>
       ) : null}
 
-      {c.client.length ? (
+      {site.settings.show_clients && c.client.length ? (
         <Section id="clients" title={b("home.clients_title")}>
           <ul className="flex flex-wrap items-center gap-x-12 gap-y-8">
             {c.client.map((cl) => (

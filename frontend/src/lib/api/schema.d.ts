@@ -3309,6 +3309,8 @@ export interface components {
       font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
       /** @description The moving strip of client and service names on the home page */
       show_marquee?: boolean;
+      /** @description The list of client names or logos on the home page */
+      show_clients?: boolean;
       /** Format: date-time */
       readonly updated_at?: string;
     };
@@ -3797,6 +3799,8 @@ export interface components {
       readonly font_fa_heading: components["schemas"]["FontFaHeadingEnum"];
       /** @description The moving strip of client and service names on the home page */
       readonly show_marquee: boolean;
+      /** @description The list of client names or logos on the home page */
+      readonly show_clients: boolean;
     };
     PublicSite: {
       settings: components["schemas"]["PublicSettings"];
@@ -4047,6 +4051,8 @@ export interface components {
       font_fa_heading?: components["schemas"]["FontFaHeadingEnum"];
       /** @description The moving strip of client and service names on the home page */
       show_marquee?: boolean;
+      /** @description The list of client names or logos on the home page */
+      show_clients?: boolean;
       /** Format: date-time */
       readonly updated_at: string;
     };
