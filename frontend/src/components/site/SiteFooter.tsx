@@ -70,6 +70,14 @@ export function SiteFooter({
               {labels.book}
             </a>
           </li>
+          <li>
+            <a
+              className="link-line inline-flex min-h-11 items-center hover:text-on-ink"
+              href={href(locale, "/sitemap")}
+            >
+              {labels.sitemap}
+            </a>
+          </li>
         </ul>
         {socials.length ? (
           <ul className="flex flex-wrap gap-3 md:justify-end">

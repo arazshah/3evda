@@ -14,6 +14,7 @@ export const STATIC_PATHS = [
   "/quote",
   "/book",
   "/contact",
+  "/sitemap",
 ] as const;
 
 const LOCALES: Locale[] = ["fa", "en"];

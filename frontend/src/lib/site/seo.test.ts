@@ -35,6 +35,7 @@ describe("buildSitemap", () => {
       en: "https://3evda.com/en/portfolio/tea",
     });
     expect(byUrl["https://3evda.com/en/contact"]).toBeDefined();
+    expect(byUrl["https://3evda.com/sitemap"]?.alternates?.languages.en).toBe("https://3evda.com/en/sitemap");
   });
 
   it("points articles only at the languages they exist in", () => {

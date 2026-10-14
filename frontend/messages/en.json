@@ -33,7 +33,8 @@
     "footer": {
       "instagram": "Instagram",
       "telegram": "Telegram",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "sitemap": "Sitemap"
     },
     "common": {
       "skip": "Skip to content",
@@ -312,6 +313,14 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "sitemap": {
+      "title": "Sitemap",
+      "intro": "Every part of the site, in one place.",
+      "pages": "Pages",
+      "projects": "Portfolio",
+      "articles": "Latest articles",
+      "allArticles": "All articles"
     }
   }
 }

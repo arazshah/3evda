@@ -21,7 +21,13 @@ const site = {
   collections: {},
 } as unknown as SiteData;
 
-const labels = { instagram: "اینستاگرام", telegram: "تلگرام", whatsapp: "واتس‌اپ", book: "رزرو" };
+const labels = {
+  instagram: "اینستاگرام",
+  telegram: "تلگرام",
+  whatsapp: "واتس‌اپ",
+  book: "رزرو",
+  sitemap: "نقشه‌ی سایت",
+};
 
 describe("SiteFooter social links", () => {
   it("shows an icon link for each network, named for screen readers", () => {
@@ -34,6 +40,14 @@ describe("SiteFooter social links", () => {
       "href",
       "https://wa.me/989121234567",
     );
+  });
+
+  it("links to the sitemap page in each language", () => {
+    const { unmount } = render(<SiteFooter site={site} locale="fa" labels={labels} />);
+    expect(screen.getByRole("link", { name: "نقشه‌ی سایت" })).toHaveAttribute("href", "/sitemap");
+    unmount();
+    render(<SiteFooter site={site} locale="en" labels={{ ...labels, sitemap: "Sitemap" }} />);
+    expect(screen.getByRole("link", { name: "Sitemap" })).toHaveAttribute("href", "/en/sitemap");
   });
 
   it("leaves out a network with no address", () => {
