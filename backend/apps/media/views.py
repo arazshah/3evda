@@ -1,3 +1,4 @@
+import io
 from typing import Any
 from urllib.parse import quote, urlsplit
 
@@ -17,6 +18,7 @@ from rest_framework.views import APIView
 
 from apps.audit.service import record
 
+from .images import apply_watermark, sample_photo
 from .models import MediaAsset, WatermarkSetting
 from .serializers import MediaAssetSerializer, MediaUploadSerializer, WatermarkSettingSerializer
 from .service import create_asset, delete_asset
@@ -160,6 +162,21 @@ class WatermarkSettingView(APIView):
         if any(getattr(current, name) != value for name, value in before.items()):
             transaction.on_commit(reapply_watermark.delay)
         return Response(serializer.data)
+
+
+class WatermarkPreviewView(APIView):
+    """A made-up photo stamped with the given, unsaved settings: what you see is what the worker makes."""
+
+    @extend_schema(request=WatermarkSettingSerializer, responses={(200, "image/png"): bytes})
+    def post(self, request: Request) -> HttpResponse:
+        serializer = WatermarkSettingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        setting = WatermarkSetting(**{name: serializer.validated_data[name] for name in WATERMARK_FIELDS})
+        buffer = io.BytesIO()
+        apply_watermark(sample_photo(), setting).save(buffer, "PNG")
+        response = HttpResponse(buffer.getvalue(), content_type="image/png")
+        response["Cache-Control"] = "no-store"
+        return response
 
 
 class WatermarkApplyView(APIView):

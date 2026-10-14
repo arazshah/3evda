@@ -1,3 +1,4 @@
+import io
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -189,3 +190,16 @@ def test_the_watermark_can_be_applied_again_on_demand_and_reports_how_many_have_
     assert response.status_code == 202
     assert (response.json()["ready_count"], response.json()["marked_count"]) == (2, 1)
     assert queued == [1]
+
+
+def test_the_watermark_preview_is_a_real_image_made_from_the_unsaved_settings(owner_client):
+    from PIL import Image
+
+    body = {"enabled": True, "text": "© سودا", "opacity": 0.8, "position": "tile", "size_ratio": 0.05}
+    response = owner_client.post("/api/admin/settings/watermark/preview", body, format="json")
+    assert response.status_code == 200 and response["Content-Type"] == "image/png"
+    assert response["Cache-Control"] == "no-store"
+    assert Image.open(io.BytesIO(response.content)).size == (1200, 800)
+    assert not WatermarkSetting.load().enabled  # a preview saves nothing
+    bad = owner_client.post("/api/admin/settings/watermark/preview", {**body, "position": "nowhere"}, format="json")
+    assert bad.status_code == 400

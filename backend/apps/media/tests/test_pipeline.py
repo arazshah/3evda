@@ -219,3 +219,28 @@ def test_reapply_queues_every_ready_photo_only(s3_buckets, monkeypatch):
     )
     assert reapply_watermark() == 1
     assert queued == [(str(ready.pk), True)] and str(pending.pk) not in {q[0] for q in queued}
+
+
+def _stamped_share(position: str, text: str = "© 3evda") -> tuple[float, tuple[int, int, int, int] | None]:
+    from PIL import ImageChops
+
+    from apps.media.images import apply_watermark
+
+    base = Image.new("RGB", (1200, 800), "#808080")
+    out = apply_watermark(base, WatermarkSetting(enabled=True, text=text, opacity=0.9, position=position))
+    box = ImageChops.difference(out, base).getbbox()
+    changed = sum(1 for px in ImageChops.difference(out, base).convert("L").get_flattened_data() if px)
+    return changed / (1200 * 800), box
+
+
+def test_the_tiled_watermark_covers_the_whole_picture_so_cropping_cannot_remove_it():
+    share, box = _stamped_share("tile")
+    assert box is not None and box[0] < 60 and box[1] < 60 and box[2] > 1140 and box[3] > 740  # corner to corner
+    corner_share, corner_box = _stamped_share("bottom_right")
+    assert share > corner_share * 5
+    assert corner_box is not None and corner_box[0] > 800  # a single mark stays in its corner
+
+
+def test_the_tiled_watermark_handles_persian_text():
+    share, box = _stamped_share("tile", "© سودا رحیم‌پور")
+    assert share > 0.01 and box is not None

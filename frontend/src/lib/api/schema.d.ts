@@ -1435,6 +1435,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/settings/watermark/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A made-up photo stamped with the given, unsaved settings: what you see is what the worker makes. */
+    post: operations["admin_settings_watermark_preview_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/system/status": {
     parameters: {
       query?: never;
@@ -3341,9 +3358,10 @@ export interface components {
      *     * `top_right` - بالا راست
      *     * `top_left` - بالا چپ
      *     * `center` - وسط
+     *     * `tile` - پخش روی کل عکس
      * @enum {string}
      */
-    PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center" | "tile";
     Preview: {
       enabled: boolean;
       rows: components["schemas"]["PreviewRow"][];
@@ -7858,6 +7876,31 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["WatermarkSetting"];
+        };
+      };
+    };
+  };
+  admin_settings_watermark_preview_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["WatermarkSetting"];
+        "application/x-www-form-urlencoded": components["schemas"]["WatermarkSetting"];
+        "multipart/form-data": components["schemas"]["WatermarkSetting"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "image/png": string;
         };
       };
     };

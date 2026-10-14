@@ -94,6 +94,7 @@ class WatermarkSetting(models.Model):
         TOP_RIGHT = "top_right", "بالا راست"
         TOP_LEFT = "top_left", "بالا چپ"
         CENTER = "center", "وسط"
+        TILE = "tile", "پخش روی کل عکس"
 
     enabled = models.BooleanField(default=False)
     text = models.CharField(max_length=80, default="© 3evda.com")
