@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { errorMessage, type WatermarkSetting } from "@/lib/api/client";
-import { useSaveWatermark, useWatermark } from "@/lib/api/queries";
+import { useApplyWatermark, useSaveWatermark, useWatermark, watermarkPending } from "@/lib/api/queries";
 import { formatNumber } from "@/lib/format";
+import { fetchWatermarkPreview } from "@/lib/watermark-preview";
 import { Alert, Button, Card, Field } from "./ui";
 
-type Form = Required<Omit<WatermarkSetting, "updated_at">>;
+type Form = Required<Omit<WatermarkSetting, "updated_at" | "ready_count" | "marked_count">>;
 
 const POSITIONS: { value: Form["position"]; label: string; className: string }[] = [
   { value: "bottom_right", label: "پایین راست", className: "bottom-3 right-3" },
@@ -14,6 +15,7 @@ const POSITIONS: { value: Form["position"]; label: string; className: string }[]
   { value: "top_right", label: "بالا راست", className: "top-3 right-3" },
   { value: "top_left", label: "بالا چپ", className: "top-3 left-3" },
   { value: "center", label: "وسط", className: "inset-0 m-auto h-fit w-fit" },
+  { value: "tile", label: "پخش روی کل عکس (با برش عکس حذف نمی‌شود)", className: "" },
 ];
 
 export function WatermarkForm() {
@@ -26,13 +28,60 @@ export function WatermarkForm() {
     position = "bottom_right",
     size_ratio = 0.035,
   } = current.data;
-  return <WatermarkEditor initial={{ enabled, text, opacity, position, size_ratio }} />;
+  return (
+    <WatermarkEditor
+      initial={{ enabled, text, opacity, position, size_ratio }}
+      counts={{ ready: current.data.ready_count ?? 0, marked: current.data.marked_count ?? 0 }}
+      pending={watermarkPending(current.data)}
+    />
+  );
 }
 
-function WatermarkEditor({ initial }: { initial: Form }) {
+function WatermarkEditor({
+  initial,
+  counts,
+  pending,
+}: {
+  initial: Form;
+  counts: { ready: number; marked: number };
+  pending: boolean;
+}) {
   const save = useSaveWatermark();
+  const apply = useApplyWatermark();
   const [form, setForm] = useState<Form>(initial);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
+
+  const [preview, setPreview] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState(false);
+  const shown = useRef<string | null>(null);
+
+  // The picture is made by the server with the very code that stamps real photos, so it can never disagree.
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetchWatermarkPreview(form, controller.signal)
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          if (shown.current) URL.revokeObjectURL(shown.current);
+          shown.current = url;
+          setPreview(url);
+          setPreviewError(false);
+        })
+        .catch((err: unknown) => {
+          if ((err as { name?: string })?.name !== "AbortError") setPreviewError(true);
+        });
+    }, 400);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [form]);
+  useEffect(
+    () => () => {
+      if (shown.current) URL.revokeObjectURL(shown.current);
+    },
+    [],
+  );
 
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm({ ...form, [key]: value });
 
@@ -42,14 +91,12 @@ function WatermarkEditor({ initial }: { initial: Form }) {
       await save.mutateAsync(form);
       setMessage({
         tone: "success",
-        text: "ذخیره شد. روی آپلودهای بعدی اعمال می‌شود؛ برای فایل‌های قبلی «پردازش مجدد» بزنید.",
+        text: "ذخیره شد. روی همه‌ی عکس‌های سایت اعمال می‌شود؛ چند دقیقه طول می‌کشد و پیشرفتش پایین دیده می‌شود.",
       });
     } catch (err) {
       setMessage({ tone: "error", text: errorMessage(err) });
     }
   };
-
-  const position = POSITIONS.find((p) => p.value === form.position) ?? POSITIONS[0]!;
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,27 +166,39 @@ function WatermarkEditor({ initial }: { initial: Form }) {
         </Card>
         <Card>
           <h2 className="mb-3 font-bold">پیش‌نمایش</h2>
-          <div
-            className="relative aspect-[3/2] overflow-hidden rounded-brand"
-            style={{
-              background: "radial-gradient(circle at 55% 55%, #c9822c 0 18%, #6b3a17 19% 30%, #1c1611 31%)",
-            }}
-          >
-            {form.enabled && (
-              <span
-                className={`absolute font-bold text-white ${position.className}`}
-                style={{
-                  opacity: form.opacity,
-                  fontSize: `${form.size_ratio * 100}cqw`,
-                  textShadow: "1px 1px 2px #000",
-                }}
-                dir="auto"
+          <div className="relative aspect-[3/2] overflow-hidden rounded-brand bg-line">
+            {preview ? (
+              // A blob made a moment ago by the server, not a site image: next/image has nothing to optimise.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="پیش‌نمایش واترمارک روی یک عکس نمونه" className="size-full" />
+            ) : null}
+            {!preview ? (
+              <p
+                className="absolute inset-0 flex items-center justify-center text-sm text-muted"
+                role="status"
               >
-                {form.text}
-              </span>
-            )}
+                {previewError ? "ساخت پیش‌نمایش ناموفق بود." : "در حال ساخت پیش‌نمایش…"}
+              </p>
+            ) : null}
           </div>
+          {!form.enabled ? (
+            <p className="mt-2 text-sm text-accent-2">
+              واترمارک خاموش است؛ این فقط نمونه‌ی ظاهر آن است و روی عکس‌های سایت اعمال نمی‌شود.
+            </p>
+          ) : null}
           <p className="mt-3 text-sm text-muted">فایل اصلی همیشه بدون واترمارک نگهداری می‌شود.</p>
+          <div className="mt-4 flex flex-col gap-2 border-t border-line pt-4 text-sm">
+            <p role="status">
+              عکس‌های آماده: <strong>{formatNumber(counts.ready)}</strong> · دارای واترمارک:{" "}
+              <strong>{formatNumber(counts.marked)}</strong>
+              {pending ? " — در حال اعمال تغییر…" : ""}
+            </p>
+            <div>
+              <Button variant="ghost" disabled={apply.isPending} onClick={() => apply.mutate()}>
+                {apply.isPending ? "در حال ارسال…" : "اعمال دوباره روی همه‌ی عکس‌ها"}
+              </Button>
+            </div>
+          </div>
         </Card>
       </div>
     </div>

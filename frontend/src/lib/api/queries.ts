@@ -132,17 +132,31 @@ export function useReprocessMedia() {
   });
 }
 
+/** Whether the stored photos still differ from the settings (the worker is re-making them). */
+export const watermarkPending = (w: { enabled?: boolean; ready_count?: number; marked_count?: number }) =>
+  w.enabled ? (w.marked_count ?? 0) < (w.ready_count ?? 0) : (w.marked_count ?? 0) > 0;
+
 export function useWatermark() {
   return useQuery({
     queryKey: keys.watermark,
     queryFn: () => unwrap(api.GET("/api/admin/settings/watermark")),
+    // Saving re-makes every photo in the background; follow its progress.
+    refetchInterval: (query) => (query.state.data && watermarkPending(query.state.data) ? 5000 : false),
+  });
+}
+
+export function useApplyWatermark() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => unwrap(api.POST("/api/admin/settings/watermark/apply")),
+    onSuccess: (data) => client.setQueryData(keys.watermark, data),
   });
 }
 
 export function useSaveWatermark() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (body: Omit<WatermarkSetting, "updated_at">) =>
+    mutationFn: (body: Omit<WatermarkSetting, "updated_at" | "ready_count" | "marked_count">) =>
       unwrap(api.PUT("/api/admin/settings/watermark", { body: body as WatermarkSetting })),
     onSuccess: (data) => client.setQueryData(keys.watermark, data),
   });

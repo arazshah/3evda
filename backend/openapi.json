@@ -7125,6 +7125,78 @@
                 }
             }
         },
+        "/api/admin/settings/watermark/apply": {
+            "post": {
+                "operationId": "admin_settings_watermark_apply_create",
+                "description": "Re-make every finished photo with the current watermark settings (the button under the settings).",
+                "tags": [
+                    "admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WatermarkSetting"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/admin/settings/watermark/preview": {
+            "post": {
+                "operationId": "admin_settings_watermark_preview_create",
+                "description": "A made-up photo stamped with the given, unsaved settings: what you see is what the worker makes.",
+                "tags": [
+                    "admin"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WatermarkSetting"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WatermarkSetting"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WatermarkSetting"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/admin/system/status": {
             "get": {
                 "operationId": "system_status",
@@ -12826,10 +12898,11 @@
                     "bottom_left",
                     "top_right",
                     "top_left",
-                    "center"
+                    "center",
+                    "tile"
                 ],
                 "type": "string",
-                "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط"
+                "description": "* `bottom_right` - پایین راست\n* `bottom_left` - پایین چپ\n* `top_right` - بالا راست\n* `top_left` - بالا چپ\n* `center` - وسط\n* `tile` - پخش روی کل عکس"
             },
             "Preview": {
                 "type": "object",
@@ -15948,9 +16021,19 @@
                         "type": "string",
                         "format": "date-time",
                         "readOnly": true
+                    },
+                    "ready_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "marked_count": {
+                        "type": "integer",
+                        "readOnly": true
                     }
                 },
                 "required": [
+                    "marked_count",
+                    "ready_count",
                     "updated_at"
                 ]
             },

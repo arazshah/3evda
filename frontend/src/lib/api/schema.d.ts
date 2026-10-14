@@ -1418,6 +1418,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/admin/settings/watermark/apply": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Re-make every finished photo with the current watermark settings (the button under the settings). */
+    post: operations["admin_settings_watermark_apply_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/admin/settings/watermark/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description A made-up photo stamped with the given, unsaved settings: what you see is what the worker makes. */
+    post: operations["admin_settings_watermark_preview_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/admin/system/status": {
     parameters: {
       query?: never;
@@ -3324,9 +3358,10 @@ export interface components {
      *     * `top_right` - بالا راست
      *     * `top_left` - بالا چپ
      *     * `center` - وسط
+     *     * `tile` - پخش روی کل عکس
      * @enum {string}
      */
-    PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center";
+    PositionEnum: "bottom_right" | "bottom_left" | "top_right" | "top_left" | "center" | "tile";
     Preview: {
       enabled: boolean;
       rows: components["schemas"]["PreviewRow"][];
@@ -4154,6 +4189,8 @@ export interface components {
       size_ratio?: number;
       /** Format: date-time */
       readonly updated_at: string;
+      readonly ready_count: number;
+      readonly marked_count: number;
     };
     WeeklyHours: {
       hours: components["schemas"]["WorkingHours"][];
@@ -7820,6 +7857,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["WatermarkSetting"];
+        };
+      };
+    };
+  };
+  admin_settings_watermark_apply_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WatermarkSetting"];
+        };
+      };
+    };
+  };
+  admin_settings_watermark_preview_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["WatermarkSetting"];
+        "application/x-www-form-urlencoded": components["schemas"]["WatermarkSetting"];
+        "multipart/form-data": components["schemas"]["WatermarkSetting"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "image/png": string;
         };
       };
     };

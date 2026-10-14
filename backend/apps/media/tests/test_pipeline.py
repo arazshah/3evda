@@ -170,3 +170,77 @@ def test_video_is_stripped_of_metadata_and_gets_a_poster(s3_buckets, tmp_path):
     assert "location" not in tags and "title" not in tags
     assert asset.variants.filter(name__startswith="poster-", format="webp").exists()
     assert asset.lqip.startswith("data:image/webp;base64,")
+
+
+def _corner_is_marked(asset: MediaAsset) -> bool:
+    img = Image.open(io.BytesIO(read_public(asset.variants.get(name="w1200", format="webp").key))).convert("RGB")
+    corner = img.crop((900, 650, 1200, 800))
+    return max(abs(c - 128) for px in corner.get_flattened_data() for c in px) > 40
+
+
+def test_refreshing_a_ready_photo_applies_the_new_watermark_without_it_leaving_ready(s3_buckets):
+    asset = make(image_bytes("PNG", size=(1200, 800), color="#808080"), "a.png")
+    assert not asset.watermarked and not _corner_is_marked(asset)
+    WatermarkSetting.objects.update_or_create(pk=1, defaults={"enabled": True, "text": "© 3evda", "opacity": 0.9})
+
+    assert process_asset(str(asset.pk), True) == MediaAsset.Status.READY
+    asset.refresh_from_db()
+    assert asset.status == MediaAsset.Status.READY and asset.watermarked and _corner_is_marked(asset)
+
+    WatermarkSetting.objects.filter(pk=1).update(enabled=False)  # switching it off removes it again
+    process_asset(str(asset.pk), True)
+    asset.refresh_from_db()
+    assert not asset.watermarked and not _corner_is_marked(asset)
+
+
+def test_a_failed_refresh_keeps_the_old_renditions(s3_buckets, monkeypatch):
+    asset = make(image_bytes("PNG", size=(1200, 800)), "a.png")
+    before = set(asset.variants.values_list("key", flat=True))
+
+    def boom(*args, **kwargs):  # type: ignore[no-untyped-def]
+        raise RuntimeError("worker out of memory")
+
+    monkeypatch.setattr("apps.media.tasks.renditions", boom)
+    assert process_asset(str(asset.pk), True) == MediaAsset.Status.READY
+    asset.refresh_from_db()
+    assert asset.status == MediaAsset.Status.READY and asset.error == ""
+    assert set(asset.variants.values_list("key", flat=True)) == before
+    assert process_asset(str(asset.pk)) == MediaAsset.Status.FAILED  # a first-time failure is still reported
+
+
+def test_reapply_queues_every_ready_photo_only(s3_buckets, monkeypatch):
+    from apps.media.tasks import reapply_watermark
+
+    ready = make(image_bytes("PNG", size=(1200, 800), color="#111111"), "a.png")
+    pending, _ = create_asset(SimpleUploadedFile("b.png", image_bytes("PNG", color="#222222")), user=None)
+    queued: list[tuple[str, bool]] = []
+    monkeypatch.setattr(
+        "apps.media.tasks.process_asset.delay", lambda asset_id, refresh=False: queued.append((asset_id, refresh))
+    )
+    assert reapply_watermark() == 1
+    assert queued == [(str(ready.pk), True)] and str(pending.pk) not in {q[0] for q in queued}
+
+
+def _stamped_share(position: str, text: str = "© 3evda") -> tuple[float, tuple[int, int, int, int] | None]:
+    from PIL import ImageChops
+
+    from apps.media.images import apply_watermark
+
+    base = Image.new("RGB", (1200, 800), "#808080")
+    out = apply_watermark(base, WatermarkSetting(enabled=True, text=text, opacity=0.9, position=position))
+    box = ImageChops.difference(out, base).getbbox()
+    changed = sum(1 for px in ImageChops.difference(out, base).convert("L").get_flattened_data() if px)
+    return changed / (1200 * 800), box
+
+
+def test_the_tiled_watermark_covers_the_whole_picture_so_cropping_cannot_remove_it():
+    share, box = _stamped_share("tile")
+    assert box is not None and box[0] < 60 and box[1] < 60 and box[2] > 1140 and box[3] > 740  # corner to corner
+    corner_share, corner_box = _stamped_share("bottom_right")
+    assert share > corner_share * 5
+    assert corner_box is not None and corner_box[0] > 800  # a single mark stays in its corner
+
+
+def test_the_tiled_watermark_handles_persian_text():
+    share, box = _stamped_share("tile", "© سودا رحیم‌پور")
+    assert share > 0.01 and box is not None

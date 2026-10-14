@@ -1,3 +1,4 @@
+import io
 from typing import Any
 from urllib.parse import quote, urlsplit
 
@@ -17,6 +18,7 @@ from rest_framework.views import APIView
 
 from apps.audit.service import record
 
+from .images import apply_watermark, sample_photo
 from .models import MediaAsset, WatermarkSetting
 from .serializers import MediaAssetSerializer, MediaUploadSerializer, WatermarkSettingSerializer
 from .service import create_asset, delete_asset
@@ -138,6 +140,9 @@ class MediaViewSet(
         return Response(self.get_serializer(self.get_queryset().get(pk=asset.pk)).data, status=status.HTTP_202_ACCEPTED)
 
 
+WATERMARK_FIELDS = ("enabled", "text", "opacity", "position", "size_ratio")
+
+
 class WatermarkSettingView(APIView):
     @extend_schema(responses=WatermarkSettingSerializer)
     def get(self, request: Request) -> Response:
@@ -145,8 +150,42 @@ class WatermarkSettingView(APIView):
 
     @extend_schema(request=WatermarkSettingSerializer, responses=WatermarkSettingSerializer)
     def put(self, request: Request) -> Response:
-        serializer = WatermarkSettingSerializer(WatermarkSetting.load(), data=request.data)
+        from .tasks import reapply_watermark
+
+        current = WatermarkSetting.load()
+        before = {name: getattr(current, name) for name in WATERMARK_FIELDS}
+        serializer = WatermarkSettingSerializer(current, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         record("settings.watermark", request=request._request, enabled=serializer.validated_data.get("enabled"))
+        # A changed look applies to the photos already on the site, not only to the next uploads.
+        if any(getattr(current, name) != value for name, value in before.items()):
+            transaction.on_commit(reapply_watermark.delay)
         return Response(serializer.data)
+
+
+class WatermarkPreviewView(APIView):
+    """A made-up photo stamped with the given, unsaved settings: what you see is what the worker makes."""
+
+    @extend_schema(request=WatermarkSettingSerializer, responses={(200, "image/png"): bytes})
+    def post(self, request: Request) -> HttpResponse:
+        serializer = WatermarkSettingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        setting = WatermarkSetting(**{name: serializer.validated_data[name] for name in WATERMARK_FIELDS})
+        buffer = io.BytesIO()
+        apply_watermark(sample_photo(), setting).save(buffer, "PNG")
+        response = HttpResponse(buffer.getvalue(), content_type="image/png")
+        response["Cache-Control"] = "no-store"
+        return response
+
+
+class WatermarkApplyView(APIView):
+    """Re-make every finished photo with the current watermark settings (the button under the settings)."""
+
+    @extend_schema(request=None, responses={202: WatermarkSettingSerializer})
+    def post(self, request: Request) -> Response:
+        from .tasks import reapply_watermark
+
+        transaction.on_commit(reapply_watermark.delay)
+        record("media.watermark_apply", request=request._request)
+        return Response(WatermarkSettingSerializer(WatermarkSetting.load()).data, status=status.HTTP_202_ACCEPTED)

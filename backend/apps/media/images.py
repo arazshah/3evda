@@ -73,10 +73,35 @@ def resize(img: Image.Image, width: int) -> Image.Image:
     return img.resize((width, height), Image.Resampling.LANCZOS, reducing_gap=3.0)
 
 
+def _tiled_overlay(
+    base_size: tuple[int, int], setting: WatermarkSetting, font: ImageFont.FreeTypeFont, size: int
+) -> Image.Image:
+    """The text repeated diagonally over the whole picture, so cropping the corners never removes it."""
+    alpha = round(255 * setting.opacity)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    left, top, right, bottom = probe.textbbox((0, 0), setting.text, font=font)
+    pad = size // 2
+    tile = Image.new("RGBA", (round(right - left) + 2 * pad, round(bottom - top) + 2 * pad), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(tile)
+    shadow = max(1, size // 18)
+    draw.text((pad - left + shadow, pad - top + shadow), setting.text, font=font, fill=(0, 0, 0, alpha // 2))
+    draw.text((pad - left, pad - top), setting.text, font=font, fill=(255, 255, 255, alpha))
+    tile = tile.rotate(25, expand=True, resample=Image.Resampling.BICUBIC)
+    overlay = Image.new("RGBA", base_size, (0, 0, 0, 0))
+    step_x, step_y = round(tile.width * 0.95), round(tile.height * 0.6)
+    for row, y in enumerate(range(-tile.height, base_size[1], step_y)):
+        for x in range(-tile.width + (row % 2) * step_x // 2, base_size[0], step_x):
+            overlay.paste(tile, (x, y), tile)
+    return overlay
+
+
 def apply_watermark(img: Image.Image, setting: WatermarkSetting) -> Image.Image:
     base = img.convert("RGBA")
     size = max(12, round(base.width * setting.size_ratio))
     font = ImageFont.truetype(str(FONT_PATH), size, layout_engine=ImageFont.Layout.RAQM)
+    if setting.position == WatermarkSetting.Position.TILE:
+        out = Image.alpha_composite(base, _tiled_overlay(base.size, setting, font, size))
+        return out if img.mode == "RGBA" else out.convert("RGB")
     overlay = Image.new("RGBA", base.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
     left, top, right, bottom = draw.textbbox((0, 0), setting.text, font=font)
@@ -131,3 +156,9 @@ def lqip(img: Image.Image) -> str:
     buf = io.BytesIO()
     small.save(buf, "WEBP", quality=30)
     return "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+def sample_photo(width: int = 1200, height: int = 800) -> Image.Image:
+    """A made-up photograph (warm light, dark vignette) for previews; no real picture is ever needed."""
+    light = Image.radial_gradient("L").resize((width, height), Image.Resampling.BICUBIC)
+    return ImageOps.colorize(light, black=(214, 150, 70), white=(40, 30, 20)).convert("RGB")
