@@ -202,3 +202,44 @@ def test_signing_in_gives_a_new_session_key(api, enrolled_owner, settings):
     assert r.status_code == 200
     after = api.cookies[django_settings.SESSION_COOKIE_NAME].value
     assert after != before
+
+
+def test_replacing_the_authenticator_needs_the_password_and_proof_from_the_new_one(verified, enrolled_owner):
+    old = TOTPDevice.objects.get(user=enrolled_owner, confirmed=True)
+    assert (
+        verified.post("/api/auth/totp/replace/start", {"password": "nope-nope-nope"}, format="json").status_code == 400
+    )
+
+    start = verified.post("/api/auth/totp/replace/start", {"password": PASSWORD}, format="json")
+    assert start.status_code == 200
+    assert start.json()["otpauth_uri"].startswith("otpauth://totp/") and start.json()["qr_data_uri"].startswith(
+        "data:image/svg+xml"
+    )
+    # Until the new one is proven nothing changes: the old authenticator is still the only way in.
+    assert list(TOTPDevice.objects.filter(user=enrolled_owner, confirmed=True)) == [old]
+
+    assert verified.post("/api/auth/totp/replace/confirm", {"code": "000000"}, format="json").status_code == 400
+    assert list(TOTPDevice.objects.filter(user=enrolled_owner, confirmed=True)) == [old]
+
+    fresh = TOTPDevice.objects.get(user=enrolled_owner, confirmed=False)
+    # django-otp locks a device for a moment after a wrong code; skip that wait here.
+    TOTPDevice.objects.filter(pk=fresh.pk).update(throttling_failure_timestamp=None, throttling_failure_count=0)
+    fresh.refresh_from_db()
+    done = verified.post("/api/auth/totp/replace/confirm", {"code": code_for(fresh)}, format="json")
+    assert done.status_code == 200 and len(done.json()["recovery_codes"]) == 10
+    confirmed = list(TOTPDevice.objects.filter(user=enrolled_owner, confirmed=True))
+    assert confirmed == [fresh] and not TOTPDevice.objects.filter(pk=old.pk).exists()
+    assert state(verified) == "verified"  # this session is not thrown out
+    assert AuditLog.objects.filter(action="auth.totp_replaced").exists()
+
+
+def test_each_start_makes_a_new_secret_and_confirming_without_starting_is_refused(verified, enrolled_owner):
+    assert verified.post("/api/auth/totp/replace/confirm", {"code": "123456"}, format="json").status_code == 400
+    first = verified.post("/api/auth/totp/replace/start", {"password": PASSWORD}, format="json").json()["secret"]
+    second = verified.post("/api/auth/totp/replace/start", {"password": PASSWORD}, format="json").json()["secret"]
+    assert first != second
+    assert TOTPDevice.objects.filter(user=enrolled_owner, confirmed=False).count() == 1
+
+
+def test_a_password_only_session_cannot_replace_the_authenticator(logged_in):
+    assert logged_in.post("/api/auth/totp/replace/start", {"password": PASSWORD}, format="json").status_code == 403

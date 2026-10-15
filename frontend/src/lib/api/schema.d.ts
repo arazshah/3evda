@@ -1582,6 +1582,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/totp/replace/confirm": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Finish it: a code from the new authenticator replaces the old one and makes fresh recovery codes. */
+    post: operations["auth_totp_replace_confirm_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/auth/totp/replace/start": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Begin enrolling a new authenticator while signed in: the old one keeps working until the new one is proven. */
+    post: operations["auth_totp_replace_start_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/totp/setup": {
     parameters: {
       query?: never;
@@ -8098,6 +8132,72 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RecoveryCodes"];
+        };
+      };
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  auth_totp_replace_confirm_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Code"];
+        "application/x-www-form-urlencoded": components["schemas"]["Code"];
+        "multipart/form-data": components["schemas"]["Code"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecoveryCodes"];
+        };
+      };
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  auth_totp_replace_start_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Password"];
+        "application/x-www-form-urlencoded": components["schemas"]["Password"];
+        "multipart/form-data": components["schemas"]["Password"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TotpSetup"];
         };
       };
       400: {
