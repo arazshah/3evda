@@ -13,6 +13,7 @@ export function SecuritySettings() {
       <div className="grid gap-6 lg:grid-cols-2">
         <PasswordChange />
         <RegenerateCodes />
+        <ReplaceAuthenticator />
       </div>
     </div>
   );
@@ -126,6 +127,122 @@ function RegenerateCodes() {
           <Button type="submit" disabled={busy || !password}>
             ساخت کدهای جدید
           </Button>
+        </form>
+      )}
+    </Card>
+  );
+}
+
+type Enrolment = { secret: string; qr_data_uri: string };
+
+/** Sets up a new authenticator while signed in; the old one works until the new one has proven itself. */
+function ReplaceAuthenticator() {
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [setup, setSetup] = useState<Enrolment | null>(null);
+  const [codes, setCodes] = useState<string[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const start = async (event: FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      setSetup(await unwrap(api.POST("/api/auth/totp/replace/start", { body: { password } })));
+      setPassword("");
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirm = async (event: FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const data = await unwrap(api.POST("/api/auth/totp/replace/confirm", { body: { code } }));
+      setCodes(data.recovery_codes);
+      setSetup(null);
+      setCode("");
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card className="lg:col-span-2">
+      <h2 className="mb-4 font-display text-2xl">ثبت دوباره‌ی ورود دومرحله‌ای</h2>
+      {codes ? (
+        <div className="flex flex-col gap-4">
+          <Alert tone="success">
+            اپ جدید ثبت شد و اپ قبلی دیگر کار نمی‌کند. ورود قبلی را از اپ احراز هویت گوشی حذف کنید و کدهای
+            بازیابی تازه را نگه دارید.
+          </Alert>
+          <RecoveryCodes codes={codes} />
+        </div>
+      ) : setup ? (
+        <form onSubmit={confirm} className="flex flex-col gap-4">
+          <p className="text-sm text-muted">
+            این کد QR را با اپ احراز هویت اسکن کنید و کد ۶ رقمی‌ای که اپ نشان می‌دهد را وارد کنید. تا وقتی این
+            مرحله تمام نشود، ورود قبلی شما سر جایش کار می‌کند.
+          </p>
+          {error && <Alert>{error}</Alert>}
+          {/* Rendered as an image (not inline markup) so the SVG can never execute anything. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={setup.qr_data_uri.startsWith("data:image/svg+xml") ? setup.qr_data_uri : ""}
+            alt="کد QR برای اپ احراز هویت"
+            className="w-56 rounded-brand"
+          />
+          <p className="text-sm text-muted">
+            ورود دستی کلید:
+            <code dir="ltr" className="mt-1 block break-all font-mono text-text">
+              {setup.secret}
+            </code>
+          </p>
+          <Field
+            label="کد ۶ رقمی از اپ"
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            dir="ltr"
+            maxLength={8}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\s/g, ""))}
+          />
+          <div className="flex gap-3">
+            <Button type="submit" disabled={busy || code.length < 6}>
+              {busy ? "در حال بررسی…" : "تأیید و جایگزینی"}
+            </Button>
+            <Button variant="ghost" onClick={() => setSetup(null)}>
+              انصراف
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={start} className="flex flex-col gap-4">
+          <p className="text-sm text-muted">
+            برای اسکن دوباره‌ی QR (مثلاً گوشی نو) رمز عبورتان را بزنید. اپ قبلی تا تأیید اپ جدید کار می‌کند.
+          </p>
+          {error && <Alert>{error}</Alert>}
+          <Field
+            label="رمز عبور"
+            type="password"
+            autoComplete="current-password"
+            dir="ltr"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div>
+            <Button type="submit" disabled={busy || !password}>
+              شروع
+            </Button>
+          </div>
         </form>
       )}
     </Card>

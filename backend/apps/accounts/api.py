@@ -186,8 +186,7 @@ class TotpSetupView(APIView):
             device = TOTPDevice.objects.create(user=user, name="authenticator", confirmed=False)
         uri = device.config_url
         secret = uri.split("secret=")[1].split("&")[0]
-        qr = segno.make(uri, error="m").svg_data_uri(scale=5, dark="#0F0D0B", light="#F2EADF")
-        return Response({"otpauth_uri": uri, "secret": secret, "qr_data_uri": qr})
+        return Response({"otpauth_uri": uri, "secret": secret, "qr_data_uri": _qr(uri)})
 
 
 class TotpConfirmView(APIView):
@@ -210,6 +209,59 @@ class TotpConfirmView(APIView):
             codes = _issue_recovery_codes(request.user)
             record("auth.totp_enrolled", request=request._request)
         otp_login(request._request, device)
+        return Response({"recovery_codes": codes})
+
+
+def _qr(uri: str) -> str:
+    return segno.make(uri, error="m").svg_data_uri(scale=5, dark="#0F0D0B", light="#F2EADF")
+
+
+class TotpReplaceStartView(APIView):
+    """Begin enrolling a new authenticator while signed in: the old one keeps working until the new one is proven."""
+
+    permission_classes = [IsVerifiedOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "otp"
+
+    @extend_schema(request=PasswordSerializer, responses={200: TotpSetupSerializer, 400: ErrorSerializer})
+    def post(self, request: Request) -> Response:
+        data = PasswordSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        user = cast(User, request.user)
+        if not user.check_password(data.validated_data["password"]):
+            return _error("invalid_credentials", "رمز عبور درست نیست.")
+        # A fresh secret on every start; only a confirmed device ever lets anyone in.
+        TOTPDevice.objects.filter(user=user, confirmed=False).delete()
+        device = TOTPDevice.objects.create(user=user, name="authenticator", confirmed=False)
+        uri = device.config_url
+        record("auth.totp_replace_started", request=request._request)
+        return Response({"otpauth_uri": uri, "secret": uri.split("secret=")[1].split("&")[0], "qr_data_uri": _qr(uri)})
+
+
+class TotpReplaceConfirmView(APIView):
+    """Finish it: a code from the new authenticator replaces the old one and makes fresh recovery codes."""
+
+    permission_classes = [IsVerifiedOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "otp"
+
+    @extend_schema(request=CodeSerializer, responses={200: RecoveryCodesSerializer, 400: ErrorSerializer})
+    def post(self, request: Request) -> Response:
+        data = CodeSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        user = cast(User, request.user)
+        device = TOTPDevice.objects.filter(user=user, confirmed=False).first()
+        if device is None:
+            return _error("not_started", "ثبت دوباره هنوز شروع نشده است؛ از اول شروع کنید.")
+        if not device.verify_token(data.validated_data["code"].replace(" ", "")):
+            return _error("invalid_code", "کد واردشده درست نیست.")
+        with transaction.atomic():
+            TOTPDevice.objects.filter(user=user, confirmed=True).delete()
+            device.confirmed = True
+            device.save(update_fields=["confirmed"])
+            codes = _issue_recovery_codes(user)
+            record("auth.totp_replaced", request=request._request)
+        otp_login(request._request, device)  # this session stays signed in
         return Response({"recovery_codes": codes})
 
 

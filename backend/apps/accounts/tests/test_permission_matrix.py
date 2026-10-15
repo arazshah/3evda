@@ -12,7 +12,13 @@ from rest_framework.test import APIClient
 
 from conftest import verify_client
 
-PROTECTED_PREFIXES = ("api/admin/", "api/schema/", "api/auth/recovery-codes", "api/auth/password")
+PROTECTED_PREFIXES = (
+    "api/admin/",
+    "api/schema/",
+    "api/auth/recovery-codes",
+    "api/auth/password",
+    "api/auth/totp/replace",
+)
 
 
 def _walk(patterns, prefix=""):  # type: ignore[no-untyped-def]
