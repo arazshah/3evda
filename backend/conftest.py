@@ -26,6 +26,14 @@ def verify_client(client: APIClient, user) -> APIClient:  # type: ignore[no-unty
 
 
 @pytest.fixture
+def two_factor_on(db):
+    """Two-step sign-in is off by default; tests of the password-only gate switch it on."""
+    from apps.cms.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"require_two_factor": True})
+
+
+@pytest.fixture
 def owner_user(db):
     return get_user_model().objects.create_superuser("owner", password="a-long-password-123")
 

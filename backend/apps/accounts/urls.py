@@ -11,6 +11,7 @@ urlpatterns = [
     path("totp/confirm", api.TotpConfirmView.as_view(), name="auth-totp-confirm"),
     path("totp/replace/start", api.TotpReplaceStartView.as_view(), name="auth-totp-replace-start"),
     path("totp/replace/confirm", api.TotpReplaceConfirmView.as_view(), name="auth-totp-replace-confirm"),
+    path("two-factor", api.TwoFactorView.as_view(), name="auth-two-factor"),
     path("recovery-codes", api.RecoveryCodesView.as_view(), name="auth-recovery-codes"),
     path("password", api.PasswordChangeView.as_view(), name="auth-password"),
     path("logout", api.LogoutView.as_view(), name="auth-logout"),

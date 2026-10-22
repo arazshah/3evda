@@ -7,7 +7,7 @@ def test_schema_is_not_public():
     assert Client().get("/api/schema/").status_code == 403
 
 
-def test_schema_requires_the_second_factor(owner_user):
+def test_schema_requires_the_second_factor(owner_user, two_factor_on):
     client = Client()
     client.force_login(owner_user)
     assert client.get("/api/schema/").status_code == 403

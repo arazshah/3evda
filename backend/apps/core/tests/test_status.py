@@ -37,7 +37,7 @@ def test_only_the_signed_in_owner_may_read_it(client):
     assert client.get(URL).status_code in (401, 403)
 
 
-def test_a_password_only_session_is_not_enough(client, owner_user):
+def test_a_password_only_session_is_not_enough(client, owner_user, two_factor_on):
     client.force_login(owner_user)  # no second factor
     assert client.get(URL).status_code in (401, 403)
 

@@ -24,7 +24,7 @@ from rest_framework.views import APIView
 from apps.audit.service import record
 
 from .models import User
-from .permissions import HasPasswordSession, IsVerifiedOwner
+from .permissions import HasPasswordSession, IsVerifiedOwner, two_factor_required
 
 RECOVERY_CODE_COUNT = 10
 
@@ -47,6 +47,8 @@ def auth_state(request: HttpRequest) -> str:
     user = request.user
     if not user.is_authenticated:
         return "anonymous"
+    if not two_factor_required():
+        return "verified" if user.is_staff else "anonymous"
     # OTPMiddleware adds is_verified() to request.user; a user just returned by authenticate() lacks it.
     is_verified = getattr(user, "is_verified", None)
     if callable(is_verified) and is_verified():
@@ -301,6 +303,42 @@ class PasswordChangeView(APIView):
         update_session_auth_hash(request._request, user)
         record("auth.password_changed", request=request._request)
         return Response(status=status.HTTP_200_OK)
+
+
+class TwoFactorSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    enabled = serializers.BooleanField()
+
+
+class TwoFactorChangeSerializer(PasswordSerializer):
+    enabled = serializers.BooleanField()
+
+
+class TwoFactorView(APIView):
+    """Whether the panel asks for the authenticator code at sign-in (off by default)."""
+
+    permission_classes = [IsVerifiedOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "otp"
+
+    @extend_schema(responses=TwoFactorSerializer)
+    def get(self, request: Request) -> Response:
+        return Response({"enabled": two_factor_required()})
+
+    @extend_schema(request=TwoFactorChangeSerializer, responses={200: TwoFactorSerializer, 400: ErrorSerializer})
+    def post(self, request: Request) -> Response:
+        from apps.cms.models import SiteSettings
+
+        data = TwoFactorChangeSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        user = cast(User, request.user)
+        if not user.check_password(data.validated_data["password"]):
+            return _error("invalid_credentials", "رمز عبور درست نیست.")
+        enabled = data.validated_data["enabled"]
+        site = SiteSettings.load()
+        site.require_two_factor = enabled
+        site.save(update_fields=["require_two_factor", "updated_at"])
+        record("auth.two_factor_enabled" if enabled else "auth.two_factor_disabled", request=request._request)
+        return Response({"enabled": enabled})
 
 
 class LogoutView(APIView):

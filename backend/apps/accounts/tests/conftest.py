@@ -11,6 +11,11 @@ def code_for(device: TOTPDevice, offset: int = 0) -> str:
     return f"{totp(device.bin_key, step=device.step, t0=device.t0, digits=device.digits, drift=offset):06d}"
 
 
+@pytest.fixture(autouse=True)
+def _two_factor(two_factor_on):
+    """The second factor is off by default; these tests exercise it."""
+
+
 @pytest.fixture
 def owner(db):
     return get_user_model().objects.create_superuser("owner", password=PASSWORD)

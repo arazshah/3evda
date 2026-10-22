@@ -37,6 +37,9 @@ class SiteSettings(MediaRefsMixin, models.Model):
         default=False, help_text="The moving strip of client and service names on the home page"
     )
     show_clients = models.BooleanField(default=False, help_text="The list of client names or logos on the home page")
+    require_two_factor = models.BooleanField(
+        default=False, help_text="Ask for the authenticator code after the password when signing in to the panel"
+    )
     logo = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     og_image = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
