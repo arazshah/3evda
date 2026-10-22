@@ -72,10 +72,9 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   await expect(switchCard.getByText("غیرفعال است")).toBeVisible({ timeout: 30_000 });
   await switchCard.getByLabel("رمز عبور").fill(PASSWORD);
   await switchCard.getByRole("button", { name: "فعال‌سازی" }).click();
-  await expect(switchCard.getByText(/^فعال است/)).toBeVisible();
 
-  // The next step is to enrol the authenticator.
-  await page.goto("/panel/login");
+  // Switching it on sends this session straight to enrolling the authenticator.
+  await expect(page).toHaveURL(/\/panel\/login$/);
   const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
   // The sample-content spec runs after everything else (see playwright.config.ts) and signs in with this secret.
   writeFileSync(OWNER_TOTP_FILE, secret);
