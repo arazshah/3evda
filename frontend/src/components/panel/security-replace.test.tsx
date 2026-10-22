@@ -14,6 +14,7 @@ const setup = {
 describe("replacing the authenticator", () => {
   it("asks for the password, shows the new QR, then takes a code and shows fresh recovery codes", async () => {
     const api = fakeApi([
+      { method: "GET", path: "/api/auth/two-factor", body: { enabled: true } },
       { method: "POST", path: "/api/auth/totp/replace/start", body: setup },
       {
         method: "POST",
@@ -31,13 +32,13 @@ describe("replacing the authenticator", () => {
 
     expect(await screen.findByAltText("کد QR برای اپ احراز هویت")).toHaveAttribute("src", setup.qr_data_uri);
     expect(screen.getByText(setup.secret)).toBeInTheDocument();
-    expect(api.calls[0]?.body).toEqual({ password: "a-long-password-123" });
+    expect(api.calls[1]?.body).toEqual({ password: "a-long-password-123" });
 
     fireEvent.change(screen.getByLabelText("کد ۶ رقمی از اپ"), { target: { value: "123 456" } });
     fireEvent.click(screen.getByRole("button", { name: "تأیید و جایگزینی" }));
 
     expect(await screen.findByText(/اپ جدید ثبت شد/)).toBeInTheDocument();
-    expect(api.calls[1]?.body).toEqual({ code: "123456" });
+    expect(api.calls[2]?.body).toEqual({ code: "123456" });
     expect(screen.getByRole("list", { name: "کدهای بازیابی" })).toHaveTextContent("AAAA1111");
   });
 
@@ -61,5 +62,26 @@ describe("replacing the authenticator", () => {
     fireEvent.click(screen.getByRole("button", { name: "شروع" }));
     expect(await screen.findByText("رمز عبور درست نیست.")).toBeInTheDocument();
     expect(screen.queryByAltText("کد QR برای اپ احراز هویت")).not.toBeInTheDocument();
+  });
+});
+
+describe("two-step sign-in switch", () => {
+  it("shows it as off and turns it on with the password", async () => {
+    const api = fakeApi([
+      { method: "GET", path: "/api/auth/two-factor", body: { enabled: false } },
+      { method: "POST", path: "/api/auth/two-factor", body: { enabled: true } },
+    ]);
+    vi.stubGlobal("fetch", api.fetchImpl);
+    renderWithQuery(<SecuritySettings />);
+
+    expect(await screen.findByText(/غیرفعال است/)).toBeInTheDocument();
+    const card = screen.getByRole("heading", { name: "ورود دومرحله‌ای" }).closest("section")!;
+    fireEvent.change(card.querySelector('input[type="password"]') as HTMLInputElement, {
+      target: { value: "a-long-password-123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "فعال‌سازی" }));
+
+    expect(await screen.findByText(/فعال است/)).toBeInTheDocument();
+    expect(api.calls[1]?.body).toEqual({ enabled: true, password: "a-long-password-123" });
   });
 });

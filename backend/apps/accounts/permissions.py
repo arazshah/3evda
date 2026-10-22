@@ -4,12 +4,21 @@ from django.http import HttpRequest
 from rest_framework.permissions import BasePermission
 
 
+def two_factor_required() -> bool:
+    """Off by default; the owner switches it on from the Security page."""
+    from apps.cms.models import SiteSettings
+
+    return bool(SiteSettings.objects.filter(pk=1, require_two_factor=True).exists())
+
+
 def is_verified_owner(user: Any) -> bool:
-    return bool(user and user.is_authenticated and user.is_staff and user.is_verified())
+    if not (user and user.is_authenticated and user.is_staff):
+        return False
+    return bool(user.is_verified() or not two_factor_required())
 
 
 class IsVerifiedOwner(BasePermission):
-    """The site owner, signed in with password *and* a second factor."""
+    """The site owner, signed in with the password (and a second factor while that is switched on)."""
 
     message = "ورود دومرحله‌ای لازم است."
 

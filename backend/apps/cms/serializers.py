@@ -16,7 +16,7 @@ class PublicSettingsSerializer(serializers.ModelSerializer):  # type: ignore[typ
 
     class Meta:
         model = SiteSettings
-        exclude = ["id", "updated_at"]
+        exclude = ["id", "updated_at", "require_two_factor"]
         read_only_fields = [f.name for f in SiteSettings._meta.get_fields()]
 
 
@@ -69,7 +69,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):  # type: ignore[type-
 
     class Meta:
         model = SiteSettings
-        exclude = ["id"]
+        exclude = ["id", "require_two_factor"]  # changed only from the Security page
         read_only_fields = ["updated_at"]
 
 

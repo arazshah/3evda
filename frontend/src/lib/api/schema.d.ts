@@ -1632,6 +1632,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/two-factor": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Whether the panel asks for the authenticator code at sign-in (off by default). */
+    get: operations["auth_two_factor_retrieve"];
+    put?: never;
+    /** @description Whether the panel asks for the authenticator code at sign-in (off by default). */
+    post: operations["auth_two_factor_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/verify": {
     parameters: {
       query?: never;
@@ -4202,6 +4220,13 @@ export interface components {
       language: string;
       slug: string;
       status: string;
+    };
+    TwoFactor: {
+      enabled: boolean;
+    };
+    TwoFactorChange: {
+      password: string;
+      enabled: boolean;
     };
     UnlockRequest: {
       password?: string;
@@ -8228,6 +8253,58 @@ export interface operations {
         };
       };
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  auth_two_factor_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TwoFactor"];
+        };
+      };
+    };
+  };
+  auth_two_factor_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TwoFactorChange"];
+        "application/x-www-form-urlencoded": components["schemas"]["TwoFactorChange"];
+        "multipart/form-data": components["schemas"]["TwoFactorChange"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TwoFactor"];
+        };
+      };
+      400: {
         headers: {
           [name: string]: unknown;
         };

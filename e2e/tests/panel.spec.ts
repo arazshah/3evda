@@ -58,9 +58,23 @@ test("owner enrols TOTP, uploads a photo and manages it", async ({
   await page.goto("/panel/login");
   await page.getByLabel("نام کاربری").fill(USERNAME);
   await page.getByLabel("رمز عبور").fill(PASSWORD);
+  const signedIn = page.waitForResponse(
+    (r) => r.url().endsWith("/api/auth/login") && r.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "ادامه" }).click();
+  expect((await signedIn).status()).toBe(200);
 
-  // First sign-in: enrol the authenticator.
+  // Two-step sign-in is off by default: the password alone gets in. Switch it on from the Security page.
+  await page.goto("/panel/security");
+  const switchCard = page.locator("section", {
+    has: page.getByRole("heading", { name: "ورود دومرحله‌ای", exact: true }),
+  });
+  await expect(switchCard.getByText("غیرفعال است")).toBeVisible({ timeout: 30_000 });
+  await switchCard.getByLabel("رمز عبور").fill(PASSWORD);
+  await switchCard.getByRole("button", { name: "فعال‌سازی" }).click();
+
+  // Switching it on sends this session straight to enrolling the authenticator.
+  await expect(page).toHaveURL(/\/panel\/login$/);
   const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
   // The sample-content spec runs after everything else (see playwright.config.ts) and signs in with this secret.
   writeFileSync(OWNER_TOTP_FILE, secret);

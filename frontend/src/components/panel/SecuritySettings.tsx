@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState, type FormEvent } from "react";
 import { api, errorMessage } from "@/lib/api/client";
-import { unwrap } from "@/lib/api/queries";
+import { keys, unwrap } from "@/lib/api/queries";
 import { RecoveryCodes } from "./RecoveryCodes";
 import { Alert, Button, Card, Field } from "./ui";
 
@@ -11,11 +12,74 @@ export function SecuritySettings() {
     <div className="flex flex-col gap-6">
       <h1 className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight">امنیت</h1>
       <div className="grid gap-6 lg:grid-cols-2">
+        <TwoFactorSwitch />
         <PasswordChange />
         <RegenerateCodes />
         <ReplaceAuthenticator />
       </div>
     </div>
+  );
+}
+
+/** Two-step sign-in is off by default; the owner switches it on (or back off) here. */
+function TwoFactorSwitch() {
+  const client = useQueryClient();
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    unwrap(api.GET("/api/auth/two-factor"))
+      .then((data) => setEnabled(data.enabled))
+      .catch((err) => setError(errorMessage(err)));
+  }, []);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (enabled === null) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const data = await unwrap(api.POST("/api/auth/two-factor", { body: { enabled: !enabled, password } }));
+      setEnabled(data.enabled);
+      setPassword("");
+      // Switching it on asks for the authenticator at the next sign-in (this session is asked to enrol now).
+      client.invalidateQueries({ queryKey: keys.me });
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card className="lg:col-span-2">
+      <form onSubmit={submit} className="flex flex-col gap-4">
+        <h2 className="font-display text-2xl">ورود دومرحله‌ای</h2>
+        <p className="text-sm text-muted">
+          {enabled === null
+            ? "در حال بارگذاری…"
+            : enabled
+              ? "فعال است: بعد از رمز عبور، کد اپ احراز هویت هم لازم است."
+              : "غیرفعال است: ورود فقط با نام کاربری و رمز عبور انجام می‌شود. هر وقت خواستید می‌توانید فعالش کنید."}
+        </p>
+        {error && <Alert>{error}</Alert>}
+        <Field
+          label="رمز عبور"
+          type="password"
+          autoComplete="current-password"
+          dir="ltr"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <div>
+          <Button type="submit" disabled={busy || enabled === null || !password}>
+            {enabled ? "غیرفعال‌سازی" : "فعال‌سازی"}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 }
 
