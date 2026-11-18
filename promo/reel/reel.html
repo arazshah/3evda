@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>3evda Reel</title>
+<style>
+@font-face { font-family: Vazir; font-weight: 200; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-200-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 400; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 700; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 900; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+@font-face { font-family: Lalezar; src: url(node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+@font-face { font-family: Bodoni; font-weight: 400; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-normal.woff2); }
+@font-face { font-family: Bodoni; font-weight: 400; font-style: italic; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-italic.woff2); }
+@font-face { font-family: Bodoni; font-weight: 700; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-700-normal.woff2); }
+@font-face { font-family: Manrope; font-weight: 400; src: url(node_modules/@fontsource/manrope/files/manrope-latin-400-normal.woff2); }
+@font-face { font-family: Manrope; font-weight: 700; src: url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2); }
+
+:root {
+  --ink: #0e0e0d; --ink2: #151514; --ink3: #1c1b19; --line: #2d2b27;
+  --paper: #ece6dc; --muted: #9d9487; --gold: #d9b878; --gold2: #cfa95e; --ember: #e58a56;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink);
+  font-family: Vazir, Manrope, sans-serif; color: var(--paper); }
+.layer, .scene { position: absolute; inset: 0; }
+.scene { display: none; }
+img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; display: none;
+  transform-origin: 50% 50%; will-change: transform, filter; }
+.abs { position: absolute; }
+.center { left: 0; right: 0; text-align: center; }
+.shadow { text-shadow: 0 4px 30px rgba(0,0,0,.75), 0 2px 6px rgba(0,0,0,.6); }
+.latin { font-family: Bodoni, serif; direction: ltr; }
+.mono { font-family: Manrope, sans-serif; direction: ltr; letter-spacing: .18em; }
+
+/* film finish */
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; mix-blend-mode: overlay; opacity: .16; pointer-events: none; }
+#vignette { background: radial-gradient(ellipse 75% 60% at 50% 48%, transparent 55%, rgba(0,0,0,.62) 100%); }
+#leak { mix-blend-mode: screen; opacity: 0; }
+#flash { background: #fff; opacity: 0; }
+#lbTop, #lbBot { position: absolute; left: 0; right: 0; height: 240px; background: #000; }
+#lbTop { top: -240px; } #lbBot { bottom: -240px; }
+
+/* hook */
+#hookTop { top: 300px; font: 700 56px/1.3 Vazir; }
+#hookBig { top: 380px; font: 400 150px/1.15 Lalezar; color: #fff; }
+#hookBig span { background: linear-gradient(transparent 62%, var(--ember) 62%, var(--ember) 90%, transparent 90%); padding: 0 18px; }
+#stamp { left: 50%; top: 1050px; width: 520px; margin-left: -260px; text-align: center; font: 400 104px/1 Lalezar;
+  color: #ff5a4a; border: 10px solid #ff5a4a; border-radius: 22px; padding: 26px 0 12px; transform-origin: 50% 50%;
+  background: rgba(20,0,0,.25); }
+#shutterBtn { left: 50%; top: 1330px; width: 150px; height: 150px; margin-left: -75px; border-radius: 50%;
+  border: 10px solid #fff; display: grid; place-items: center; }
+#shutterBtn i { width: 108px; height: 108px; border-radius: 50%; background: #fff; display: block; }
+#blades { position: absolute; inset: 0; }
+#blades b { position: absolute; left: 0; right: 0; height: 960px; background: #050505; }
+#bladeT { top: -960px; } #bladeB { bottom: -960px; }
+#phoneUi { inset: 0; }
+#phoneUi .bar { position: absolute; left: 70px; right: 70px; top: 190px; display: flex; justify-content: space-between;
+  font: 700 30px Manrope; color: rgba(255,255,255,.85); direction: ltr; }
+
+/* reveal */
+#compare { inset: 0; }
+#compareLine { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: #fff; box-shadow: 0 0 30px rgba(0,0,0,.6); }
+#compareKnob { position: absolute; top: 760px; width: 96px; height: 96px; margin-left: -48px; border-radius: 50%; background: #fff;
+  color: #111; display: grid; place-items: center; font: 700 40px Manrope; direction: ltr; }
+.cmpLabel { position: absolute; top: 640px; font: 700 46px Vazir; padding: 6px 26px 10px; border-radius: 40px; background: rgba(0,0,0,.55); }
+#nameLatin { top: 1040px; font: italic 400 40px Bodoni; letter-spacing: .3em; color: var(--gold); }
+#nameFa { top: 1140px; font: 900 132px/1.25 Vazir; color: #fff; }
+#nameRule { top: 1330px; left: 50%; height: 4px; width: 420px; margin-left: -210px; background: var(--gold); transform-origin: 50% 50%; }
+#nameSub { top: 1360px; font: 400 52px/1.4 Vazir; color: var(--paper); }
+
+/* montage */
+#hud { inset: 0; }
+.corner { position: absolute; width: 90px; height: 90px; border: 0 solid rgba(255,255,255,.9); }
+#c1 { top: 250px; left: 80px; border-top-width: 6px; border-left-width: 6px; }
+#c2 { top: 250px; right: 80px; border-top-width: 6px; border-right-width: 6px; }
+#c3 { bottom: 400px; left: 80px; border-bottom-width: 6px; border-left-width: 6px; }
+#c4 { bottom: 400px; right: 80px; border-bottom-width: 6px; border-right-width: 6px; }
+#focus { left: 50%; top: 820px; width: 200px; height: 200px; margin: -100px 0 0 -100px; border: 4px solid var(--gold); }
+#focus::before, #focus::after { content: ""; position: absolute; background: var(--gold); }
+#focus::before { left: 50%; top: -24px; bottom: -24px; width: 4px; margin-left: -2px; transform: scaleY(.25); }
+#focus::after { top: 50%; left: -24px; right: -24px; height: 4px; margin-top: -2px; transform: scaleX(.25); }
+#hudInfo { bottom: 430px; left: 110px; right: 110px; display: flex; justify-content: space-between; font: 700 28px Manrope;
+  letter-spacing: .14em; color: rgba(255,255,255,.92); direction: ltr; }
+#hudCount { top: 290px; right: 120px; font: 700 40px Vazir; color: #fff; }
+#hudDot { top: 300px; left: 120px; display: flex; align-items: center; gap: 14px; font: 700 26px Manrope; letter-spacing: .2em; direction: ltr; }
+#hudDot i { width: 22px; height: 22px; border-radius: 50%; background: #ff3b30; display: block; }
+#word { top: 1060px; font: 400 250px/1.1 Lalezar; color: #fff; }
+#wordEn { top: 1360px; font: italic 400 46px Bodoni; letter-spacing: .5em; color: var(--gold); }
+#marquee { top: 1500px; left: 0; right: 0; height: 70px; overflow: hidden; background: rgba(14,14,13,.72); border-top: 2px solid var(--gold2); border-bottom: 2px solid var(--gold2); }
+#marqueeTrack { position: absolute; top: 8px; white-space: nowrap; font: 700 38px Vazir; color: var(--gold); direction: rtl; }
+
+/* break */
+.breakLine { font: 900 104px/1.3 Vazir; color: #fff; }
+#br1 { top: 720px; } #br2 { top: 860px; color: var(--gold); }
+#br3 { top: 780px; font: 400 150px/1.2 Lalezar; }
+#br4 { top: 760px; font: 400 230px/1.1 Lalezar; color: #fff; }
+
+/* drop */
+#svc { top: 1080px; }
+#svc span { display: inline-block; white-space: nowrap; font: 400 132px/1.25 Lalezar; color: var(--ink); background: var(--gold); padding: 10px 50px 0; border-radius: 18px; }
+#svcEn { top: 1330px; font: 700 34px Manrope; letter-spacing: .4em; color: #fff; direction: ltr; }
+#svcIdx { top: 330px; font: 700 34px Manrope; letter-spacing: .5em; color: var(--gold); direction: ltr; }
+
+/* grid + phone */
+#grid { position: absolute; left: 0; top: 0; width: 1050px; height: 1857px; transform-origin: 0 0; }
+.tile { position: absolute; width: 340px; height: 453px; overflow: hidden; border-radius: 6px; background: #222; }
+.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#gridTitle { top: 250px; font: 900 92px/1.3 Vazir; color: #fff; }
+#phone { position: absolute; left: 260px; top: 430px; width: 560px; height: 1130px; border-radius: 70px; border: 14px solid #232220;
+  box-shadow: 0 0 0 3px #4a463f, 0 60px 120px rgba(0,0,0,.7); transform-origin: 50% 50%; }
+#screen { position: absolute; inset: 0; border-radius: 56px; overflow: hidden; }
+#notch { position: absolute; top: 14px; left: 50%; width: 150px; height: 38px; margin-left: -75px; border-radius: 20px; background: #050505; z-index: 9; }
+#siteHeader { position: absolute; top: 0; left: 0; right: 0; height: 120px; padding: 62px 28px 0; display: flex; justify-content: space-between;
+  align-items: center; background: rgba(17,17,16,.96); z-index: 5; border-bottom: 1px solid var(--line); }
+#siteHeader b { font: 700 26px Vazir; color: var(--paper); }
+#siteHeader .burger { width: 34px; height: 20px; border-top: 3px solid var(--paper); border-bottom: 3px solid var(--paper); position: relative; }
+#siteHeader .burger::after { content: ""; position: absolute; left: 0; right: 0; top: 6px; border-top: 3px solid var(--paper); }
+#chips { position: absolute; top: 132px; right: 20px; display: flex; gap: 10px; z-index: 4; }
+#chips span { font: 400 20px Vazir; padding: 4px 16px 6px; border-radius: 20px; border: 1px solid var(--line); color: var(--muted); background: var(--ink2); }
+#chips span.on { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.feat { position: absolute; left: 0; right: 0; top: 120px; bottom: 0; background: var(--ink); padding: 30px 30px 0; z-index: 6; }
+.feat h3 { font: 900 40px/1.3 Vazir; color: var(--paper); margin-bottom: 8px; }
+.feat p.lead { font: 400 21px/1.6 Vazir; color: var(--muted); margin-bottom: 26px; }
+.field { border-bottom: 2px solid rgba(236,230,220,.6); padding: 12px 4px 10px; margin-bottom: 20px; display: flex; justify-content: space-between; font: 400 24px Vazir; }
+.field small { color: var(--muted); font-size: 20px; }
+.estimate { margin-top: 26px; border: 1px solid var(--gold2); border-radius: 18px; padding: 24px; background: var(--ink2); }
+.estimate small { font: 400 20px Vazir; color: var(--muted); display: block; margin-bottom: 14px; }
+.shimmer { height: 34px; border-radius: 10px; background: linear-gradient(90deg, #2a2823, #6f5f3f, #2a2823); background-size: 300% 100%; }
+.btn { margin-top: 26px; height: 74px; border-radius: 40px; background: var(--gold); color: var(--ink); font: 700 26px Vazir; display: grid; place-items: center; }
+.slider { height: 8px; border-radius: 4px; background: var(--line); position: relative; margin: 4px 0 26px; }
+.slider i { position: absolute; top: -12px; width: 32px; height: 32px; border-radius: 50%; background: var(--gold); margin-right: -16px; }
+.slider u { position: absolute; top: 0; bottom: 0; right: 0; background: var(--gold); border-radius: 4px; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font: 400 22px Vazir; }
+.cal .h { color: var(--muted); font-size: 18px; }
+.cal .d { height: 54px; display: grid; place-items: center; border-radius: 12px; background: var(--ink2); }
+.cal .x { color: #4a463f; background: transparent; }
+.cal .sel { background: var(--gold); color: var(--ink); font-weight: 700; }
+.times { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.times span { font: 400 22px Manrope; padding: 10px 20px; border-radius: 30px; border: 1px solid var(--line); direction: ltr; }
+.times span.sel { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 700; }
+.route { position: relative; height: 520px; margin-top: 10px; }
+.city { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; font: 700 24px Vazir; }
+.city i { width: 30px; height: 30px; border-radius: 50%; border: 6px solid var(--gold); background: var(--ink); display: block; }
+.city.studio i { background: var(--gold); box-shadow: 0 0 0 12px rgba(217,184,120,.2); }
+#box { position: absolute; width: 74px; height: 64px; margin: -32px 0 0 -37px; border-radius: 8px; background: #b98a4e; border: 3px solid #6f4f27; }
+#box::before { content: ""; position: absolute; left: 30px; top: -3px; bottom: -3px; width: 10px; background: #e5c98f; }
+.galGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.galGrid div { position: relative; height: 230px; border-radius: 10px; overflow: hidden; }
+.galGrid img { width: 100%; height: 100%; object-fit: cover; }
+.heart { position: absolute; bottom: 10px; left: 10px; width: 46px; height: 46px; border-radius: 50%; background: rgba(0,0,0,.55); display: grid; place-items: center; font: 400 28px sans-serif; color: #fff; }
+.heart.on { background: var(--ember); }
+#featCap { top: 220px; }
+#featCap div { display: inline-block; font: 900 60px/1.35 Vazir; color: #fff; }
+#featCap small { display: block; font: 700 28px Manrope; letter-spacing: .35em; color: var(--gold); direction: ltr; margin-bottom: 10px; }
+#featDots { top: 1600px; display: flex; justify-content: center; gap: 16px; }
+#featDots i { width: 16px; height: 16px; border-radius: 8px; background: rgba(255,255,255,.3); display: block; transition: none; }
+#featDots i.on { width: 52px; background: var(--gold); }
+
+/* cta */
+#ctaName { top: 520px; font: 900 120px/1.3 Vazir; color: #fff; }
+#ctaRole { top: 700px; font: italic 400 48px Bodoni; color: var(--gold); letter-spacing: .08em; }
+#urlBox { top: 860px; left: 90px; right: 90px; height: 190px; border: 4px solid var(--gold); border-radius: 30px; display: flex; align-items: center;
+  justify-content: center; background: rgba(14,14,13,.8); direction: ltr; }
+#url { font: 700 128px Bodoni; color: #fff; letter-spacing: .01em; }
+#cursor { display: inline-block; width: 8px; height: 110px; background: var(--gold); margin-left: 8px; vertical-align: -14px; }
+#ctaBtn { top: 1120px; left: 150px; right: 150px; height: 130px; border-radius: 70px; background: var(--gold); color: var(--ink);
+  font: 900 52px/130px Vazir; text-align: center; box-shadow: 0 20px 60px rgba(217,184,120,.35); }
+#ctaIg { top: 1300px; font: 700 44px Vazir; color: #fff; }
+#ctaIg span { font: 700 46px Manrope; direction: ltr; display: inline-block; color: var(--gold); margin-right: 16px; }
+#ctaCity { top: 1385px; font: 400 38px Vazir; color: var(--paper); opacity: .9; }
+
+#watermark { top: 196px; font: 700 26px Manrope; letter-spacing: .5em; color: rgba(255,255,255,.75); direction: ltr; }
+#phTag { top: 40px; left: 40px; padding: 10px 22px 12px; border-radius: 30px; background: #ff3b30; color: #fff; font: 700 26px Vazir; display: none; z-index: 99; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- photo layers -->
+  <div class="layer" id="beforeLayer"><img class="cover" id="beforeImg" style="display:block"></div>
+  <div class="layer" id="photoA"></div>
+  <div class="layer" id="compare"><img class="cover" id="cmpImg" style="display:block"></div>
+  <div class="layer" id="photoB"></div>
+
+  <!-- hook -->
+  <div class="scene" id="sHook">
+    <div id="phoneUi"><div class="bar"><span>1x</span><span>PHOTO</span><span>⚡ AUTO</span></div></div>
+    <div class="abs center shadow" id="hookTop">عکس منوی شما</div>
+    <div class="abs center shadow" id="hookBig"><span>هنوز این شکلیه؟</span></div>
+    <div class="abs" id="stamp">معمولی!</div>
+    <div class="abs" id="shutterBtn"><i></i></div>
+  </div>
+
+  <!-- reveal -->
+  <div class="scene" id="sReveal">
+    <div id="compareLine"></div>
+    <div id="compareKnob">‹ ›</div>
+    <div class="cmpLabel" id="lblBefore">قبل</div>
+    <div class="cmpLabel" id="lblAfter">بعد</div>
+    <div class="abs center shadow" id="nameLatin">SEVDA RAHIMPOUR</div>
+    <div class="abs center shadow" id="nameFa">سودا رحیم‌پور</div>
+    <div class="abs" id="nameRule"></div>
+    <div class="abs center shadow" id="nameSub">عکاسی تبلیغاتی غذا و محصول</div>
+  </div>
+
+  <!-- montage -->
+  <div class="scene" id="sMontage">
+    <div id="hud">
+      <div class="corner" id="c1"></div><div class="corner" id="c2"></div><div class="corner" id="c3"></div><div class="corner" id="c4"></div>
+      <div class="abs" id="focus"></div>
+      <div class="abs" id="hudCount">۰۱ / ۱۰</div>
+      <div class="abs" id="hudDot"><i></i>SHOT</div>
+      <div class="abs" id="hudInfo"><span>ISO 100</span><span>f/8</span><span>1/125</span><span>5600K</span></div>
+    </div>
+    <div class="abs center shadow" id="word">نور</div>
+    <div class="abs center shadow" id="wordEn">LIGHT</div>
+    <div class="abs" id="marquee"><div id="marqueeTrack"></div></div>
+  </div>
+
+  <!-- break -->
+  <div class="scene" id="sBreak">
+    <div class="abs center shadow breakLine" id="br1">هر عکس،</div>
+    <div class="abs center shadow breakLine" id="br2">یک داستان.</div>
+    <div class="abs center shadow" id="br3">نوبت برند توئه</div>
+    <div class="abs center shadow" id="br4">آماده‌ای؟</div>
+  </div>
+
+  <!-- drop -->
+  <div class="scene" id="sDrop">
+    <div class="abs center" id="svcIdx">SERVICES</div>
+    <div class="abs center" id="svc"><span>عکاسی منو</span></div>
+    <div class="abs center shadow" id="svcEn">MENU</div>
+  </div>
+
+  <!-- grid / site -->
+  <div class="scene" id="sSite">
+    <div id="grid"></div>
+    <div id="phone">
+      <div id="screen">
+        <div id="notch"></div>
+        <div id="siteHeader"><div class="burger"></div><b>سودا رحیم‌پور</b></div>
+        <div id="chips"><span class="on">همه</span><span>لو‌کی</span><span>های‌کی</span><span>طبیعی</span></div>
+
+        <div class="feat" id="f0">
+          <h3>استعلام قیمت</h3>
+          <p class="lead">نوع کار و تعداد محصول را انتخاب کنید تا یک برآورد تقریبی ببینید.</p>
+          <div class="field"><small>نوع خدمت</small><span>عکاسی منو</span></div>
+          <div class="field"><small>تعداد محصول</small><span id="qty">۱</span></div>
+          <div class="slider"><u id="sliderFill"></u><i id="sliderKnob"></i></div>
+          <div class="field"><small>افزونه‌ها</small><span>استایلینگ · ویدیو</span></div>
+          <div class="estimate"><small>برآورد تقریبی</small><div class="shimmer" id="shimmer"></div></div>
+          <div class="btn">ارسال استعلام</div>
+        </div>
+
+        <div class="feat" id="f1">
+          <h3>رزرو وقت</h3>
+          <p class="lead">یک روز و ساعت آزاد بردارید؛ رزرو بعد از تأیید قطعی می‌شود.</p>
+          <div class="cal" id="cal"></div>
+          <div class="times"><span>09:30</span><span id="tSel">11:00</span><span>14:30</span><span>16:00</span></div>
+        </div>
+
+        <div class="feat" id="f2">
+          <h3>ارسال محصول به استودیو</h3>
+          <p class="lead">محصول را پست کنید؛ عکس‌ها را آنلاین تحویل بگیرید.</p>
+          <div class="route">
+            <svg width="472" height="520" style="position:absolute;inset:0" viewBox="0 0 472 520">
+              <path id="routePath" d="M 380 440 C 300 380, 80 360, 120 230 S 300 120, 110 60" fill="none" stroke="#cfa95e" stroke-width="5" stroke-dasharray="14 12" stroke-linecap="round"/>
+            </svg>
+            <div class="city" style="left:330px;top:450px"><i></i>شهر شما</div>
+            <div class="city studio" style="left:40px;top:10px"><i></i>استودیو · ارومیه</div>
+            <div id="box"></div>
+          </div>
+        </div>
+
+        <div class="feat" id="f3">
+          <h3>گالری عکس‌های شما</h3>
+          <p class="lead">عکس‌های دلخواه را انتخاب کنید و بفرستید.</p>
+          <div class="galGrid" id="gal"></div>
+          <div class="btn" id="galBtn">ارسال انتخاب</div>
+        </div>
+      </div>
+    </div>
+    <div class="abs center shadow" id="gridTitle">نمونه‌کارها</div>
+    <div class="abs center" id="featCap"><small>3EVDA.COM</small><div id="featText"></div></div>
+    <div class="abs center" id="featDots"><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- cta -->
+  <div class="scene" id="sCta">
+    <div class="abs center shadow" id="ctaName">سودا رحیم‌پور</div>
+    <div class="abs center shadow" id="ctaRole">Food &amp; Product Photography</div>
+    <div class="abs" id="urlBox"><span id="url"></span><span id="cursor"></span></div>
+    <div class="abs" id="ctaBtn">همین حالا استعلام قیمت بگیر</div>
+    <div class="abs center shadow" id="ctaIg">اینستاگرام<span id="igHandle"></span></div>
+    <div class="abs center shadow" id="ctaCity">استودیو در ارومیه · ارسال محصول از سراسر ایران</div>
+  </div>
+
+  <!-- finish -->
+  <div class="layer" id="leak"></div>
+  <div class="layer" id="vignette"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="lbTop"></div><div id="lbBot"></div>
+  <div class="abs center" id="watermark">3EVDA.COM</div>
+  <div class="layer" id="blades"><b id="bladeT"></b><b id="bladeB"></b></div>
+  <div class="layer" id="flash"></div>
+  <div class="abs" id="phTag">عکس‌های موقت · PLACEHOLDER</div>
+</div>
+
+<script src="build/manifest.js"></script>
+<script>
+"use strict";
+const M = window.MANIFEST;
+for (const k in M.photos) M.photos[k].src = "build/" + M.photos[k].src;
+const B = 60 / 128, BAR = 4 * B;
+const T = { hook: 0, reveal: BAR, montage: 3 * BAR, brk: 8 * BAR, drop: 10 * BAR, grid: 11 * BAR, site: 12 * BAR, cta: 14 * BAR, end: 16 * BAR };
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, d) => clamp((t - a) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eox = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const eio = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eob = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise1 = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const st = (el, o) => { for (const k in o) el.style[k] = o[k]; };
+
+// ---------- kick envelope (mirrors tools/music.py drum pattern)
+function kick(t) {
+  const bar = Math.floor(t / BAR), beat = Math.floor((t % BAR) / B);
+  const on = (bar >= 1 && bar <= 7) || (bar >= 10 && bar <= 14) || (bar === 15 && beat < 2);
+  if (!on) return 0;
+  return Math.exp(-(t - Math.floor(t / B) * B) / 0.09);
+}
+
+// ---------- photo pools: one <img> per photo per layer, so nothing has to load mid-render
+const names = Object.keys(M.photos).filter(n => n !== "before");
+const pools = {};
+for (const layer of ["photoA", "photoB"]) {
+  pools[layer] = {};
+  for (const n of names) {
+    const img = document.createElement("img");
+    img.className = "cover"; img.src = M.photos[n].src; $(layer).appendChild(img); pools[layer][n] = img;
+  }
+}
+$("beforeImg").src = M.photos.before.src;
+$("cmpImg").src = M.photos.before.src;
+
+function photo(layer, name, o = {}) {
+  const pool = pools[layer];
+  for (const n in pool) pool[n].style.display = n === name ? "block" : "none";
+  if (!name) return;
+  const { s = 1, x = 0, y = 0, r = 0, blur = 0, bright = 1, sat = 1, con = 1, op = 1 } = o;
+  st(pool[name], {
+    transform: `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`,
+    filter: `blur(${blur}px) brightness(${bright}) saturate(${sat}) contrast(${con})`,
+    opacity: op,
+  });
+}
+
+// ---------- static content
+$("marqueeTrack").textContent = ("غذای ایرانی  ✦  نوشیدنی  ✦  شیرینی و دسر  ✦  آجیل و خشکبار  ✦  محصول و بسته‌بندی  ✦  مناسبتی  ✦  ").repeat(4);
+$("igHandle").textContent = M.contact.instagram;
+const tiles = M.grid.map((n, i) => {
+  const d = document.createElement("div"); d.className = "tile";
+  const col = i % 3, row = Math.floor(i / 3);
+  d.style.left = (col * 355) + "px"; d.style.top = (row * 468) + "px";
+  d.innerHTML = `<img src="${M.photos[n].src}">`; $("grid").appendChild(d); return d;
+});
+$("gal").innerHTML = M.site.slice(0, 4).map((n, i) => `<div><img src="${M.photos[n].src}"><span class="heart" id="h${i}">♥</span></div>`).join("");
+$("cal").innerHTML = ["ش", "ی", "د", "س", "چ", "پ", "ج"].map(d => `<div class="h">${d}</div>`).join("") +
+  Array.from({ length: 28 }, (_, i) => `<div class="d ${[0, 6, 13, 20, 27, 3].includes(i) ? "x" : ""}" id="d${i}">${fa(i + 1)}</div>`).join("");
+if (M.placeholder) $("phTag").style.display = "block";
+
+// grain frames
+const grainFrames = [];
+for (let k = 0; k < 6; k++) {
+  const c = document.createElement("canvas"); c.width = 540; c.height = 960;
+  const g = c.getContext("2d"), im = g.createImageData(540, 960);
+  let seed = 1234 + k * 999;
+  for (let i = 0; i < im.data.length; i += 4) {
+    seed = (seed * 16807) % 2147483647; const v = (seed / 2147483647) * 255;
+    im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255;
+  }
+  g.putImageData(im, 0, 0); grainFrames.push(c);
+}
+
+const scenes = ["sHook", "sReveal", "sMontage", "sBreak", "sDrop", "sSite", "sCta"];
+function only(id) { for (const s of scenes) $(s).style.display = s === id ? "block" : "none"; }
+
+// ---------- scenes
+function hook(t, layerOpacity = 1) {
+  only("sHook");
+  $("sHook").style.opacity = layerOpacity;
+  const shake = 6;
+  st($("beforeImg"), { display: "block", opacity: 1, filter: "none",
+    transform: `translate(${noise1(t * 3) * shake}px,${noise1(t * 3 + 9) * shake}px) scale(${1.06 + t * 0.03}) rotate(${noise1(t * 2 + 4) * 0.6}deg)` });
+  $("beforeLayer").style.opacity = 1;
+  const tickPunch = Math.exp(-((t % (B / 2))) / 0.07);
+  $("hookBig").style.transform = `scale(${1 + 0.025 * tickPunch})`;
+  const sp = prog(t, 2 * B, 0.22);
+  st($("stamp"), { opacity: sp > 0 ? 1 : 0, transform: `rotate(-9deg) scale(${lerp(2.4, 1, eo(sp))})` });
+  const bp = prog(t, 3 * B - 0.15, 0.18);
+  const press = Math.exp(-Math.max(0, t - 1.70) / 0.05) * (t >= 1.70 ? 1 : 0);
+  st($("shutterBtn"), { opacity: eo(bp), transform: `scale(${lerp(0.6, 1, eob(bp)) * (1 - 0.12 * press)})` });
+  // shutter blades close just before the flash
+  const cl = prog(t, 1.72, 0.14);
+  $("bladeT").style.transform = `translateY(${eio(cl) * 960}px)`;
+  $("bladeB").style.transform = `translateY(${-eio(cl) * 960}px)`;
+}
+
+function reveal(t) {
+  only("sReveal");
+  const u = t - T.reveal;
+  $("beforeLayer").style.opacity = 0;
+  const k = kick(t);
+  photo("photoA", M.hook, { s: lerp(1.16, 1.0, eox(clamp(u / 0.8))) + u * 0.012 + k * 0.012 });
+  // before/after wipe: line goes from the right edge to 30% and back
+  const a = prog(u, 2 * B, 0.55), b = prog(u, 2.2 + 0.4, 0.45);
+  const pos = 1080 * (1 - 0.68 * eio(a) * (1 - eio(b)));
+  const showCmp = a > 0 && b < 1;
+  st($("compare"), { display: showCmp ? "block" : "none", clipPath: `inset(0 0 0 ${pos}px)` });
+  // the comparison shows the "before" on the right side (where the line came from)
+  $("compare").style.clipPath = `inset(0 0 0 ${pos}px)`;
+  st($("cmpImg"), { transform: `scale(${1.06})` });
+  st($("compareLine"), { left: pos + "px", display: showCmp ? "block" : "none" });
+  st($("compareKnob"), { left: pos + "px", display: showCmp ? "grid" : "none" });
+  const lblOn = showCmp && pos < 900;
+  st($("lblBefore"), { display: lblOn ? "block" : "none", left: (pos + 40) + "px" });
+  st($("lblAfter"), { display: lblOn ? "block" : "none", left: (pos - 190) + "px" });
+  // name block (comes in after the comparison)
+  const n0 = prog(u, 4 * B, 0.5);
+  st($("nameLatin"), { opacity: n0 > 0 ? 1 : 0, letterSpacing: lerp(0.1, 0.32, eo(n0)) + "em", transform: `translateY(${lerp(30, 0, eo(n0))}px)` });
+  const n1 = prog(u, 4.5 * B, 0.45);
+  st($("nameFa"), { clipPath: `inset(0 0 0 ${lerp(100, 0, eox(n1))}%)`, transform: `translateY(${lerp(40, 0, eo(n1))}px) scale(${1 + k * 0.015})` });
+  const n2 = prog(u, 5 * B, 0.5);
+  $("nameRule").style.transform = `scaleX(${eox(n2)})`;
+  const n3 = prog(u, 5.5 * B, 0.45);
+  st($("nameSub"), { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(n3))}%)`, transform: `translateY(${lerp(30, 0, eo(n3))}px)` });
+  // dim the photo behind the text a little once the name is in
+  photo("photoB", null);
+}
+
+function montage(t) {
+  only("sMontage");
+  const u = t - T.montage, i = Math.min(9, Math.floor(u / (2 * B))), s = u - i * 2 * B;
+  const shot = M.montage[i], k = kick(t), mode = i % 4;
+  let x = 0, y = 0, blur = 0, sc = lerp(1.2, 1.05, eox(clamp(s / 0.4))) + s * 0.03 + k * 0.015, r = 0;
+  const inP = clamp(s / 0.16);
+  if (mode === 1) { x = lerp(i % 2 ? -420 : 420, 0, eo(inP)); blur = lerp(28, 0, inP); }
+  if (mode === 2) { sc *= lerp(1.5, 1, eo(inP)); blur = lerp(18, 0, inP); }
+  if (mode === 3) { y = lerp(500, 0, eo(inP)); r = lerp(4, 0, eo(inP)); }
+  x += (i % 2 ? 1 : -1) * s * 30;
+  photo("photoA", shot.photo, { s: sc, x, y, r, blur, con: 1.06, sat: 1.08 });
+  $("flash").style.opacity = mode === 0 ? Math.max(0, 0.55 - s * 6) : 0;
+  // word punch
+  const w = clamp(s / 0.22);
+  $("word").textContent = shot.fa; $("wordEn").textContent = shot.en;
+  st($("word"), { transform: `scale(${lerp(1.5, 1, eob(w)) * (1 + k * 0.03)})`, opacity: w > 0 ? 1 : 0, letterSpacing: "0" });
+  st($("wordEn"), { transform: `translateY(${lerp(30, 0, eo(clamp((s - 0.08) / 0.3)))}px)`, letterSpacing: lerp(0.2, 0.5, eo(w)) + "em" });
+  // viewfinder: focus box locks at the start of each shot
+  const f = clamp(s / 0.25);
+  st($("focus"), { transform: `scale(${lerp(1.5, 1, eob(f))})`, borderColor: f < 1 ? "#ffffff" : "#d9b878" });
+  $("hudCount").textContent = `${fa(String(i + 1).padStart(2, "0"))} / ۱۰`;
+  $("hudDot").style.opacity = Math.floor(t / (B / 2)) % 2 ? 1 : 0.25;
+  const inHud = prog(u, 0, 0.3);
+  $("hud").style.transform = `scale(${lerp(1.15, 1, eo(inHud))})`;
+  $("marqueeTrack").style.right = (-2600 + u * 160) + "px";
+  st($("marquee"), { transform: `translateY(${lerp(120, 0, eo(prog(u, 0.2, 0.4)))}px)` });
+}
+
+function brk(t) {
+  only("sBreak");
+  const u = t - T.brk, D = T.drop - T.brk;
+  const build = u / D;
+  const sh = Math.pow(build, 3) * 14;
+  photo("photoA", M.break, {
+    s: 1.02 + 0.25 * eio(build) + Math.pow(build, 6) * 0.2, x: noise1(t * 18) * sh, y: noise1(t * 18 + 5) * sh,
+    bright: lerp(0.7, 1.15, Math.pow(build, 2)), sat: lerp(0.85, 1.25, build), con: 1.08,
+  });
+  const lb = eo(clamp(u / 0.5)) * (1 - eo(prog(u, D - 0.3, 0.3)));
+  $("lbTop").style.transform = `translateY(${lb * 240}px)`;
+  $("lbBot").style.transform = `translateY(${-lb * 240}px)`;
+  const line = (el, a, end) => {
+    const pp = prog(u, a, 0.4), gone = end !== undefined && u >= end;
+    st(el, { visibility: pp > 0 && !gone ? "visible" : "hidden", clipPath: `inset(0 0 0 ${lerp(100, 0, eo(pp))}%)` });
+  };
+  line($("br1"), 0.05, 4 * B); line($("br2"), 2 * B, 4 * B);
+  line($("br3"), 4 * B, 6 * B);
+  const q = prog(u, 6 * B, 0.2), shake = Math.pow(prog(u, 6 * B, 2 * B), 2) * 18;
+  st($("br4"), { visibility: q > 0 ? "visible" : "hidden",
+    transform: `translate(${noise1(t * 40) * shake}px,${noise1(t * 40 + 3) * shake}px) scale(${lerp(1.6, 1, eob(q)) + prog(u, 6 * B, 2 * B) * 0.25})`,
+    textShadow: `${shake * 0.8}px 0 0 rgba(255,60,60,.75), ${-shake * 0.8}px 0 0 rgba(60,200,255,.75), 0 4px 30px rgba(0,0,0,.7)` });
+  $("flash").style.opacity = Math.pow(prog(u, D - 0.35, 0.35), 2);
+}
+
+const SERVICES = [["عکاسی منو", "MENU"], ["عکس فروشگاهی", "E-COMMERCE"], ["کمپین تبلیغاتی", "ADVERTISING"], ["محتوای اینستاگرام", "SOCIAL CONTENT"]];
+function drop(t) {
+  only("sDrop");
+  const u = t - T.drop, i = Math.min(3, Math.floor(u / B)), s = u - i * B, k = kick(t);
+  const sh = Math.exp(-s / 0.12) * 24;
+  photo("photoA", M.drop[i], { s: lerp(1.35, 1.06, eox(clamp(s / 0.25))) + k * 0.02, x: noise1(t * 30) * sh, y: noise1(t * 30 + 7) * sh,
+    con: 1.12, sat: 1.15, bright: 1 + Math.exp(-s / 0.06) * 0.6 });
+  $("flash").style.opacity = i === 0 ? Math.max(0, 1 - s / 0.3) : Math.max(0, 0.3 - s * 3);
+  const p = clamp(s / 0.18);
+  $("svc").firstElementChild.textContent = SERVICES[i][0];
+  $("svcEn").textContent = SERVICES[i][1];
+  st($("svc"), { transform: `scale(${lerp(0.4, 1, eob(p)) * (1 + k * 0.04)}) rotate(${(i % 2 ? 1 : -1) * lerp(8, 0, eo(p))}deg)` });
+  $("svcIdx").textContent = `SERVICES  0${i + 1} / 04`;
+}
+
+// grid geometry: full frame -> inside the phone screen
+const GRID_FULL = { x: 15, y: 32, s: 1 };
+const GRID_PHONE = { x: 260 + 14 + 14, y: 430 + 14 + 175, s: (560 - 28 - 28) / 1050 };
+function gridScene(t) {
+  only("sSite");
+  photo("photoA", M.cta, { s: 1.2, blur: 40, bright: 0.25 });
+  const u = t - T.grid;
+  tiles.forEach((d, i) => {
+    const a = (hash(i * 3.1) * 1.4 + 0.1) * B, pp = eox(prog(u, a, 0.55));
+    const fx = (hash(i + 7) - 0.5) * 2400, fy = (hash(i + 13) - 0.5) * 3200, fr = (hash(i + 21) - 0.5) * 60;
+    st(d, { transform: `translate(${lerp(fx, 0, pp)}px,${lerp(fy, 0, pp)}px) rotate(${lerp(fr, 0, pp)}deg) scale(${lerp(0.4, 1, pp)})`, opacity: pp > 0 ? 1 : 0 });
+  });
+  const z = eio(prog(u, 2 * B, 2 * B - 0.1));
+  const g = { x: lerp(GRID_FULL.x, GRID_PHONE.x, z), y: lerp(GRID_FULL.y, GRID_PHONE.y, z), s: lerp(GRID_FULL.s, GRID_PHONE.s, z) };
+  $("grid").style.transform = `translate(${g.x}px,${g.y}px) scale(${g.s})`;
+  st($("phone"), { opacity: z, transform: `scale(${lerp(1.9, 1, z)})` });
+  $("phone").style.background = "transparent";
+  for (const f of ["f0", "f1", "f2", "f3"]) $(f).style.transform = "translateX(-110%)";
+  const gt = prog(u, 0.6 * B, 0.4);
+  st($("gridTitle"), { visibility: "visible", clipPath: `inset(0 0 0 ${lerp(100, 0, eo(gt))}%)`, transform: `translateY(${lerp(0, -40, z)}px)` });
+  st($("featCap"), { visibility: "hidden" }); st($("featDots"), { visibility: "hidden" });
+  $("watermark").style.opacity = 0;
+}
+
+const FEATS = ["قیمت رو آنلاین برآورد کن", "وقت عکاسی رو رزرو کن", "از هر شهری، محصولت رو بفرست", "تحویل در گالری اختصاصی"];
+function site(t) {
+  only("sSite");
+  photo("photoA", M.cta, { s: 1.2, blur: 40, bright: 0.25 });
+  const u = t - T.site, i = Math.min(3, Math.floor(u / (2 * B))), s = u - i * 2 * B, k = kick(t);
+  tiles.forEach(d => st(d, { transform: "none", opacity: 1 }));
+  $("grid").style.transform = `translate(${GRID_PHONE.x}px,${GRID_PHONE.y}px) scale(${GRID_PHONE.s})`;
+  st($("phone"), { opacity: 1, transform: `scale(${1 + k * 0.008}) rotate(${noise1(t * 0.8) * 1.2}deg)` });
+  $("gridTitle").style.visibility = "hidden";
+  $("watermark").style.opacity = 0;
+  // feature screens slide in from the left (reading direction is right to left)
+  ["f0", "f1", "f2", "f3"].forEach((f, j) => {
+    let x = -110;
+    if (j < i) x = 0;
+    if (j === i) x = lerp(-110, 0, eox(clamp(s / 0.3)));
+    $(f).style.transform = `translateX(${x}%)`;
+  });
+  // per-feature micro animation
+  if (i === 0) {
+    const q = eio(clamp((s - 0.15) / 0.5));
+    $("qty").textContent = fa(Math.round(lerp(1, 12, q)));
+    $("sliderKnob").style.right = (q * 85) + "%"; $("sliderFill").style.width = (q * 85) + "%";
+    $("shimmer").style.backgroundPosition = `${(1 - (s / (2 * B))) * 300}% 0`;
+  }
+  if (i === 1) {
+    for (let d = 0; d < 28; d++) $("d" + d).classList.toggle("sel", d === 17 && s > 0.3);
+    $("tSel").classList.toggle("sel", s > 0.6);
+  }
+  if (i === 2) {
+    const path = $("routePath"), L = path.getTotalLength(), q = eio(clamp((s - 0.1) / 0.75));
+    const pt = path.getPointAtLength(L * q);
+    st($("box"), { left: pt.x + "px", top: pt.y + "px", transform: `rotate(${Math.sin(s * 20) * 6}deg)` });
+    path.style.strokeDashoffset = -s * 60;
+  }
+  if (i === 3) {
+    [0.25, 0.45, 0.6].forEach((a, j) => $("h" + [0, 3, 1][j]).classList.toggle("on", s > a));
+    $("galBtn").style.transform = `scale(${1 + (s > 0.75 ? Math.exp(-(s - 0.75) / 0.1) * 0.08 : 0)})`;
+  }
+  const c = clamp(s / 0.3);
+  $("featText").textContent = FEATS[i];
+  st($("featCap"), { visibility: "visible", clipPath: `inset(0 0 0 ${lerp(100, 0, eo(c))}%)` });
+  $("featCap").querySelector("small").textContent = `0${i + 1} — 3EVDA.COM`;
+  st($("featDots"), { visibility: "visible" });
+  [...$("featDots").children].forEach((d, j) => d.classList.toggle("on", j === i));
+}
+
+function cta(t) {
+  only("sCta");
+  const u = t - T.cta, k = kick(t), loopIn = eio(prog(t, T.end - 2 * B, 2 * B));
+  photo("photoA", M.cta, { s: 1.1 + u * 0.03, blur: lerp(0, 14, eo(clamp(u / 0.6))), bright: lerp(1, 0.32, eo(clamp(u / 0.6))), op: 1 - loopIn });
+  $("flash").style.opacity = Math.max(0, 1 - u / 0.35);
+  const line = (el, a, d = 0.45) => { const pp = prog(u, a, d); st(el, { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(pp))}%)`, transform: `translateY(${lerp(30, 0, eo(pp))}px)` }); };
+  line($("ctaName"), 0.15); line($("ctaRole"), 0.5);
+  const ub = prog(u, 0.9, 0.3);
+  st($("urlBox"), { transform: `scale(${lerp(0.7, 1, eob(ub)) * (1 + k * 0.012)})`, opacity: ub > 0 ? 1 : 0 });
+  const text = M.contact.site, n = Math.floor(clamp((u - 1.0) / 0.9) * text.length + 0.0001);
+  $("url").textContent = text.slice(0, n);
+  $("cursor").style.opacity = Math.floor(t / 0.25) % 2 ? 1 : 0;
+  const bt = prog(u, 2.0, 0.3);
+  st($("ctaBtn"), { transform: `scale(${lerp(0.5, 1, eob(bt)) * (1 + k * 0.035)})`, opacity: bt > 0 ? 1 : 0 });
+  line($("ctaIg"), 2.3); line($("ctaCity"), 2.5);
+  // last half bar: dissolve into the opening frame so the reel loops seamlessly
+  const lp = prog(t, T.end - 2 * B, 2 * B);
+  $("sCta").style.opacity = 1 - eio(lp);
+  if (lp > 0) {
+    // draw the hook exactly as it looks at t=0, faded in on top
+    hook(0, eio(lp));
+    $("sCta").style.display = "block";
+    $("beforeLayer").style.opacity = eio(lp);
+    $("watermark").style.opacity = 0;
+  }
+}
+
+// ---------- master
+function renderAt(t) {
+  // reset shared layers
+  $("flash").style.opacity = 0;
+  $("compare").style.display = "none";
+  $("beforeLayer").style.opacity = 0;
+  $("lbTop").style.transform = $("lbBot").style.transform = "none";
+  $("bladeT").style.transform = $("bladeB").style.transform = "none";
+  $("sHook").style.opacity = 1; $("sCta").style.opacity = 1;
+  photo("photoB", null);
+  $("watermark").style.opacity = t >= T.reveal + 4 * B && t < T.grid ? 0.8 : 0;
+
+  if (t < T.reveal) { photo("photoA", null); hook(t); }
+  else if (t < T.montage) reveal(t);
+  else if (t < T.brk) montage(t);
+  else if (t < T.drop) brk(t);
+  else if (t < T.grid) drop(t);
+  else if (t < T.site) gridScene(t);
+  else if (t < T.cta) site(t);
+  else cta(t);
+
+  // flash on the reveal downbeat
+  if (t >= T.reveal && t < T.reveal + 0.5) $("flash").style.opacity = Math.max(0, 1 - (t - T.reveal) / 0.4);
+
+  // light leak: warm sweep on section changes
+  const leaks = [T.reveal, T.montage, T.drop, T.cta];
+  let leak = 0, lx = 50;
+  for (const a of leaks) { const pp = prog(t, a - 0.1, 1.0); if (pp > 0 && pp < 1) { leak = Math.sin(pp * Math.PI) * 0.75; lx = lerp(-20, 120, pp); } }
+  st($("leak"), { opacity: leak, background: `radial-gradient(ellipse 60% 45% at ${lx}% 35%, rgba(255,150,60,.9), rgba(255,80,20,.35) 45%, transparent 70%)` });
+
+  // grain
+  const g = $("grain").getContext("2d");
+  g.drawImage(grainFrames[Math.floor(t * 30) % grainFrames.length], 0, 0);
+}
+
+window.renderAt = renderAt;
+window.DURATION = T.end;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(im => (im.complete && im.naturalWidth ? null : im.decode().catch(() => null))));
+  await Promise.all([...document.images].map(im => im.decode().catch(() => null)));
+  renderAt(0);
+  return true;
+})();
+</script>
+</body>
+</html>
