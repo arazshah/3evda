@@ -1,0 +1,23 @@
+{
+  "hook": ["abgoosht.jpg"],
+  "montage": [
+    "pomegranate.jpg", "challah.jpg", "pistachio.jpg", "halva-tea.jpg", "ash.jpg",
+    "noghl.jpg", "pastry.jpg", "tea-bread.jpg", "choco-bites.jpg", "halva-ribbon.jpg"
+  ],
+  "words": [
+    ["میوه", "FRUIT"], ["نان", "BREAD"], ["خشکبار", "NUTS"], ["حلوا", "HALVA"], ["غذای ایرانی", "PERSIAN FOOD"],
+    ["نقل", "NOGHL"], ["شیرینی", "PASTRY"], ["چای و نان", "TEA TIME"], ["دسر", "DESSERT"], ["محصول", "PRODUCT"]
+  ],
+  "break": ["lemonade.jpg"],
+  "drop": ["noghl.jpg", "halva-ribbon.jpg", "tea-bread.jpg", "pistachio.jpg"],
+  "grid": [
+    "pomegranate.jpg", "challah.jpg", "pistachio.jpg", "halva-tea.jpg", "ash.jpg", "noghl.jpg",
+    "pastry.jpg", "lemonade.jpg", "choco-bites.jpg", "abgoosht.jpg", "tea-bread.jpg", "halva-ribbon.jpg"
+  ],
+  "site": ["pomegranate.jpg", "ash.jpg", "pastry.jpg", "lemonade.jpg", "abgoosht.jpg", "noghl.jpg"],
+  "cta": ["pomegranate.jpg"],
+  "services": [
+    ["عکاسی مینیمال", "MINIMAL"], ["عکاسی زمینه سفید", "WHITE BACKGROUND"],
+    ["عکاسی لایف‌استایل", "LIFESTYLE"], ["عکاسی چیدمان‌شده", "STYLED"]
+  ]
+}

@@ -25,6 +25,10 @@ html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; 
   font-family: Vazir, Manrope, sans-serif; color: var(--paper); }
 .layer, .scene { position: absolute; inset: 0; }
 .scene { display: none; }
+.frame { position: absolute; inset: 0; display: none; overflow: hidden; }
+.frame .bg { position: absolute; inset: -40px; width: 1160px; height: 2000px; object-fit: cover; }
+.frame .fg { position: absolute; object-fit: cover; border-radius: 6px; transform-origin: 50% 50%;
+  box-shadow: 0 50px 90px rgba(0,0,0,.65), 0 0 0 2px rgba(236,230,220,.12); }
 img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; display: none;
   transform-origin: 50% 50%; will-change: transform, filter; }
 .abs { position: absolute; }
@@ -85,9 +89,9 @@ img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-
 #hudCount { top: 290px; right: 120px; font: 700 40px Vazir; color: #fff; }
 #hudDot { top: 300px; left: 120px; display: flex; align-items: center; gap: 14px; font: 700 26px Manrope; letter-spacing: .2em; direction: ltr; }
 #hudDot i { width: 22px; height: 22px; border-radius: 50%; background: #ff3b30; display: block; }
-#word { top: 1060px; font: 400 250px/1.1 Lalezar; color: #fff; }
-#wordEn { top: 1360px; font: italic 400 46px Bodoni; letter-spacing: .5em; color: var(--gold); }
-#marquee { top: 1500px; left: 0; right: 0; height: 70px; overflow: hidden; background: rgba(14,14,13,.72); border-top: 2px solid var(--gold2); border-bottom: 2px solid var(--gold2); }
+#word { top: 1250px; font: 400 200px/1.1 Lalezar; color: #fff; white-space: nowrap; }
+#wordEn { top: 1480px; font: italic 400 46px Bodoni; letter-spacing: .5em; color: var(--gold); }
+#marquee { display: none; top: 1500px; left: 0; right: 0; height: 70px; overflow: hidden; background: rgba(14,14,13,.72); border-top: 2px solid var(--gold2); border-bottom: 2px solid var(--gold2); }
 #marqueeTrack { position: absolute; top: 8px; white-space: nowrap; font: 700 38px Vazir; color: var(--gold); direction: rtl; }
 
 /* break */
@@ -97,9 +101,9 @@ img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-
 #br4 { top: 760px; font: 400 230px/1.1 Lalezar; color: #fff; }
 
 /* drop */
-#svc { top: 1080px; }
-#svc span { display: inline-block; white-space: nowrap; font: 400 132px/1.25 Lalezar; color: var(--ink); background: var(--gold); padding: 10px 50px 0; border-radius: 18px; }
-#svcEn { top: 1330px; font: 700 34px Manrope; letter-spacing: .4em; color: #fff; direction: ltr; }
+#svc { top: 1270px; }
+#svc span { display: inline-block; white-space: nowrap; font: 400 116px/1.25 Lalezar; color: var(--ink); background: var(--gold); padding: 10px 50px 0; border-radius: 18px; }
+#svcEn { top: 1470px; font: 700 34px Manrope; letter-spacing: .4em; color: #fff; direction: ltr; }
 #svcIdx { top: 330px; font: 700 34px Manrope; letter-spacing: .5em; color: var(--gold); direction: ltr; }
 
 /* grid + phone */
@@ -177,9 +181,9 @@ img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-
 <body>
 <div id="stage">
   <!-- photo layers -->
-  <div class="layer" id="beforeLayer"><img class="cover" id="beforeImg" style="display:block"></div>
+  <div class="layer" id="beforeLayer"></div>
   <div class="layer" id="photoA"></div>
-  <div class="layer" id="compare"><img class="cover" id="cmpImg" style="display:block"></div>
+  <div class="layer" id="compare"></div>
   <div class="layer" id="photoB"></div>
 
   <!-- hook -->
@@ -310,7 +314,7 @@ img.cover { position: absolute; inset: 0; width: 1080px; height: 1920px; object-
 <script>
 "use strict";
 const M = window.MANIFEST;
-for (const k in M.photos) M.photos[k].src = "build/" + M.photos[k].src;
+for (const k in M.photos) { M.photos[k].src = "build/" + M.photos[k].src; M.photos[k].bg = "build/" + M.photos[k].bg; }
 const B = 60 / 128, BAR = 4 * B;
 const T = { hook: 0, reveal: BAR, montage: 3 * BAR, brk: 8 * BAR, drop: 10 * BAR, grid: 11 * BAR, site: 12 * BAR, cta: 14 * BAR, end: 16 * BAR };
 const $ = id => document.getElementById(id);
@@ -337,26 +341,36 @@ function kick(t) {
 // ---------- photo pools: one <img> per photo per layer, so nothing has to load mid-render
 const names = Object.keys(M.photos).filter(n => n !== "before");
 const pools = {};
+// Every photo is shown as a sharp "print" (card) on a blurred, darkened copy of itself: the source photos are
+// web-sized, so the card is never enlarged past what they can carry.
+const CARD = { w: 940, h: 1150, cy: 880 };
+function framed(name) {
+  const ph = M.photos[name], el = document.createElement("div");
+  el.className = "frame";
+  const a = ph.w / ph.h;
+  let w = CARD.w, h = CARD.w / a;
+  if (h > CARD.h) { h = CARD.h; w = CARD.h * a; }
+  el.innerHTML = `<img class="bg" src="${ph.bg}"><img class="fg" src="${ph.src}" style="width:${w}px;height:${h}px;left:${(1080 - w) / 2}px;top:${CARD.cy - h / 2}px">`;
+  el._bg = el.firstElementChild; el._fg = el.lastElementChild;
+  return el;
+}
+function applyFrame(el, o = {}) {
+  const { s = 1, x = 0, y = 0, r = 0, blur = 0, bright = 1, sat = 1, con = 1, op = 1 } = o;
+  st(el, { display: "block", opacity: op, filter: `blur(${blur}px) brightness(${bright}) saturate(${sat}) contrast(${con})` });
+  el._fg.style.transform = `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`;
+  el._bg.style.transform = `translate(${-x * 0.15}px,${-y * 0.15}px) scale(${1 + (s - 1) * 0.35})`;
+}
 for (const layer of ["photoA", "photoB"]) {
   pools[layer] = {};
-  for (const n of names) {
-    const img = document.createElement("img");
-    img.className = "cover"; img.src = M.photos[n].src; $(layer).appendChild(img); pools[layer][n] = img;
-  }
+  for (const n of names) { const el = framed(n); $(layer).appendChild(el); pools[layer][n] = el; }
 }
-$("beforeImg").src = M.photos.before.src;
-$("cmpImg").src = M.photos.before.src;
+const beforeFrame = framed("before"); $("beforeLayer").appendChild(beforeFrame);
+const cmpFrame = framed("before"); $("compare").appendChild(cmpFrame);
 
 function photo(layer, name, o = {}) {
   const pool = pools[layer];
-  for (const n in pool) pool[n].style.display = n === name ? "block" : "none";
-  if (!name) return;
-  const { s = 1, x = 0, y = 0, r = 0, blur = 0, bright = 1, sat = 1, con = 1, op = 1 } = o;
-  st(pool[name], {
-    transform: `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`,
-    filter: `blur(${blur}px) brightness(${bright}) saturate(${sat}) contrast(${con})`,
-    opacity: op,
-  });
+  for (const n in pool) if (n !== name) pool[n].style.display = "none";
+  if (name) applyFrame(pool[name], o);
 }
 
 // ---------- static content
@@ -394,8 +408,7 @@ function hook(t, layerOpacity = 1) {
   only("sHook");
   $("sHook").style.opacity = layerOpacity;
   const shake = 6;
-  st($("beforeImg"), { display: "block", opacity: 1, filter: "none",
-    transform: `translate(${noise1(t * 3) * shake}px,${noise1(t * 3 + 9) * shake}px) scale(${1.06 + t * 0.03}) rotate(${noise1(t * 2 + 4) * 0.6}deg)` });
+  applyFrame(beforeFrame, { x: noise1(t * 3) * shake, y: noise1(t * 3 + 9) * shake, s: 1.0 + t * 0.02, r: -2 + noise1(t * 2 + 4) * 0.6 });
   $("beforeLayer").style.opacity = 1;
   const tickPunch = Math.exp(-((t % (B / 2))) / 0.07);
   $("hookBig").style.transform = `scale(${1 + 0.025 * tickPunch})`;
@@ -423,7 +436,7 @@ function reveal(t) {
   st($("compare"), { display: showCmp ? "block" : "none", clipPath: `inset(0 0 0 ${pos}px)` });
   // the comparison shows the "before" on the right side (where the line came from)
   $("compare").style.clipPath = `inset(0 0 0 ${pos}px)`;
-  st($("cmpImg"), { transform: `scale(${1.06})` });
+  applyFrame(cmpFrame, { s: lerp(1.16, 1.0, eox(clamp(u / 0.8))) + u * 0.012 + k * 0.012 });
   st($("compareLine"), { left: pos + "px", display: showCmp ? "block" : "none" });
   st($("compareKnob"), { left: pos + "px", display: showCmp ? "grid" : "none" });
   const lblOn = showCmp && pos < 900;
@@ -495,7 +508,7 @@ function brk(t) {
   $("flash").style.opacity = Math.pow(prog(u, D - 0.35, 0.35), 2);
 }
 
-const SERVICES = [["عکاسی منو", "MENU"], ["عکس فروشگاهی", "E-COMMERCE"], ["کمپین تبلیغاتی", "ADVERTISING"], ["محتوای اینستاگرام", "SOCIAL CONTENT"]];
+const SERVICES = M.services || [["عکاسی منو", "MENU"], ["عکس فروشگاهی", "E-COMMERCE"], ["کمپین تبلیغاتی", "ADVERTISING"], ["محتوای اینستاگرام", "SOCIAL CONTENT"]];
 function drop(t) {
   only("sDrop");
   const u = t - T.drop, i = Math.min(3, Math.floor(u / B)), s = u - i * B, k = kick(t);

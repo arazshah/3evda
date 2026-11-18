@@ -62,6 +62,15 @@ def load(path: Path) -> Image.Image:
     return img
 
 
+def background(img: Image.Image) -> Image.Image:
+    """The frame behind a photo "print": the same photo, cover-cropped to 9:16, heavily blurred and darkened."""
+    small = ImageOps.fit(img, (270, 480), Image.Resampling.LANCZOS)
+    small = small.filter(ImageFilter.GaussianBlur(14))
+    small = ImageEnhance.Brightness(small).enhance(0.55)
+    small = ImageEnhance.Color(small).enhance(1.15)
+    return small.resize((1080, 1920), Image.Resampling.BICUBIC)
+
+
 def make_before(img: Image.Image) -> Image.Image:
     """A dull phone-snap version of the same dish: what the client has now."""
     w, h = img.size
@@ -86,7 +95,7 @@ def main() -> None:
     for old in IMG.glob("*.jpg"):
         old.unlink()
 
-    files = sorted(p for p in PHOTOS.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"})
+    files = sorted(p for p in PHOTOS.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"} and not p.name.startswith("_"))
     placeholder = not files
     shots_cfg = {}
     if (PHOTOS / "shots.json").exists():
@@ -102,7 +111,8 @@ def main() -> None:
     for name, im in images.items():
         dest = IMG / f"{name}.jpg"
         im.save(dest, "JPEG", quality=92)
-        saved[name] = {"src": f"img/{name}.jpg", "w": im.width, "h": im.height}
+        background(im).save(IMG / f"{name}-bg.jpg", "JPEG", quality=85)
+        saved[name] = {"src": f"img/{name}.jpg", "bg": f"img/{name}-bg.jpg", "w": im.width, "h": im.height}
 
     def pick(slot: str, n: int, offset: int) -> list[str]:
         chosen = shots_cfg.get(slot)
@@ -114,10 +124,14 @@ def main() -> None:
             return [Path(c).stem for c in chosen]
         return [names[(offset + i) % len(names)] for i in range(n)]
 
+    if placeholder:
+        shots_cfg = {}
+
     hook = pick("hook", 1, 0)[0]
     before = make_before(images[hook])
     before.save(IMG / "before.jpg", "JPEG", quality=88)
-    saved["before"] = {"src": "img/before.jpg", "w": before.width, "h": before.height}
+    background(before).save(IMG / "before-bg.jpg", "JPEG", quality=85)
+    saved["before"] = {"src": "img/before.jpg", "bg": "img/before-bg.jpg", "w": before.width, "h": before.height}
 
     words = shots_cfg.get("words") or WORDS
     montage = pick("montage", SLOTS["montage"], 1)
@@ -131,6 +145,7 @@ def main() -> None:
         "grid": pick("grid", SLOTS["grid"], 0),
         "site": pick("site", SLOTS["site"], 3),
         "cta": pick("cta", 1, 0)[0],
+        "services": shots_cfg.get("services"),
         "contact": {
             "site": "3evda.com",
             "instagram": "@3evda.r",
