@@ -19,6 +19,9 @@ const fps = Number(arg("fps", 30));
 const out = path.resolve(root, arg("out", "build/reel.mp4"));
 const audio = arg("audio", "build/music.wav");
 const stills = arg("stills", null);
+// --master: near-lossless file for archiving/editing (bigger); default: Instagram-friendly size
+const master = process.argv.includes("--master");
+const vq = master ? ["-crf", "12", "-preset", "slower", "-tune", "film"] : ["-crf", "20", "-maxrate", "10M", "-bufsize", "20M", "-preset", "slow"];
 mkdirSync(path.join(root, "build"), { recursive: true });
 
 const browser = await chromium.launch({ args: ["--force-color-profile=srgb", "--disable-lcd-text"] });
@@ -54,8 +57,8 @@ const ff = spawn("ffmpeg", [
   "-hide_banner", "-loglevel", "error", "-y",
   "-f", "image2pipe", "-framerate", String(fps), "-c:v", "mjpeg", "-i", "-",
   ...(audio !== "none" ? ["-i", path.resolve(root, audio)] : []),
-  "-map", "0:v", ...(audio !== "none" ? ["-map", "1:a", "-c:a", "aac", "-b:a", "256k", "-ar", "44100"] : []),
-  "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-maxrate", "10M", "-bufsize", "20M", "-pix_fmt", "yuv420p", "-profile:v", "high", "-level", "4.2",
+  "-map", "0:v", ...(audio !== "none" ? ["-map", "1:a", "-c:a", "aac", "-b:a", master ? "320k" : "256k", "-ar", "44100"] : []),
+  "-c:v", "libx264", ...vq, "-pix_fmt", "yuv420p", "-profile:v", "high", "-level", "4.2",
   "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
   "-r", String(fps), "-t", String(duration), "-movflags", "+faststart", out,
 ], { stdio: ["pipe", "inherit", "inherit"] });
