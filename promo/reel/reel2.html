@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>3evda Reel 2</title>
+<style>
+@font-face { font-family: Vazir; font-weight: 400; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 700; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 900; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+@font-face { font-family: Lalezar; src: url(node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+@font-face { font-family: Bodoni; font-weight: 700; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-700-normal.woff2); }
+@font-face { font-family: Bodoni; font-style: italic; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-italic.woff2); }
+@font-face { font-family: Manrope; font-weight: 700; src: url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2); }
+:root { --ink: #0e0e0d; --paper: #ece6dc; --gold: #d9b878; --ember: #ff7a3d; --red: #ff3b30; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); color: #fff;
+  font-family: Vazir, Manrope, "Noto Color Emoji", sans-serif; }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.center { left: 0; right: 0; text-align: center; }
+.sh { text-shadow: 0 6px 30px rgba(0,0,0,.8), 0 2px 6px rgba(0,0,0,.7); }
+.emoji { font-family: "Noto Color Emoji"; }
+#bg img { position: absolute; inset: -60px; width: 1200px; height: 2040px; object-fit: cover; display: none; }
+#cards { perspective: 1600px; }
+.card { position: absolute; display: none; transform-origin: 50% 50%; will-change: transform; }
+.card img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block;
+  box-shadow: 0 60px 110px rgba(0,0,0,.7), 0 0 0 4px rgba(255,255,255,.92); }
+.chip { position: absolute; top: -34px; right: 40px; font: 400 54px/1 Lalezar; color: var(--ink); background: var(--gold);
+  padding: 18px 30px 8px; border-radius: 14px; transform: rotate(-4deg); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+
+/* hunger meter */
+#meter { top: 225px; left: 90px; right: 90px; height: 190px; }
+#meterHead { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px; }
+#meterLabel { font: 900 46px Vazir; }
+#meterVal { font: 400 92px/1 Lalezar; display: flex; align-items: center; gap: 14px; }
+#meterFace { font-size: 74px; }
+#track { height: 46px; border-radius: 24px; background: rgba(255,255,255,.16); border: 3px solid rgba(255,255,255,.85); overflow: hidden; position: relative; }
+#fill { position: absolute; top: 0; bottom: 0; right: 0; width: 0; border-radius: 20px;
+  background: linear-gradient(270deg, #ffd36a, #ff9a3d 50%, #ff3b30); }
+#fill::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, rgba(255,255,255,.22) 0 16px, transparent 16px 32px); }
+#danger { box-shadow: inset 0 0 220px 40px rgba(255,40,20,.9); opacity: 0; }
+
+#taunt { top: 1530px; font: 400 104px/1.2 Lalezar; }
+#hook1 { top: 640px; }
+#hook1 span { font: 400 64px/1 Lalezar; color: var(--ink); background: var(--gold); padding: 22px 36px 10px; border-radius: 18px; display: inline-block; }
+#hook2 { top: 800px; font: 400 150px/1.2 Lalezar; }
+#hook3 { top: 990px; font: 400 210px/1.1 Lalezar; color: var(--ember); }
+#hookHint { top: 1290px; font: 700 44px Vazir; color: var(--paper); }
+
+#lost { top: 760px; left: 50%; width: 900px; margin-left: -450px; text-align: center; font: 400 230px/1.05 Lalezar; color: #fff;
+  background: var(--red); border-radius: 40px; padding: 60px 0 20px; transform-origin: 50% 50%; box-shadow: 0 40px 120px rgba(255,59,48,.5); }
+#lostSub { top: 1120px; font: 700 56px Vazir; }
+#credit { top: 1240px; }
+#credit small { display: block; font: 700 40px Vazir; color: var(--paper); margin-bottom: 6px; }
+#credit b { font: 900 104px/1.3 Vazir; color: var(--gold); }
+.tile { position: absolute; left: 390px; top: 860px; width: 300px; height: 360px; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.6), 0 0 0 4px #fff; }
+.tile img { width: 100%; height: 100%; object-fit: cover; }
+
+#ctaQ { top: 480px; font: 400 112px/1.3 Lalezar; }
+#ctaQ em { font-style: normal; color: var(--ember); }
+#url { top: 900px; left: 110px; right: 110px; height: 200px; border-radius: 100px; background: var(--gold); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; font: 700 120px Bodoni; direction: ltr; box-shadow: 0 30px 90px rgba(217,184,120,.45); }
+#tag { top: 1150px; font: 700 46px Vazir; color: var(--paper); }
+#tagEn { top: 1225px; font: italic 40px Bodoni; color: var(--gold); direction: ltr; }
+#share { top: 1360px; left: 80px; right: 80px; border-radius: 34px; background: rgba(0,0,0,.6); border: 3px solid rgba(255,255,255,.8);
+  padding: 30px 30px 34px; text-align: center; }
+#share b { display: block; font: 900 54px/1.5 Vazir; }
+#share span { display: block; font: 700 42px/1.5 Vazir; color: var(--gold); margin-top: 6px; }
+#watermark { top: 175px; font: 700 26px Manrope; letter-spacing: .5em; color: rgba(255,255,255,.7); direction: ltr; }
+#flash { background: #fff; opacity: 0; }
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; mix-blend-mode: overlay; opacity: .14; }
+#vig { background: radial-gradient(ellipse 80% 62% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+.scene { position: absolute; inset: 0; display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="bg"></div>
+  <div class="layer" id="cards"></div>
+  <div class="layer" id="tiles"></div>
+  <div class="layer" id="danger"></div>
+  <div class="layer" id="vig"></div>
+
+  <div class="abs" id="meter">
+    <div id="meterHead"><div id="meterLabel">گرسنگی‌سنج</div><div id="meterVal"><span id="meterFace" class="emoji">😐</span><span id="meterNum">۰٪</span></div></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+
+  <div class="scene" id="sHook">
+    <div class="abs center" id="hook1"><span>چالش ۱۵ ثانیه‌ای ⏱️</span></div>
+    <div class="abs center sh" id="hook2">اگه گرسنه نشدی</div>
+    <div class="abs center sh" id="hook3">برنده‌ای! 😈</div>
+    <div class="abs center sh" id="hookHint">تا آخر نگاه کن… اگه می‌تونی</div>
+  </div>
+  <div class="scene" id="sShots"><div class="abs center sh" id="taunt"></div></div>
+  <div class="scene" id="sLost">
+    <div class="abs" id="lost">باختی! 😋</div>
+    <div class="abs center sh" id="lostSub">نگران نباش، همه می‌بازن 😅</div>
+    <div class="abs center sh" id="credit"><small>این عکس‌ها کار</small><b>سودا رحیم‌پور</b></div>
+  </div>
+  <div class="scene" id="sCta">
+    <div class="abs center sh" id="ctaQ">می‌خوای مشتری‌هات هم<br><em>همین‌قدر گرسنه</em> بشن؟</div>
+    <div class="abs" id="url">3evda.com</div>
+    <div class="abs center sh" id="tag">عکاسی تبلیغاتی غذا و محصول · ارومیه</div>
+    <div class="abs center sh" id="tagEn">Food &amp; Product Photography</div>
+    <div class="abs" id="share"><b>✈️ بفرستش برای رفیقی که رستوران یا کافه داره</b><span>درصدت رو کامنت کن 👇</span></div>
+  </div>
+
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div class="abs center" id="watermark">@3EVDA.R</div>
+  <div class="layer" id="flash"></div>
+</div>
+<script src="build/manifest.js"></script>
+<script src="build/kicks2.js"></script>
+<script>
+"use strict";
+const M = window.MANIFEST;
+for (const k in M.photos) { M.photos[k].src = "build/" + M.photos[k].src; M.photos[k].bg = "build/" + M.photos[k].bg; }
+const B = 60 / window.BPM, BAR = 4 * B;
+const T = { shots: BAR, lost: 7 * BAR, cta: 8 * BAR, share: 9 * BAR, loop: 9 * BAR + 2 * B, end: 10 * BAR };
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, d) => clamp((t - a) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eox = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const eio = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eob = x => { const c1 = 2.2, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const st = (el, o) => { for (const k in o) el.style[k] = o[k]; };
+function kick(t) { let last = -9; for (const k of window.KICKS) { if (k <= t) last = k; else break; } return Math.exp(-(t - last) / 0.09); }
+
+// ---- the 12 shots: lighter first, the heartiest dish last
+const SHOTS = [
+  ["noghl", "نقل", "آسونه…"], ["challah", "نون تازه", "هنوز خوبی؟"], ["pistachio", "پسته", "مطمئنی؟"],
+  ["halva-tea", "حلوا و چای", "بوش رو حس کردی؟"], ["choco-bites", "شکلات", "دهنت آب افتاد؟"], ["pastry", "شیرینی", "تحمل کن!"],
+  ["pomegranate", "انار", "داری می‌بازی…"], ["lemonade", "لیموناد", "نفس عمیق!"], ["ash", "آش", "فقط یه‌کم دیگه…"],
+  ["tea-bread", "چای و نون", "اوه‌اوه…"], ["halva-ribbon", "دسر", "دیگه نمی‌تونی!"], ["abgoosht", "آبگوشت", "تمومه!"],
+].filter(s => M.photos[s[0]]);
+const LEVELS = [6, 13, 21, 30, 38, 47, 56, 64, 73, 82, 91, 99];
+const FACES = ["😐", "🙂", "😏", "😋", "🤤", "😵"];
+const SHOT = 2 * B;
+
+// cards and blurred backgrounds, one per photo
+const CW = 860, CH = 1000, CY = 960;
+const cards = {}, bgs = {};
+for (const [name, label] of SHOTS) {
+  const p = M.photos[name], a = p.w / p.h;
+  let w = CW, h = CW / a; if (h > CH) { h = CH; w = CH * a; }
+  const c = document.createElement("div"); c.className = "card";
+  st(c, { width: w + "px", height: h + "px", left: (1080 - w) / 2 + "px", top: (CY - h / 2) + "px" });
+  c.innerHTML = `<img src="${p.src}"><div class="chip">#${label}</div>`;
+  $("cards").appendChild(c); cards[name] = c;
+  const b = document.createElement("img"); b.src = p.bg; $("bg").appendChild(b); bgs[name] = b;
+}
+// explosion tiles for the "you lost" moment
+const tiles = SHOTS.map(([name], i) => { const d = document.createElement("div"); d.className = "tile"; d.innerHTML = `<img src="${M.photos[name].src}">`; $("tiles").appendChild(d); return d; });
+
+const grainFrames = [];
+for (let k = 0; k < 6; k++) {
+  const c = document.createElement("canvas"); c.width = 540; c.height = 960;
+  const g = c.getContext("2d"), im = g.createImageData(540, 960); let s = 99 + k * 777;
+  for (let i = 0; i < im.data.length; i += 4) { s = (s * 16807) % 2147483647; const v = (s / 2147483647) * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  g.putImageData(im, 0, 0); grainFrames.push(c);
+}
+
+function showBg(name, o = {}) {
+  for (const n in bgs) bgs[n].style.display = n === name ? "block" : "none";
+  if (name) st(bgs[name], { transform: `scale(${o.s || 1.05})`, filter: `brightness(${o.b ?? 1})` });
+}
+function hideCards() { for (const n in cards) cards[n].style.display = "none"; }
+function only(id) { for (const s of ["sHook", "sShots", "sLost", "sCta"]) $(s).style.display = s === id ? "block" : "none"; }
+
+function meter(level, t, pop = 0) {
+  const lv = clamp(level / 100);
+  $("fill").style.width = (lv * 100) + "%";
+  $("meterNum").textContent = fa(Math.round(level)) + "٪";
+  $("meterFace").textContent = FACES[Math.min(FACES.length - 1, Math.floor(lv * FACES.length))];
+  const sh = Math.pow(lv, 2.5) * 10;
+  st($("meter"), { transform: `translate(${noise(t * 25) * sh}px,${noise(t * 25 + 4) * sh}px) scale(${1 + pop * 0.06})` });
+  $("meterNum").style.color = lv > 0.7 ? "#ff6a50" : "#fff";
+  $("danger").style.opacity = lv > 0.55 ? (lv - 0.55) * 1.6 * (0.6 + 0.4 * kick(t)) : 0;
+}
+
+// ---- scenes
+function hook(t, alpha = 1) {
+  only("sHook"); $("sHook").style.opacity = alpha;
+  hideCards(); showBg("abgoosht", { s: 1.08 + t * 0.03, b: 0.75 });
+  meter(0, t);
+  // a fan of three dishes behind the words: the very first frame already makes you hungry
+  [["pastry", -16, -260], ["pomegranate", 16, 260], ["abgoosht", 0, 0]].forEach(([n, r, x], j) => {
+    const c = cards[n]; if (!c) return;
+    const breathe = Math.sin(t * 3 + j) * 6;
+    st(c, { display: "block", filter: "brightness(.5) saturate(1.2)",
+      transform: `translate(${x}px,${170 + breathe + Math.abs(x) * 0.25}px) rotate(${r + noise(t + j) * 2}deg) scale(${0.72 + 0.02 * Math.exp(-((t % B)) / 0.1)})` });
+  });
+  const k = Math.exp(-((t % B)) / 0.1);
+  $("hook2").style.transform = `scale(${1 + 0.02 * k})`;
+  const p3 = prog(t, 2 * B, 0.2);
+  st($("hook3"), { opacity: p3 > 0 || alpha < 1 ? 1 : 0, transform: `scale(${alpha < 1 ? 1 : lerp(2.6, 1, eob(p3))}) rotate(${alpha < 1 ? -3 : lerp(-14, -3, eo(p3))}deg)` });
+  $("hookHint").style.opacity = t > 3 * B || alpha < 1 ? 1 : 0;
+}
+
+function shots(t) {
+  only("sShots"); $("tiles").style.display = "none";
+  const u = t - T.shots, i = Math.min(SHOTS.length - 1, Math.floor(u / SHOT)), s = u - i * SHOT, k = kick(t);
+  const [name, , taunt] = SHOTS[i];
+  hideCards(); showBg(name, { s: 1.1 + s * 0.05, b: 0.8 });
+  const c = cards[name]; c.style.display = "block";
+  const p = clamp(s / 0.3), mode = i % 4;
+  let tr = "";
+  if (mode === 0) tr = `rotateY(${lerp(-110, 0, eob(p))}deg)`;
+  if (mode === 1) tr = `translateY(${lerp(1500, 0, eo(p))}px) rotate(${lerp(28, -2, eo(p))}deg)`;
+  if (mode === 2) tr = `scale(${lerp(2.4, 1, eox(p))})`;
+  if (mode === 3) tr = `rotate(${lerp(-200, 2, eo(p))}deg) scale(${lerp(0.2, 1, eob(p))})`;
+  const blur = mode === 2 ? lerp(22, 0, p) : 0;
+  st(c, { transform: `${tr} scale(${1 + k * 0.035 + s * 0.03}) rotate(${noise(t * 2 + i) * 1.2}deg)`, filter: `blur(${blur}px)` });
+  // previous card flies out
+  if (i > 0 && s < 0.22) {
+    const pc = cards[SHOTS[i - 1][0]], q = eio(s / 0.22); pc.style.display = "block";
+    st(pc, { transform: `translateX(${(i % 2 ? -1 : 1) * q * 1300}px) rotate(${(i % 2 ? -1 : 1) * q * 30}deg) scale(${1 - q * 0.2})`, filter: "none" });
+  }
+  // meter jumps to the next level on each shot
+  const from = i ? LEVELS[i - 1] : 0, to = LEVELS[i], mp = eob(clamp((s - 0.05) / 0.35));
+  meter(lerp(from, to, mp), t, Math.exp(-Math.max(0, s - 0.05) / 0.12));
+  const tp = clamp((s - 0.08) / 0.2);
+  $("taunt").textContent = taunt;
+  st($("taunt"), { opacity: tp > 0 ? 1 : 0, transform: `scale(${lerp(1.6, 1, eob(tp)) * (1 + k * 0.04)})`, color: i >= 6 ? "#ff8a5c" : "#fff" });
+  $("flash").style.opacity = i === 0 ? Math.max(0, 0.9 - s * 4) : Math.max(0, 0.25 - s * 3);
+}
+
+function lost(t) {
+  only("sLost"); hideCards(); showBg("abgoosht", { s: 1.15, b: 0.5 });
+  const u = t - T.lost, k = kick(t);
+  meter(100, t, Math.exp(-u / 0.2) * 2);
+  $("flash").style.opacity = Math.max(0, 1 - u / 0.3);
+  // every photo explodes outward from the centre
+  $("tiles").style.display = "block";
+  const ex = eox(clamp(u / 0.9));
+  tiles.forEach((d, j) => {
+    const a = (j / tiles.length) * Math.PI * 2 + hash(j) * 0.5, r = lerp(0, 620 + hash(j + 3) * 380, ex);
+    st(d, { transform: `translate(${Math.cos(a) * r}px,${Math.sin(a) * r * 1.35}px) rotate(${lerp(0, (hash(j + 9) - 0.5) * 120, ex)}deg) scale(${lerp(0.3, 0.55 + hash(j + 5) * 0.3, ex)})`, opacity: 0.95 });
+  });
+  const lp = clamp(u / 0.25), sh = Math.exp(-u / 0.35) * 30;
+  st($("lost"), { transform: `translate(${noise(t * 40) * sh}px,${noise(t * 40 + 2) * sh}px) rotate(-5deg) scale(${lerp(3, 1, eob(lp)) * (1 + k * 0.05)})` });
+  $("lostSub").style.clipPath = `inset(0 0 0 ${lerp(100, 0, eo(prog(u, B, 0.3)))}%)`;
+  const cp = prog(u, 2 * B, 0.3);
+  st($("credit"), { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(cp))}%)`, transform: `translateY(${lerp(40, 0, eo(cp))}px)` });
+}
+
+function cta(t) {
+  only("sCta"); hideCards(); $("tiles").style.display = "none";
+  showBg("pomegranate", { s: 1.08 + (t - T.cta) * 0.03, b: 0.55 });
+  const u = t - T.cta, k = kick(t);
+  meter(100, t);
+  $("flash").style.opacity = Math.max(0, 0.6 - u / 0.25);
+  const q = prog(u, 0, 0.35);
+  st($("ctaQ"), { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(q))}%)` });
+  const up = prog(u, 1.5 * B, 0.3);
+  st($("url"), { opacity: up > 0 ? 1 : 0, transform: `scale(${lerp(0.3, 1, eob(up)) * (1 + k * 0.03)})` });
+  $("tag").style.clipPath = $("tagEn").style.clipPath = `inset(0 0 0 ${lerp(100, 0, eo(prog(u, 2.5 * B, 0.3)))}%)`;
+  const sp = prog(t, T.share, 0.25);
+  st($("share"), { opacity: sp > 0 ? 1 : 0, transform: `translateY(${lerp(200, 0, eob(sp))}px) scale(${1 + (sp >= 1 ? k * 0.02 : 0)})` });
+}
+
+function renderAt(t) {
+  $("flash").style.opacity = 0; $("sCta").style.opacity = 1; $("sHook").style.opacity = 1;
+  $("tiles").style.display = "none";
+  if (t < T.shots) hook(t);
+  else if (t < T.lost) shots(t);
+  else if (t < T.cta) lost(t);
+  else {
+    cta(t);
+    // last two beats: dissolve into the very first frame so the reel loops
+    const out = eio(prog(t, T.loop, B * 0.8)), lp = eio(prog(t, T.loop + B * 0.5, T.end - T.loop - B * 0.5));
+    $("sCta").style.opacity = 1 - out;
+    if (lp > 0) {
+      $("sHook").style.display = "block";
+      // draw the hook's first frame on top
+      const saved = $("sCta").style.display;
+      hook(0, lp); $("sCta").style.display = saved;
+      showBg(lp > 0.5 ? "abgoosht" : "pomegranate", { s: 1.08, b: lerp(0.55, 0.75, lp) });
+      meter(lerp(100, 0, lp), t);
+    }
+  }
+  $("grain").getContext("2d").drawImage(grainFrames[Math.floor(t * 30) % 6], 0, 0);
+}
+window.renderAt = renderAt;
+window.DURATION = T.end;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(im => im.decode().catch(() => null)));
+  renderAt(0); return true;
+})();
+</script>
+</body>
+</html>

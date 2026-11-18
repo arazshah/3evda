@@ -27,7 +27,8 @@ mkdirSync(path.join(root, "build"), { recursive: true });
 const browser = await chromium.launch({ args: ["--force-color-profile=srgb", "--disable-lcd-text"] });
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
 page.on("pageerror", (e) => { console.error("page error:", e.message); process.exitCode = 1; });
-await page.goto("file://" + path.join(root, "reel.html"));
+const pageFile = arg("page", "reel.html");
+await page.goto("file://" + path.join(root, pageFile));
 await page.evaluate(async () => {
   await window.ready;
   const fams = ["900 40px Vazir", "700 40px Vazir", "400 40px Vazir", "200 40px Vazir", "40px Lalezar", "700 40px Bodoni",
@@ -43,7 +44,7 @@ const shoot = async (t, type = "jpeg") => {
 
 if (stills) {
   for (const s of stills.split(",").map(Number)) {
-    const file = path.join(root, `build/still-${s.toFixed(2)}.png`);
+    const file = path.join(root, `build/${arg("prefix", "still")}-${s.toFixed(2)}.png`);
     await page.evaluate((x) => window.renderAt(x), s);
     await page.screenshot({ path: file });
     console.log(file);
