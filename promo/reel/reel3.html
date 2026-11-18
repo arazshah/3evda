@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>3evda Reel 3</title>
+<style>
+@font-face { font-family: Vazir; font-weight: 200; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-200-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 400; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 700; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 900; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+@font-face { font-family: Bodoni; font-weight: 400; font-style: italic; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-italic.woff2); }
+@font-face { font-family: Bodoni; font-weight: 700; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-700-normal.woff2); }
+@font-face { font-family: Manrope; font-weight: 700; src: url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2); }
+:root {
+  /* the site's own tokens (frontend/src/app/globals.css, light theme + ink sections) */
+  --bg: #f3eee6; --surface: #faf7f2; --elevated: #e8e0d4; --line: #c9bfae; --text: #141311; --muted: #5a5148;
+  --accent: #755524; --ink: #111110; --on-ink: #ece6dc; --accent-on-ink: #d9b878; --gold: #d9b878;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #0c0b0a; color: #fff; font-family: Vazir, Manrope, sans-serif; }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.center { left: 0; right: 0; text-align: center; }
+.sh { text-shadow: 0 6px 30px rgba(0,0,0,.75), 0 2px 6px rgba(0,0,0,.6); }
+#bgBlur img { position: absolute; inset: -60px; width: 1200px; height: 2040px; object-fit: cover; display: none; filter: blur(50px) brightness(.38) saturate(1.2); }
+#glow { background: radial-gradient(ellipse 60% 40% at 50% 55%, rgba(217,184,120,.16), transparent 70%); }
+
+/* phone */
+#phoneWrap { position: absolute; inset: 0; perspective: 2200px; }
+#phone { position: absolute; left: 210px; top: 380px; width: 660px; height: 1340px; border-radius: 86px; background: #1a1917;
+  border: 16px solid #1a1917; box-shadow: 0 0 0 3px #57524a, 0 0 0 5px #1a1917, 0 80px 160px rgba(0,0,0,.75); transform-origin: 50% 50%; }
+#screen { position: absolute; inset: 0; border-radius: 70px; overflow: hidden; background: var(--bg); }
+#island { position: absolute; top: 18px; left: 50%; width: 170px; height: 46px; margin-left: -85px; border-radius: 24px; background: #000; z-index: 20; }
+#sheen { position: absolute; inset: 0; border-radius: 70px; pointer-events: none; z-index: 19;
+  background: linear-gradient(115deg, rgba(255,255,255,.10) 0%, transparent 32%, transparent 70%, rgba(255,255,255,.05) 100%); }
+#page { position: absolute; top: 0; left: 0; width: 390px; transform-origin: 0 0; color: var(--text); background: var(--bg); }
+#hdr { position: absolute; top: 0; left: 0; width: 390px; height: 92px; padding: 44px 18px 0; display: flex; justify-content: space-between; align-items: center;
+  background: rgba(243,238,230,.94); border-bottom: 1px solid rgba(201,191,174,.7); transform-origin: 0 0; z-index: 10; }
+#hdr b { font: 600 15px Vazir; font-weight: 700; color: var(--text); }
+#hdr .bur { width: 20px; height: 12px; border-top: 2px solid var(--text); border-bottom: 2px solid var(--text); position: relative; }
+#hdr .bur::after { content: ""; position: absolute; left: 0; right: 0; top: 3px; border-top: 2px solid var(--text); }
+
+/* site sections (mobile layout, 390 px wide) */
+.sec { padding: 34px 16px 30px; }
+.kick { font: 400 11px Manrope; letter-spacing: .28em; color: var(--accent); direction: ltr; text-align: right; margin-bottom: 6px; }
+.h2 { font: 400 27px/1.35 Vazir; color: var(--text); margin-bottom: 16px; }
+#hero { position: relative; height: 640px; background: var(--ink); overflow: hidden; }
+#hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+#hero .shade { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(17,17,16,.88) 92%); }
+#heroText { position: absolute; right: 18px; left: 18px; bottom: 34px; color: var(--on-ink); }
+#heroText small { display: block; font: italic 13px Bodoni; letter-spacing: .3em; color: var(--accent-on-ink); direction: ltr; text-align: right; }
+#heroText h1 { font: 200 40px/1.25 Vazir; margin: 6px 0 4px; }
+#heroText p { font: 400 14px/1.7 Vazir; color: rgba(236,230,220,.85); }
+#heroBtns { display: flex; gap: 10px; margin-top: 18px; }
+#heroBtns span { font: 400 14px Vazir; padding: 10px 20px 11px; border-radius: 30px; border: 1px solid var(--accent-on-ink); color: var(--on-ink); }
+#heroBtns span.on { background: var(--accent-on-ink); color: var(--ink); }
+#heroDots { position: absolute; left: 18px; bottom: 40px; display: flex; gap: 6px; }
+#heroDots i { width: 6px; height: 6px; border-radius: 3px; background: rgba(236,230,220,.4); display: block; }
+#heroDots i.on { width: 20px; background: var(--accent-on-ink); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tile { position: relative; height: 224px; overflow: hidden; background: var(--elevated); }
+.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 10px 10px; background: linear-gradient(transparent, rgba(0,0,0,.55));
+  color: #fff; font: 400 15px Vazir; display: flex; justify-content: space-between; align-items: flex-end; }
+.tile .cap small { font: 700 9px Manrope; color: rgba(255,255,255,.35); direction: ltr; }
+.feat { margin-bottom: 18px; }
+.feat .ph { position: relative; height: 300px; overflow: hidden; }
+.feat .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.feat .ph i { position: absolute; top: 8px; right: 10px; font: 400 11px Vazir; font-style: normal; color: #fff; }
+.feat .t { font: 400 17px Vazir; margin-top: 8px; }
+.pill { float: left; font: 400 12px Vazir; border: 1px solid var(--text); border-radius: 20px; padding: 5px 14px 6px; margin-top: 6px; }
+.svcImg { height: 270px; overflow: hidden; margin-bottom: 10px; background: #fff; }
+.svcImg img { width: 100%; height: 100%; object-fit: cover; }
+.svc { border-top: 1px solid var(--line); padding: 16px 0 14px; display: flex; gap: 12px; }
+.svc .n { font: 400 12px Vazir; color: var(--muted); width: 22px; padding-top: 6px; }
+.svc h3 { font: 400 21px/1.4 Vazir; color: var(--text); }
+.svc p { font: 400 12.5px/1.85 Vazir; color: var(--muted); margin-top: 4px; }
+.fld { border-bottom: 1.5px solid rgba(20,19,17,.6); padding: 12px 2px 8px; margin-bottom: 14px; display: flex; justify-content: space-between; font: 400 14px Vazir; }
+.fld small { color: var(--muted); font-size: 12px; }
+.est { border: 1px solid var(--accent); padding: 14px; margin: 18px 0 14px; background: var(--surface); }
+.est small { font: 400 12px Vazir; color: var(--muted); }
+.est b { display: block; font: 400 13px/1.8 Vazir; color: var(--muted); margin-top: 4px; font-weight: 400; }
+.btn { height: 46px; display: grid; place-items: center; background: var(--text); color: var(--bg); font: 400 15px Vazir; }
+#footer { background: var(--ink); color: var(--on-ink); padding: 36px 16px 120px; }
+#footer h4 { font: 200 30px Vazir; margin-bottom: 4px; }
+#footer .lat { font: italic 13px Bodoni; color: var(--accent-on-ink); letter-spacing: .2em; direction: ltr; text-align: right; margin-bottom: 22px; }
+#footer .links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; font: 400 14px Vazir; color: rgba(236,230,220,.85); margin-bottom: 24px; }
+#footer .soc { display: flex; gap: 10px; }
+#footer .soc span { font: 400 13px Vazir; border: 1px solid rgba(236,230,220,.35); border-radius: 20px; padding: 6px 14px 7px; }
+
+/* the site's cursor ring, used as the tap indicator */
+#ring { position: absolute; width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 50%; border: 3px solid #b8925a; opacity: 0; z-index: 50; }
+
+/* overlays */
+#cap { top: 175px; }
+#cap small { display: block; font: 700 24px Manrope; letter-spacing: .45em; color: var(--gold); direction: ltr; margin-bottom: 14px; }
+#cap div { font: 900 62px/1.3 Vazir; color: #fff; }
+#cap i { display: block; width: 120px; height: 3px; background: var(--gold); margin: 18px auto 0; }
+#pop { display: none; overflow: hidden; z-index: 30; }
+#pop img { position: absolute; object-fit: cover; }
+#popBg { position: absolute; inset: 0; display: none; }
+#popCap { position: absolute; left: 0; right: 0; top: 1450px; text-align: center; z-index: 31; }
+#popCap div { font: 900 78px/1.3 Vazir; }
+#popCap small { display: block; font: 700 26px Manrope; letter-spacing: .4em; color: var(--gold); direction: ltr; margin-top: 10px; }
+
+.frame { position: absolute; inset: 0; display: none; overflow: hidden; }
+.frame .bg { position: absolute; inset: -40px; width: 1160px; height: 2000px; object-fit: cover; }
+.frame .fg { position: absolute; object-fit: cover; transform-origin: 50% 50%; box-shadow: 0 50px 100px rgba(0,0,0,.6); }
+.frame.full .fg { box-shadow: none; }
+#hookText { top: 1180px; z-index: 32; }
+#hookText div { font: 900 96px/1.3 Vazir; color: #fff; }
+#hookText small { display: block; font: 400 44px/1.5 Vazir; color: var(--on-ink); margin-top: 12px; }
+#dropWord { top: 1470px; font: 900 80px/1.3 Vazir; z-index: 32; }
+#dropIdx { top: 250px; font: 700 26px Manrope; letter-spacing: .4em; color: var(--gold); direction: ltr; z-index: 32; }
+#end { display: none; z-index: 40; }
+#endName { top: 560px; font: 200 128px/1.3 Vazir; color: #fff; }
+#endRole { top: 760px; font: 400 48px Vazir; color: var(--on-ink); }
+#endUrl { top: 900px; left: 130px; right: 130px; height: 170px; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center;
+  font: 700 112px Bodoni; color: var(--gold); direction: ltr; }
+#endList { top: 1140px; font: 400 40px/1.9 Vazir; color: var(--on-ink); }
+#endIg { top: 1320px; font: 700 40px Manrope; letter-spacing: .25em; color: #fff; direction: ltr; }
+#flash { background: #fff; opacity: 0; z-index: 60; }
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; mix-blend-mode: overlay; opacity: .1; z-index: 55; }
+#vig { background: radial-gradient(ellipse 80% 64% at 50% 50%, transparent 58%, rgba(0,0,0,.55) 100%); z-index: 54; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="bgBlur"></div>
+  <div class="layer" id="glow"></div>
+  <div class="abs center" id="cap"><small>3EVDA.COM</small><div id="capText"></div><i></i></div>
+
+  <div id="phoneWrap"><div id="phone"><div id="screen">
+    <div id="island"></div><div id="sheen"></div>
+    <div id="hdr"><div class="bur"></div><b>سودا رحیم‌پور</b></div>
+    <div id="page">
+      <section id="hero">
+        <img data-p="nabat"><img data-p="muffins"><img data-p="walnut-cookies">
+        <div class="shade"></div>
+        <div id="heroText">
+          <small>SEVDA RAHIMPOUR</small>
+          <h1>سودا رحیم‌پور</h1>
+          <p>عکاسی تبلیغاتی غذا و محصول در ارومیه</p>
+          <div id="heroBtns"><span class="on">استعلام قیمت</span><span>نمونه‌کارها</span></div>
+        </div>
+        <div id="heroDots"><i class="on"></i><i></i><i></i></div>
+      </section>
+      <section class="sec" id="cats">
+        <div class="kick">PORTFOLIO</div><div class="h2">نمونه‌کارها</div>
+        <div class="grid2" id="catGrid"></div>
+      </section>
+      <section class="sec" id="featured" style="background:var(--surface)">
+        <span class="pill" id="seeAll">مشاهده‌ی همه</span><div class="h2">نمونه‌کارهای منتخب</div>
+        <div id="featList"></div>
+      </section>
+      <section class="sec" id="services">
+        <div class="kick">SERVICES</div><div class="h2">خدمات</div>
+        <div class="svcImg"><img data-p="halva-ribbon"></div>
+        <div id="svcList"></div>
+      </section>
+      <section class="sec" id="quote" style="background:var(--surface)">
+        <div class="kick">QUOTE</div><div class="h2">استعلام قیمت</div>
+        <p style="font:400 13px/1.9 Vazir;color:var(--muted);margin-bottom:14px">نوع کار و تعداد محصول را انتخاب کنید تا یک برآورد تقریبی ببینید، بعد اطلاعات تماس را بفرستید.</p>
+        <div class="fld" id="fService"><small>نوع خدمت</small><span id="vService">انتخاب کنید</span></div>
+        <div class="fld" id="fQty"><small>تعداد محصول</small><span id="vQty">۱</span></div>
+        <div class="fld"><small>افزونه‌ها</small><span>استایلینگ</span></div>
+        <div class="est"><small>برآورد تقریبی</small><b>این عدد فقط یک برآورد تقریبی است؛ قیمت نهایی بعد از بررسی نیاز شما با پیش‌فاکتور اعلام می‌شود.</b></div>
+        <div class="btn" id="qBtn">ارسال استعلام</div>
+      </section>
+      <section id="footer">
+        <h4>سودا رحیم‌پور</h4><div class="lat">FOOD &amp; PRODUCT PHOTOGRAPHY</div>
+        <div class="links"><span>نمونه‌کارها</span><span>خدمات</span><span>پکیج‌ها</span><span>رزرو</span><span>مجله</span><span>درباره‌ی من</span><span>تماس</span><span>نقشه‌ی سایت</span></div>
+        <div class="soc"><span>اینستاگرام</span><span>تلگرام</span><span>واتس‌اپ</span></div>
+      </section>
+    </div>
+  </div></div></div>
+  <div id="ring"></div>
+
+  <div class="layer" id="pop"><div id="popBg"></div><img id="popImg"><img id="popImg2"></div>
+  <div class="abs center sh" id="popCap"><div id="popText"></div><small id="popEn"></small></div>
+  <div class="layer" id="frames"></div>
+  <div class="abs center sh" id="hookText"><div id="hookLine"></div><small id="hookSub"></small></div>
+  <div class="abs center sh" id="dropWord"></div>
+  <div class="abs center" id="dropIdx"></div>
+  <div class="layer" id="end">
+    <div class="abs center" id="endName">سودا رحیم‌پور</div>
+    <div class="abs center" id="endRole">عکاسی تبلیغاتی غذا و محصول</div>
+    <div class="abs" id="endUrl">3evda.com</div>
+    <div class="abs center" id="endList">نمونه‌کار · استعلام قیمت آنلاین · رزرو<br>ارسال محصول از سراسر ایران به استودیو</div>
+    <div class="abs center" id="endIg">@3EVDA.R</div>
+  </div>
+  <div class="layer" id="vig"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div class="layer" id="flash"></div>
+</div>
+<script src="build/manifest.js"></script>
+<script src="build/kicks3.js"></script>
+<script>
+"use strict";
+const M = window.MANIFEST;
+for (const k in M.photos) { M.photos[k].src = "build/" + M.photos[k].src; M.photos[k].bg = "build/" + M.photos[k].bg; }
+const B = 60 / window.BPM, BAR = 4 * B;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, d) => clamp((t - a) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eox = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const eio = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eob = x => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const st = (el, o) => { for (const k in o) el.style[k] = o[k]; };
+function kick(t) { let last = -9; for (const k of window.KICKS) { if (k <= t) last = k; else break; } return Math.exp(-(t - last) / 0.1); }
+const src = n => M.photos[n].src;
+
+// ---------- site content (wording as on 3evda.com)
+const CATS = [["pomegranate", "عکاسی میوه ها"], ["challah", "عکاسی نان"], ["pistachio", "عکاسی خشک بار"], ["halva-tea", "عکاسی حلوا"],
+  ["ash", "عکاسی غذای ایرانی"], ["noghl", "عکاسی نقل"], ["pastry", "عکاسی شیرینی"], ["lemonade", "عکاسی نوشیدنی"]];
+$("catGrid").innerHTML = CATS.map(([p, c], i) => `<div class="tile" id="cat${i}"><img src="${src(p)}"><div class="cap"><span>${c}</span><small>© 3evda.com</small></div></div>`).join("");
+const FEAT = [["tea-bread", "عکاسی نان های حجیم"], ["abgoosht", "عکاسی غذاهای ایرانی"], ["choco-bites", "عکاسی شیرینی"]];
+$("featList").innerHTML = FEAT.map(([p, c], i) => `<div class="feat"><div class="ph"><img src="${src(p)}"><i>${fa("0" + (i + 1))}</i></div><div class="t">${c}</div></div>`).join("");
+const SVC = [
+  ["عکاسی مینیمال", "در عکاسی مینیمال با تمرکز بر سادگی، نور و جزئیات، تصاویری خلق می‌کنیم که زیبایی محصول را در فضایی ظریف و مینیمال به نمایش بگذاریم"],
+  ["عکاسی زمینه سفید", "عکاسی زمینه سفید سبکی کاربردی برای فروشگاه‌های آنلاین، کاتالوگ‌ها و معرفی محصولات که با پس‌زمینه سفید و نورپردازی دقیق، امکان نمایش واضح و واقعی با تمرکز بر محصول فراهم می کند"],
+  ["عکاسی لایف استایل", "با قرار دادن محصول در فضایی طبیعی و متناسب با کاربرد آن، تصاویری خلق می‌کنیم که حس استفاده از محصول را منتقل کرده و ارتباط ملموس‌تر میان برند و مخاطب ایجاد می‌کنند."],
+  ["عکاسی چیدمان‌شده", "در این سبک، محصول و عناصر اطراف آن با برنامه‌ریزی و طراحی بصری کنار هم قرار می‌گیرند تا یک ترکیب‌بندی هدفمند و جذاب ایجاد شود."],
+];
+$("svcList").innerHTML = SVC.map(([h, p], i) => `<div class="svc" id="svc${i}"><div class="n">${fa("0" + (i + 1))}</div><div><h3>${h}</h3><p>${p}</p></div></div>`).join("");
+document.querySelectorAll("img[data-p]").forEach(im => { im.src = src(im.dataset.p); });
+
+// ---------- full-frame photo frames (sharp print on a blurred copy; tall photos fill the frame)
+const frames = {};
+function frameFor(name) {
+  if (frames[name]) return frames[name];
+  const p = M.photos[name], a = p.w / p.h, el = document.createElement("div");
+  el.className = "frame";
+  let w, h, l, tp;
+  if (a < 0.75) { el.classList.add("full"); w = 1080; h = 1080 / a; if (h < 1920) { h = 1920; w = 1920 * a; } l = (1080 - w) / 2; tp = (1920 - h) / 2; }
+  else { w = 940; h = 940 / a; if (h > 1150) { h = 1150; w = 1150 * a; } l = (1080 - w) / 2; tp = 860 - h / 2; }
+  el.innerHTML = `<img class="bg" src="${p.bg}"><img class="fg" src="${p.src}" style="width:${w}px;height:${h}px;left:${l}px;top:${tp}px">`;
+  el._fg = el.lastElementChild; el._bg = el.firstElementChild; el._full = el.classList.contains("full");
+  $("frames").appendChild(el); frames[name] = el; return el;
+}
+function showFrame(name, o = {}) {
+  for (const n in frames) frames[n].style.display = n === name ? "block" : "none";
+  if (!name) return;
+  const el = frameFor(name); el.style.display = "block";
+  const { s = 1, x = 0, y = 0, r = 0, op = 1, bright = 1 } = o;
+  st(el, { opacity: op, filter: `brightness(${bright})` });
+  el._fg.style.transform = `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`;
+  el._bg.style.transform = `scale(${1.05 + (s - 1) * 0.3})`;
+}
+const bgImgs = {};
+function blurBg(name) {
+  if (!bgImgs[name]) { const im = document.createElement("img"); im.src = M.photos[name].bg; $("bgBlur").appendChild(im); bgImgs[name] = im; }
+  for (const n in bgImgs) bgImgs[n].style.display = n === name ? "block" : "none";
+}
+const ALL = ["blood-orange", "ghasemi-boxes", "muffins", "nabat", "walnut-cookies", "pomegranate", "tea-bread", "abgoosht", "lemonade", "ash", "pistachio", "halva-ribbon"];
+ALL.forEach(frameFor); ALL.forEach(blurBg);
+
+const grainFrames = [];
+for (let k = 0; k < 6; k++) {
+  const c = document.createElement("canvas"); c.width = 540; c.height = 960;
+  const g = c.getContext("2d"), im = g.createImageData(540, 960); let s = 7 + k * 555;
+  for (let i = 0; i < im.data.length; i += 4) { s = (s * 16807) % 2147483647; const v = (s / 2147483647) * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  g.putImageData(im, 0, 0); grainFrames.push(c);
+}
+
+// ---------- page geometry and scroll path
+const S = 628 / 390;           // page px -> screen px
+const VIEW = 1308 / S;         // visible page height
+let A = {};
+function measure() {
+  st($("page"), { transform: `scale(${S})` }); $("hdr").style.transform = `scale(${S})`;
+  const top = id => $(id).offsetTop;
+  A = { hero: 0, cats: top("cats") - 70, catsEnd: top("cats") + $("cats").offsetHeight - VIEW + 10, feat: top("featured") - 60,
+    featEnd: top("featured") + 380, svc: top("services") - 60, svcEnd: top("services") + $("services").offsetHeight - VIEW + 20,
+    quote: top("quote") - 60, foot: $("page").offsetHeight - VIEW };
+}
+function keyframes() {
+  return [[0, 0], [5.55, 0], [6.4, A.cats], [7.35, A.catsEnd], [10.1, A.catsEnd], [10.8, A.feat], [11.6, A.featEnd], [14.1, A.featEnd],
+    [14.8, A.svc], [17.6, A.svcEnd], [18.15, A.quote], [20.0, A.quote], [20.9, A.foot], [30, A.foot]];
+}
+let KF = [];
+function scrollAt(t) {
+  for (let i = 0; i < KF.length - 1; i++) {
+    const [t0, y0] = KF[i], [t1, y1] = KF[i + 1];
+    if (t >= t0 && t <= t1) return lerp(y0, y1, eio((t - t0) / (t1 - t0)));
+  }
+  return KF[KF.length - 1][1];
+}
+
+// phone tilt: flat during the pull-back and the two pop-outs (so rects line up), gently turned otherwise
+function flatness(t) {
+  const win = (a, b, r = 0.45) => clamp(Math.min((t - a) / r, (b - t) / r) + 1, 0, 1);
+  return Math.max(win(2.0, 3.3), win(7.45, 10.2), win(11.55, 14.25));
+}
+function phone(t, extra = {}) {
+  const f = 1 - flatness(t), k = kick(t);
+  const ry = f * (-9 + noise(t * 0.4) * 3), rx = f * (5 + noise(t * 0.3 + 5) * 2);
+  const s = (extra.s ?? 1) * (1 + k * 0.004 * f);
+  st($("phone"), { transform: `translate(${extra.x || 0}px,${extra.y || 0}px) rotateY(${ry}deg) rotateX(${rx}deg) scale(${s})`, opacity: extra.op ?? 1 });
+  $("page").style.transform = `scale(${S}) translateY(${-scrollAt(t)}px)`;
+}
+function rectOf(el) { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }
+function ring(at, t, x, y) {
+  const p = (t - at) / 0.45;
+  if (p < -0.6 || p > 1) { $("ring").style.opacity = 0; return; }
+  const press = p < 0 ? lerp(1.3, 1, eo((p + 0.6) / 0.6)) : lerp(1, 0.75, Math.sin(clamp(p * 2) * Math.PI));
+  st($("ring"), { left: x + "px", top: y + "px", opacity: p < 0 ? eo((p + 0.6) / 0.6) : 1 - clamp((p - 0.6) / 0.4), transform: `scale(${press})`,
+    background: p >= 0 && p < 0.5 ? "rgba(184,146,90,.25)" : "transparent" });
+}
+
+// ---------- captions
+const CAPS = [[2.0, "سایت رسمی سودا رحیم‌پور", "WEBSITE TOUR"], [4.0, "۰۱ · صفحه‌ی اصلی"], [6.0, "۰۲ · دسته‌بندی نمونه‌کارها"], [10.0, "۰۳ · نمونه‌کارهای منتخب"],
+  [14.0, "۰۴ · خدمات و سبک‌های عکاسی"], [18.0, "۰۵ · استعلام قیمت آنلاین"], [20.0, "۰۶ · رزرو، گالری اختصاصی، ارتباط"]];
+function caption(t) {
+  let c = null; for (const x of CAPS) if (t >= x[0]) c = x;
+  const hidden = t < 2 || t >= 22 || (t > 8.1 && t < 9.9) || (t > 12.1 && t < 13.9);
+  if (!c || hidden) { $("cap").style.visibility = "hidden"; return; }
+  $("cap").style.visibility = "visible";
+  $("capText").textContent = c[1];
+  $("cap").querySelector("small").textContent = c[2] || "3EVDA.COM";
+  const p = prog(t, c[0], 0.4);
+  st($("capText"), { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(p))}%)` });
+  $("cap").querySelector("i").style.transform = `scaleX(${eox(p)})`;
+}
+
+// ---------- pop-out (a photo leaves the screen and fills the frame)
+function popOut(t, at, el, seq) {
+  // seq: [[startTime, photo, fa, en], ...]; out at `at`, back at at + 1.6
+  const out = eio(prog(t, at, 0.45)), back = eio(prog(t, at + 1.55, 0.45));
+  const k = out * (1 - back);
+  if (k <= 0) { $("pop").style.display = "none"; $("popCap").style.visibility = "hidden"; return false; }
+  const r = rectOf(el);
+  const box = { x: lerp(r.x, 0, k), y: lerp(r.y, 0, k), w: lerp(r.w, 1080, k), h: lerp(r.h, 1920, k) };
+  let cur = seq[0]; for (const s of seq) if (t >= s[0]) cur = s;
+  const fromSrc = el.querySelector("img").src;
+  $("pop").style.display = "block";
+  // the tile's own photo grows, then the full photo cross-fades in on top
+  st($("popImg"), { left: box.x + "px", top: box.y + "px", width: box.w + "px", height: box.h + "px", opacity: 1 });
+  $("popImg").src = fromSrc;
+  const ph = M.photos[cur[1]], cf = clamp((t - Math.max(at + 0.25, cur[0])) / 0.25);
+  st($("popImg2"), { left: box.x + "px", top: box.y + "px", width: box.w + "px", height: box.h + "px", opacity: cf * (1 - back),
+    transform: `scale(${1 + (t - at) * 0.03})` });
+  $("popImg2").src = ph.src;
+  if (ph.w / ph.h > 0.75) { // square photos: show whole, on a blurred copy
+    $("popImg2").style.objectFit = k > 0.95 ? "contain" : "cover";
+    st($("popBg"), { display: k > 0.95 ? "block" : "none", background: `center/cover url(${ph.bg})` });
+  } else { $("popImg2").style.objectFit = "cover"; $("popBg").style.display = "none"; }
+  const cp = prog(t, cur[0] + 0.2, 0.35);
+  $("popCap").style.visibility = k > 0.9 ? "visible" : "hidden";
+  $("popText").textContent = cur[2]; $("popEn").textContent = cur[3];
+  $("popText").style.clipPath = `inset(0 0 0 ${lerp(100, 0, eo(cp))}%)`;
+  return true;
+}
+
+// ---------- scenes
+const HOOK = [["blood-orange", "پشت هر فروش موفق،", ""], ["ghasemi-boxes", "یک تصویر حرفه‌ای است.", ""],
+  ["muffins", "سودا رحیم‌پور", "عکاسی تبلیغاتی غذا و محصول"], ["nabat", "سودا رحیم‌پور", "عکاسی تبلیغاتی غذا و محصول"]];
+const DROP = [["blood-orange", "نوشیدنی"], ["ghasemi-boxes", "محصول و بسته‌بندی"], ["nabat", "نبات و چای"], ["walnut-cookies", "شیرینی"],
+  ["muffins", "کیک و دسر"], ["pomegranate", "میوه"], ["tea-bread", "لایف استایل"], ["abgoosht", "غذای ایرانی"],
+  ["lemonade", "نوشیدنی"], ["ash", "غذای ایرانی"], ["pistachio", "چیدمان‌شده"], ["halva-ribbon", "زمینه سفید"]];
+
+function hookScene(t, alpha = 1) {
+  const i = Math.min(3, Math.floor(t / B)), s = t - i * B, [name, line, sub] = HOOK[i];
+  showFrame(name, { s: lerp(1.12, 1.03, eox(clamp(s / 0.3))) + s * 0.03, op: alpha });
+  st($("hookText"), { visibility: "visible", opacity: alpha });
+  $("hookLine").textContent = line; $("hookSub").textContent = sub;
+  const p = i === 0 && alpha === 1 ? 1 : clamp(s / 0.22);
+  $("hookLine").style.transform = `translateY(${lerp(40, 0, eo(p))}px)`;
+  $("hookLine").style.clipPath = i === 3 ? "none" : `inset(0 0 0 ${lerp(100, 0, eo(p))}%)`;
+  if (alpha === 1) $("flash").style.opacity = i ? Math.max(0, 0.35 - s * 2.5) : 0;
+}
+
+function renderAt(t) {
+  $("flash").style.opacity = 0; $("ring").style.opacity = 0; $("end").style.display = "none";
+  st($("hookText"), { visibility: "hidden", opacity: 1 }); $("dropWord").style.visibility = "hidden"; $("dropIdx").style.visibility = "hidden";
+  $("pop").style.display = "none"; $("popCap").style.visibility = "hidden";
+  showFrame(null);
+  caption(t);
+
+  if (t < 2.0) { // hook: four hard cuts
+    $("phoneWrap").style.display = "none"; blurBg("nabat");
+    hookScene(t);
+  } else if (t < 22.0) {
+    $("phoneWrap").style.display = "block";
+    phone(t);
+    // hero slider
+    const hero = [...$("hero").querySelectorAll("img")];
+    const slide = t < 4.6 ? 0 : t < 5.3 ? 1 : 2, sf = t < 4.6 ? 1 : clamp((t - (slide === 1 ? 4.6 : 5.3)) / 0.3);
+    hero.forEach((im, j) => { im.style.opacity = j === slide ? 1 : j === slide - 1 ? 1 - sf : 0; im.style.transform = `scale(${1.08 - (t - 2) * 0.01})`; });
+    [...$("heroDots").children].forEach((d, j) => d.classList.toggle("on", j === slide));
+    blurBg(["nabat", "muffins", "walnut-cookies"][slide]);
+    // pull-back: the hook's last photo shrinks into the hero
+    if (t < 3.3) {
+      const r = rectOf($("hero")), k = eio(prog(t, 2.0, 1.1));
+      $("pop").style.display = "block"; $("popBg").style.display = "none";
+      st($("popImg"), { left: lerp(0, r.x, k) + "px", top: lerp(0, r.y, k) + "px", width: lerp(1080, r.w, k) + "px", height: lerp(1920, r.h, k) + "px",
+        opacity: 1 - prog(t, 3.0, 0.3), objectFit: "cover", transform: "none" });
+      $("popImg").src = src("nabat"); $("popImg2").style.opacity = 0;
+      st($("phone"), { opacity: eo(prog(t, 2.25, 0.6)) });
+      $("hookText").style.visibility = t < 2.35 ? "visible" : "hidden";
+    }
+    // pop-out 1: tap the drinks category -> full-frame drink
+    ring(7.75, t, ...(() => { const r = rectOf($("cat7")); return [r.x + r.w * 0.55, r.y + r.h * 0.5]; })());
+    popOut(t, 8.0, $("cat7"), [[8.0, "blood-orange", "عکاسی نوشیدنی", "BEVERAGE · LOW-KEY"]]);
+    // pop-out 2: product & packaging, then sweets
+    if (t > 11 && t < 14.5) {
+      const fe = $("featList").children[0].querySelector(".ph");
+      ring(11.75, t, ...(() => { const r = rectOf(fe); return [r.x + r.w * 0.5, r.y + r.h * 0.5]; })());
+      popOut(t, 12.0, fe, [[12.0, "ghasemi-boxes", "عکاسی محصول و بسته‌بندی", "PRODUCT · PACKAGING"], [12.85, "walnut-cookies", "عکاسی شیرینی", "BAKERY · STYLED"]]);
+    }
+    // services: the item in the middle of the screen lights up
+    if (t > 14 && t < 18.2) {
+      const mid = 380 + 670;
+      SVC.forEach((_, i) => { const r = rectOf($("svc" + i)), d = Math.abs(r.y + r.h / 2 - mid); const on = d < r.h * 0.6;
+        $("svc" + i).querySelector("h3").style.color = on ? "#755524" : "#141311"; $("svc" + i).querySelector(".n").style.color = on ? "#755524" : "#5a5148"; });
+    }
+    // quote form: two taps, the fields fill in
+    if (t > 18) {
+      const fs = rectOf($("fService")), fq = rectOf($("fQty")), qb = rectOf($("qBtn"));
+      if (t < 19.1) ring(18.5, t, fs.x + fs.w * 0.3, fs.y + fs.h / 2); else ring(19.25, t, qb.x + qb.w / 2, qb.y + qb.h / 2);
+      $("vService").textContent = t > 18.6 ? "عکاسی محصول" : "انتخاب کنید";
+      $("vQty").textContent = fa(Math.round(lerp(1, 12, eio(prog(t, 18.7, 0.5)))));
+      $("qBtn").textContent = t > 19.35 ? "در حال ارسال…" : "ارسال استعلام";
+      $("qBtn").style.background = t > 19.35 ? "#755524" : "#141311";
+    }
+    // exit: the phone turns away into the drop
+    if (t > 21.0) {
+      const e = eio(prog(t, 21.0, 1.0));
+      phone(t, { s: lerp(1, 0.55, e), y: lerp(0, -80, e), op: 1 - prog(t, 21.6, 0.4) });
+      $("phone").style.transform += ` rotateY(${e * 70}deg)`;
+      $("flash").style.opacity = Math.pow(prog(t, 21.65, 0.35), 2);
+    }
+  } else if (t < 28.0) { // drop montage: 12 photos, one per beat
+    $("phoneWrap").style.display = "none";
+    const u = t - 22, i = Math.min(11, Math.floor(u / B)), s = u - i * B, [name, w] = DROP[i], k = kick(t);
+    blurBg(name);
+    showFrame(name, { s: lerp(1.25, 1.04, eox(clamp(s / 0.2))) + k * 0.015, x: (i % 2 ? 1 : -1) * s * 40 });
+    $("flash").style.opacity = i === 0 ? Math.max(0, 1 - s / 0.3) : i % 4 === 0 ? Math.max(0, 0.4 - s * 3) : 0;
+    st($("dropWord"), { visibility: "visible", transform: `translateY(${lerp(30, 0, eo(clamp(s / 0.15)))}px)` });
+    $("dropWord").textContent = w;
+    $("dropIdx").style.visibility = "visible"; $("dropIdx").textContent = `${String(i + 1).padStart(2, "0")} / 12   3EVDA.COM`;
+  } else { // end card, then dissolve into the opening frame
+    $("phoneWrap").style.display = "none"; blurBg("nabat");
+    const u = t - 28, k = kick(t);
+    $("end").style.display = "block";
+    $("flash").style.opacity = Math.max(0, 0.8 - u / 0.3);
+    const line = (id, a) => { const p = prog(u, a, 0.4); st($(id), { clipPath: `inset(0 0 0 ${lerp(100, 0, eo(p))}%)`, transform: `translateY(${lerp(24, 0, eo(p))}px)` }); };
+    line("endName", 0.05); line("endRole", 0.25); line("endList", 0.55); line("endIg", 0.7);
+    const up = prog(u, 0.35, 0.35);
+    st($("endUrl"), { opacity: up > 0 ? 1 : 0, transform: `scale(${lerp(0.85, 1, eob(up)) * (1 + k * 0.01)})` });
+    const lp = eio(prog(t, 29.4, 0.6));
+    $("end").style.opacity = 1 - lp;
+    if (lp > 0) hookScene(0, lp);
+  }
+  $("grain").getContext("2d").drawImage(grainFrames[Math.floor(t * 30) % 6], 0, 0);
+}
+window.renderAt = renderAt;
+window.DURATION = 15 * BAR;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(im => im.decode().catch(() => null)));
+  measure(); KF = keyframes();
+  renderAt(0); return true;
+})();
+</script>
+</body>
+</html>
