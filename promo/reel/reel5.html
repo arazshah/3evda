@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>3evda Reel 5</title>
+<style>
+@font-face { font-family: Vazir; font-weight: 200; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-200-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 400; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 700; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+@font-face { font-family: Vazir; font-weight: 900; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+@font-face { font-family: Bodoni; font-weight: 700; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-700-normal.woff2); }
+@font-face { font-family: Bodoni; font-style: italic; src: url(node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-400-italic.woff2); }
+@font-face { font-family: Manrope; font-weight: 700; src: url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2); }
+:root { --gold: #d9b878; --paper: #ece6dc; --ink: #0e0e0d; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); color: #fff; font-family: Vazir, Manrope, sans-serif; }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.center { left: 0; right: 0; text-align: center; }
+.sh { text-shadow: 0 4px 26px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.55); }
+#frames { z-index: 0; isolation: isolate; }
+.frame { position: absolute; inset: 0; display: none; overflow: hidden; }
+.frame img { position: absolute; left: -100px; top: 0; width: 1280px; height: 1920px; object-fit: cover; transform-origin: 50% 55%; }
+.frame .lit { -webkit-mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; }
+#beam { mix-blend-mode: screen; opacity: 0; }
+#tint { mix-blend-mode: soft-light; }
+#shadeTop { background: linear-gradient(rgba(0,0,0,.6), transparent 26%); }
+#shadeBot { background: linear-gradient(transparent 50%, rgba(0,0,0,.62) 65%, rgba(0,0,0,.9) 100%); }
+#vig { background: radial-gradient(ellipse 85% 65% at 50% 50%, transparent 60%, rgba(0,0,0,.45) 100%); }
+
+#clock { position: absolute; left: 465px; top: 190px; width: 150px; height: 150px; }
+#clock svg { width: 150px; height: 150px; overflow: visible; }
+#time { top: 352px; font: 200 84px/1.2 Vazir; letter-spacing: .04em; }
+#meal { top: 1300px; font: 200 132px/1.25 Vazir; }
+#line { top: 1490px; left: 110px; right: 110px; text-align: center; font: 400 42px/1.7 Vazir; color: var(--paper); }
+#idx { top: 1250px; font: 700 24px Manrope; letter-spacing: .5em; color: var(--gold); direction: ltr; }
+
+#hookBy { top: 700px; font: 400 40px Vazir; color: var(--paper); }
+#hook1 { top: 780px; font: 200 160px/1.25 Vazir; }
+#hook2 { top: 980px; font: 900 160px/1.25 Vazir; color: var(--gold); }
+
+#strip { position: absolute; top: 760px; height: 560px; display: flex; gap: 26px; direction: ltr; }
+.cell { width: 300px; }
+.cell div { width: 300px; height: 450px; overflow: hidden; border: 3px solid rgba(255,255,255,.85); }
+.cell img { width: 100%; height: 100%; object-fit: cover; }
+.cell b { display: block; text-align: center; margin-top: 16px; font: 200 46px Vazir; direction: rtl; }
+.cell small { display: block; text-align: center; font: 400 28px Vazir; color: var(--gold); direction: rtl; }
+#stripText { top: 520px; font: 200 86px/1.35 Vazir; }
+#stripText em { font-style: normal; font-weight: 900; color: var(--gold); }
+
+#endName { top: 520px; font: 200 132px/1.3 Vazir; }
+#endRole { top: 720px; font: 400 50px Vazir; color: var(--paper); }
+#endUrl { top: 860px; left: 140px; right: 140px; height: 170px; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center;
+  font: 700 110px Bodoni; color: var(--gold); direction: ltr; }
+#endList { top: 1100px; font: 400 42px/1.9 Vazir; color: var(--paper); }
+#endIg { top: 1300px; font: 700 38px Manrope; letter-spacing: .3em; direction: ltr; }
+.scene { position: absolute; inset: 0; display: none; }
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; mix-blend-mode: overlay; opacity: .09; }
+#fade { background: #000; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="frames"></div>
+  <div class="layer" id="beam"></div>
+  <div class="layer" id="tint"></div>
+  <div class="layer" id="vig"></div>
+  <div class="layer" id="shadeTop"></div>
+  <div class="layer" id="shadeBot"></div>
+  <div class="layer" id="fade"></div>
+
+  <div id="clock"><svg viewBox="-75 -75 150 150">
+    <circle r="70" fill="rgba(14,14,13,.35)" stroke="#d9b878" stroke-width="3"/>
+    <g id="ticks"></g>
+    <line id="hHand" x1="0" y1="8" x2="0" y2="-36" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+    <line id="mHand" x1="0" y1="10" x2="0" y2="-56" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+    <circle r="5" fill="#d9b878"/>
+  </svg></div>
+  <div class="abs center sh" id="time"></div>
+
+  <div class="scene" id="sHook">
+    <div class="abs center sh" id="hookBy">سودا رحیم‌پور · عکاسی غذا و محصول</div>
+    <div class="abs center sh" id="hook1">یک روز،</div>
+    <div class="abs center sh" id="hook2">پنج قاب.</div>
+  </div>
+  <div class="scene" id="sFrame">
+    <div class="abs center" id="idx"></div>
+    <div class="abs center sh" id="meal"></div>
+    <div class="abs sh" id="line"></div>
+  </div>
+  <div class="scene" id="sStrip">
+    <div class="abs center sh" id="stripText">از صبح تا شب،<br><em>برای برند شما.</em></div>
+    <div id="strip"></div>
+  </div>
+  <div class="scene" id="sEnd">
+    <div class="abs center sh" id="endName">سودا رحیم‌پور</div>
+    <div class="abs center sh" id="endRole">عکاسی تبلیغاتی غذا و محصول</div>
+    <div class="abs" id="endUrl">3evda.com</div>
+    <div class="abs center sh" id="endList">استعلام قیمت آنلاین · رزرو<br>ارسال محصول از سراسر ایران به استودیو</div>
+    <div class="abs center sh" id="endIg">@3EVDA.R</div>
+  </div>
+  <canvas id="grain" width="540" height="960"></canvas>
+</div>
+<script src="build/manifest.js"></script>
+<script src="build/kicks5.js"></script>
+<script>
+"use strict";
+const M = window.MANIFEST;
+for (const k in M.photos) { M.photos[k].src = "build/" + M.photos[k].src; M.photos[k].bg = "build/" + M.photos[k].bg; }
+const B = 60 / window.BPM, BAR = 4 * B;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, d) => clamp((t - a) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const st = (el, o) => { for (const k in o) el.style[k] = o[k]; };
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+
+// one day, five frames: time (minutes since midnight), meal, line, light tint
+const DAY = [
+  { photo: "olives", min: 8 * 60, meal: "صبحانه", line: "زیتونِ براق در ظرف کریستال، با نورِ نرم و روشنِ صبح.", tint: "rgba(190,215,255,.22)", warm: 0 },
+  { photo: "biscuit-milk", min: 10 * 60 + 30, meal: "میان‌وعده", line: "بیسکویت و شیر روی چوبِ روشن؛ چیدمانی گرم و خانگی.", tint: "rgba(255,245,225,.16)", warm: 0.2 },
+  { photo: "strawberries", min: 13 * 60, meal: "میوه‌ی تازه", line: "توت‌فرنگی روی زمینه‌ی سفید؛ قرمزِ زنده در قابی مینیمال.", tint: "rgba(255,255,255,.12)", warm: 0.1 },
+  { photo: "pastry-tea", min: 17 * 60, meal: "عصرانه", line: "شیرینی و چای تازه‌دم روی سینی قلم‌زنی؛ بخارِ چای یعنی همین حالا.", tint: "rgba(255,170,90,.24)", warm: 0.6 },
+  { photo: "date-cookies", min: 20 * 60, meal: "شب‌نشینی", line: "شیرینیِ خرمایی و چای، با نورِ گرم روی زمینه‌ی تیره.", tint: "rgba(255,130,50,.26)", warm: 0.9 },
+];
+const T = { f0: BAR, flen: 2 * BAR, strip: 11 * BAR, end: 12 * BAR, total: 13 * BAR };
+
+// frames: a dark copy and a lit copy, the lit one revealed by a moving soft-light mask
+const frames = DAY.map((d, i) => {
+  const el = document.createElement("div"); el.className = "frame";
+  el.innerHTML = `<img class="dark" src="${M.photos[d.photo].src}"><img class="lit" src="${M.photos[d.photo].src}">`;
+  $("frames").appendChild(el); el._dark = el.children[0]; el._lit = el.children[1]; return el;
+});
+function showFrame(i, o = {}) {
+  frames.forEach((f, j) => { f.style.display = j === i || j === o.under ? "block" : "none"; f.style.zIndex = j === i ? 2 : 1; });
+  if (i < 0) return;
+  const f = frames[i], { s = 1.05, x = 0, reveal = 1, op = 1, dark = 0.2 } = o;
+  const tr = `translateX(${x}px) scale(${s})`;
+  st(f, { opacity: op });
+  st(f._dark, { transform: tr, filter: `brightness(${dark}) saturate(.7)` });
+  // the light edge travels diagonally; 0 = all dark, 1 = all lit
+  const X = lerp(-40, 140, reveal);
+  const mask = `linear-gradient(105deg, #000 ${X - 30}%, transparent ${X}%)`;
+  st(f._lit, { transform: tr, webkitMaskImage: reveal >= 1 ? "none" : mask, filter: "none" });
+}
+function clockTo(minutes) {
+  const h = (minutes / 60) % 12, mm = minutes % 60;
+  $("hHand").setAttribute("transform", `rotate(${h * 30})`);
+  $("mHand").setAttribute("transform", `rotate(${mm * 6})`);
+  const H = Math.floor(minutes / 60) % 24, Mi = Math.floor(minutes % 60);
+  $("time").textContent = fa(String(H).padStart(2, "0")) + ":" + fa(String(Mi).padStart(2, "0"));
+}
+$("ticks").innerHTML = Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="-62" x2="0" y2="${i % 3 ? -56 : -50}" stroke="#ece6dc" stroke-width="${i % 3 ? 2 : 3.5}" transform="rotate(${i * 30})"/>`).join("");
+$("strip").innerHTML = DAY.map(d => `<div class="cell"><div><img src="${M.photos[d.photo].src}"></div><b>${fa(String(Math.floor(d.min / 60)).padStart(2, "0") + ":" + String(d.min % 60).padStart(2, "0"))}</b><small>${d.meal}</small></div>`).join("");
+
+const grainFrames = [];
+for (let k = 0; k < 6; k++) {
+  const c = document.createElement("canvas"); c.width = 540; c.height = 960;
+  const g = c.getContext("2d"), im = g.createImageData(540, 960); let s = 17 + k * 733;
+  for (let i = 0; i < im.data.length; i += 4) { s = (s * 16807) % 2147483647; const v = (s / 2147483647) * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  g.putImageData(im, 0, 0); grainFrames.push(c);
+}
+function only(id) { for (const s of ["sHook", "sFrame", "sStrip", "sEnd"]) $(s).style.display = s === id ? "block" : "none"; }
+function chrome(on) { $("clock").style.display = $("time").style.display = on ? "block" : "none"; }
+
+function hook(t, alpha = 1) {
+  only("sHook"); $("sHook").style.opacity = alpha; chrome(true);
+  showFrame(0, { s: 1.12 - t * 0.01, reveal: 0, dark: 0.32, op: alpha < 1 ? alpha : 1 });
+  clockTo(7 * 60 + 30 + t * 4);
+  $("tint").style.background = "transparent"; $("beam").style.opacity = 0;
+  const p1 = alpha < 1 ? 1 : prog(t, 0.0, 0.01), p2 = alpha < 1 ? 1 : prog(t, B, 0.6);
+  $("hook1").style.opacity = p1;
+  st($("hook2"), { opacity: p2, letterSpacing: lerp(0.15, 0, eo(p2)) + "em" });
+  const out = alpha < 1 ? 0 : prog(t, BAR - 0.45, 0.4);
+  $("sHook").style.opacity = alpha * (1 - out);
+}
+
+function frame(t) {
+  only("sFrame"); chrome(true);
+  const i = Math.min(4, Math.floor((t - T.f0) / T.flen)), u = t - T.f0 - i * T.flen, d = DAY[i];
+  // 0-0.5 s: the new frame fades in dark over the previous one; 0.4-1.6 s: the light sweeps across it
+  const inP = eio(clamp(u / 0.5)), rev = eio(prog(u, 0.4, 1.2));
+  showFrame(i, { s: 1.05 + u * 0.014, x: (i % 2 ? 1 : -1) * u * 6, reveal: rev, op: inP, dark: 0.22, under: i > 0 ? i - 1 : -1 });
+  if (i > 0 && inP < 1) {
+    const prev = frames[i - 1], pu = u + T.flen;
+    st(prev._dark, { transform: `translateX(${(i % 2 ? -1 : 1) * pu * 6}px) scale(${1.05 + pu * 0.014})` });
+    st(prev._lit, { transform: `translateX(${(i % 2 ? -1 : 1) * pu * 6}px) scale(${1.05 + pu * 0.014})`, webkitMaskImage: "none" });
+    prev.style.opacity = 1;
+  }
+  // a warm beam rides the light edge
+  const X = lerp(-40, 140, rev);
+  st($("beam"), { opacity: rev > 0 && rev < 1 ? Math.sin(rev * Math.PI) * 0.55 : 0,
+    background: `linear-gradient(105deg, transparent ${X - 34}%, rgba(255,${Math.round(lerp(240, 190, d.warm))},${Math.round(lerp(220, 130, d.warm))},.55) ${X - 12}%, transparent ${X + 2}%)` });
+  // time of day: clock sweeps from the previous hour, tint follows
+  const from = i ? DAY[i - 1].min : 7 * 60 + 40, cp = eio(clamp(u / 0.9));
+  clockTo(lerp(from, d.min, cp));
+  const prevTint = i ? DAY[i - 1].tint : "rgba(0,0,0,0)";
+  $("tint").style.background = cp < 1 ? prevTint : d.tint;
+  $("tint").style.opacity = 1;
+  // words, unhurried
+  $("idx").textContent = `0${i + 1} / 05`;
+  $("meal").textContent = d.meal; $("line").textContent = d.line;
+  const mp = prog(u, 1.1, 0.8), lp = prog(u, 1.7, 0.8), out = prog(u, T.flen - 0.5, 0.45);
+  st($("meal"), { opacity: eo(mp) * (1 - out), letterSpacing: lerp(0.12, 0, eo(mp)) + "em" });
+  st($("line"), { opacity: eo(lp) * (1 - out), transform: `translateY(${lerp(20, 0, eo(lp))}px)` });
+  $("idx").style.opacity = eo(mp) * (1 - out);
+}
+
+function strip(t) {
+  only("sStrip"); chrome(false); showFrame(-1); $("beam").style.opacity = 0;
+  const u = t - T.strip;
+  $("tint").style.background = "transparent";
+  $("fade").style.opacity = 0.0;
+  const x = lerp(1080, -880, eio(clamp(u / (BAR + 0.6))));
+  $("strip").style.left = x + "px";
+  st($("stripText"), { opacity: eo(prog(u, 0.3, 0.7)) });
+}
+
+function endCard(t) {
+  only("sEnd"); chrome(false);
+  showFrame(4, { s: 1.2, reveal: 1, op: 1 }); frames[4].style.filter = "blur(24px) brightness(.3)";
+  $("beam").style.opacity = 0; $("tint").style.background = "transparent";
+  const u = t - T.end;
+  [["endName", 0.1], ["endRole", 0.4], ["endUrl", 0.7], ["endList", 1.0], ["endIg", 1.3]].forEach(([id, a]) => {
+    const p = prog(u, a, 0.6); st($(id), { opacity: eo(p), transform: `translateY(${lerp(20, 0, eo(p))}px)` });
+  });
+  const lp = eio(prog(t, T.total - 0.7, 0.7));
+  $("sEnd").style.opacity = 1 - lp;
+  if (lp > 0) { frames[4].style.opacity = 1 - lp; hook(0, lp); $("sEnd").style.display = "block"; frames[0].style.filter = "none"; frames[4].style.display = "block"; }
+}
+
+function renderAt(t) {
+  frames.forEach(f => { f.style.filter = "none"; });
+  $("sEnd").style.opacity = 1; $("sHook").style.opacity = 1; $("fade").style.opacity = 0;
+  if (t < T.f0) hook(t);
+  else if (t < T.strip) frame(t);
+  else if (t < T.end) strip(t);
+  else endCard(t);
+  $("grain").getContext("2d").drawImage(grainFrames[Math.floor(t * 30) % 6], 0, 0);
+}
+window.renderAt = renderAt;
+window.DURATION = T.total;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(im => im.decode().catch(() => null)));
+  renderAt(0); return true;
+})();
+</script>
+</body>
+</html>
